@@ -1,9 +1,12 @@
 package com.lyx.member.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,6 +26,7 @@ public class Member implements Serializable {
     /**
      * id
      */
+    @TableId(type = IdType.INPUT)
     private Long id;
 
     /**
@@ -74,16 +78,18 @@ public class Member implements Serializable {
      * 最近登陆时间
      */
     private LocalDateTime lastLoginTime;
+     /**
+       * 删除状态
+       */
+    @TableLogic(value = "0", delval = "1")
+    private Integer deleted;
 
-    /**
-     * 创建时间
-     */
+    @TableField(value = "CREATE_TIME",fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    /**
-     * 修改时间
-     */
-    private LocalDateTime modifiedTime;
+    @TableField(value = "UPDATE_TIME",fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updateTime;
+
 
     public Long getId() {
         return id;
@@ -173,6 +179,14 @@ public class Member implements Serializable {
         this.lastLoginTime = lastLoginTime;
     }
 
+    public Integer getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Integer deleted) {
+        this.deleted = deleted;
+    }
+
     public LocalDateTime getCreateTime() {
         return createTime;
     }
@@ -181,11 +195,11 @@ public class Member implements Serializable {
         this.createTime = createTime;
     }
 
-    public LocalDateTime getModifiedTime() {
-        return modifiedTime;
+    public LocalDateTime getUpdateTime() {
+        return updateTime;
     }
 
-    public void setModifiedTime(LocalDateTime modifiedTime) {
-        this.modifiedTime = modifiedTime;
+    public void setUpdateTime(LocalDateTime updateTime) {
+        this.updateTime = updateTime;
     }
 }

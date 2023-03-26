@@ -88,14 +88,14 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
      */
     @Override
     public void createPermission(SavePermissionReq req) {
-        // 更新缓存中的权限信息
-        refreshPermRolesRules();
         SysPermission permission = new SysPermission();
         BeanUtils.copyProperties(req,permission);
         // 拼接url
         String permUrl = getPermUrl(req);
         permission.setUrlPerm(permUrl);
         save(permission);
+        // 更新缓存中的权限信息
+        refreshPermRolesRules();
     }
 
     /**
@@ -105,8 +105,6 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
      */
     @Override
     public void updatePermission(SavePermissionReq req) {
-        // 更新缓存中的权限信息
-        refreshPermRolesRules();
         AssertUtil.notEmpty(req.getId(), ResultCode.PARAM_VALID_FAIL);
         SysPermission permission = new SysPermission();
         // 拼接url
@@ -114,6 +112,8 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
         permission.setUrlPerm(permUrl);
         BeanUtils.copyProperties(req,permission);
         updateById(permission);
+        // 更新缓存中的权限信息
+        refreshPermRolesRules();
     }
 
     /**

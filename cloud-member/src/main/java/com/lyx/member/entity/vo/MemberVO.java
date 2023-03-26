@@ -1,5 +1,6 @@
 package com.lyx.member.entity.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -59,17 +60,20 @@ public class MemberVO {
     /**
      * 最近登陆时间
      */
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastLoginTime;
 
     /**
      * 创建时间
      */
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
     /**
      * 修改时间
      */
-    private LocalDateTime modifiedTime;
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updateTime;
 
     public Long getId() {
         return id;
@@ -159,11 +163,11 @@ public class MemberVO {
         this.createTime = createTime;
     }
 
-    public LocalDateTime getModifiedTime() {
-        return modifiedTime;
+    public LocalDateTime getUpdateTime() {
+        return updateTime;
     }
 
-    public void setModifiedTime(LocalDateTime modifiedTime) {
-        this.modifiedTime = modifiedTime;
+    public void setUpdateTime(LocalDateTime updateTime) {
+        this.updateTime = updateTime;
     }
 }

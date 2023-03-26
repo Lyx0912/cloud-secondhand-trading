@@ -1,15 +1,49 @@
 <template>
   <div class="app-container">
     <el-row style="margin-bottom: 12px">
-      <el-col :span="19">
+      <el-col :span="5">
         <el-button icon="el-icon-plus" size="mini" type="warning" @click="handleAdd()" v-permission="'admin:user:add'">新增</el-button>
         <el-button icon="el-icon-delete" size="mini" type="danger" @click="handleDeletes()">删除</el-button>
       </el-col>
-      <el-col :span="5">
-        <el-row style="display: flex">
-          <el-input v-model="queryParams.keyword" placeholder="请输入内容" size="small" style="margin-right: 20px"></el-input>
-          <el-button icon="el-icon-search" size="mini" type="primary" @click="getList">查询</el-button>
-        </el-row>
+      <el-col :span="19">
+        <el-form :model="queryParams" ref="queryForm" size="small" style="float: right" :inline="true">
+          <el-form-item label="用户名" prop="deptName">
+            <el-input
+              v-model="queryParams.username"
+              placeholder="请输入用户名"
+              clearable
+              @keyup.enter.native="handleQuery"
+            />
+          </el-form-item>
+          <el-form-item label="昵称" prop="status">
+            <el-input
+              v-model="queryParams.nickname"
+              placeholder="请输入用户昵称"
+              clearable
+              @keyup.enter.native="handleQuery"
+            />
+          </el-form-item>
+          <el-form-item label="手机号" prop="status">
+            <el-input
+              v-model="queryParams.mobile"
+              placeholder="请输入手机号"
+              clearable
+              @keyup.enter.native="handleQuery"
+            />
+          </el-form-item>
+          <el-form-item label="邮箱" prop="status">
+            <el-input
+              v-model="queryParams.email"
+              placeholder="请输入邮箱"
+              clearable
+              @keyup.enter.native="handleQuery"
+            />
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+            <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+          </el-form-item>
+        </el-form>
       </el-col>
     </el-row>
     <el-table
@@ -28,7 +62,7 @@
         width="55">
       </el-table-column>
       <el-table-column align="center" label="用户名" prop="username" />
-      <el-table-column label="用户昵称" align="center" prop="nickname" v-permission="'admin:user:add'"/>
+      <el-table-column label="昵称" align="center" prop="nickname" v-permission="'admin:user:add'"/>
       <el-table-column label="手机号" align="center" prop="mobile" width="150"/>
       <el-table-column label="邮箱"  align="center" prop="email" />
       <el-table-column class-name="status-col" label="性别" width="110" align="center">
@@ -36,7 +70,7 @@
           <el-tag :type="scope.row.gender===1?'primary':'success'">{{scope.row.gender===1?'男':'女'}}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column align="center" prop="created_at" label="账号状态" width="150">
+      <el-table-column align="center" prop="created_at" label="账号状态" width="80">
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.status"
@@ -48,10 +82,12 @@
           </el-switch>
         </template>
       </el-table-column>
+      <el-table-column label="注册时间"  align="center" prop="createTime" width="180"/>
       <el-table-column align="center" prop="created_at" label="操作" >
         <template v-slot="scope">
-          <el-button type="primary" size="mini" @click="handleEdit(scope.row.id)">编辑</el-button>
-          <el-button type="danger" size="mini" @click="handleDelete(scope.row)">删除</el-button>
+          <el-button type="success" size="mini" @click="handleEdit(scope.row.id)" icon="el-icon-plus">详情</el-button>
+          <el-button type="primary" size="mini" @click="handleEdit(scope.row.id)" icon="el-icon-edit">编辑</el-button>
+          <el-button type="danger" size="mini" @click="handleDelete(scope.row)" icon="el-icon-delete">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -100,7 +136,7 @@
 </template>
 
 <script>
-import { getList, updateStatus, userDetail, updateUserInfo, deletes, createUserInfo } from '@/api/admin/user'
+import { list } from '@/api/member/member'
 import { roleSelect } from '@/api/admin/role'
 import pagination from '@/components/Pagination'
 
@@ -134,9 +170,12 @@ export default {
       },
       total: 0,
       queryParams: {
+        username: '',
+        nickname: '',
+        mobile: '',
+        email: '',
         pageNo: 1,
-        pageSize: 10,
-        keyword: ''
+        pageSize: 15
       },
       list: null,
       listLoading: true
@@ -147,6 +186,22 @@ export default {
     this.loadRoleIds()
   },
   methods: {
+    /** 搜索按钮操作 */
+    handleQuery() {
+      this.getList()
+    },
+    /** 重置按钮操作 */
+    resetQuery() {
+      this.queryParams = {
+        username: '',
+        nickname: '',
+        mobile: '',
+        email: '',
+        pageNo: 1,
+        pageSize: 15
+      }
+      this.handleQuery()
+    },
     handleSelectionChange(values) {
       this.checkedIds = []
       values.map(res => this.checkedIds.push(res.id))
@@ -207,7 +262,7 @@ export default {
     },
     getList() {
       this.listLoading = true
-      getList(this.queryParams).then(response => {
+      list(this.queryParams).then(response => {
         this.list = response.data.list
         this.total = response.data.total
         this.listLoading = false
@@ -270,3 +325,7 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+
+</style>

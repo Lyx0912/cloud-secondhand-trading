@@ -54,8 +54,4 @@ public class SecurityGlobalFilter implements GlobalFilter, Ordered {
         return 0;
     }
 
-    public static void main(String[] args) throws ParseException {
-        System.out.println(JWSObject.parse("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJhbXMiLCJzY29wZSI6WyJhbGwiXSwiZXhwIjoyMDI3OTgzNzAzLCJ1c2VySWQiOjQsImF1dGhvcml0aWVzIjpbIm1hbmFnZXIiLCJhZG1pbiJdLCJqdGkiOiI0MTM1ZDUyYS02NzUxLTRkYjAtYTZjZC04MmVlYzMwZjA0MzciLCJjbGllbnRfaWQiOiJhbXMiLCJ1c2VybmFtZSI6ImFtcyJ9.wfDCRHF21nbypFlwNkZm3hR1Zi_H5kKmFKmzKPfSSZOuS7FA3XWW_ZvLS9czAZ_tXhc1zlmnyp6RxdOtCgkwEmnO7sVhpUps0XF2YW5HIzS-C3ejy6HYaOoDYmfctDl5vuiTINcllTRk2Bh4JR8kUGGTKn1Gp_-unjaWP01tGks").getPayload());
-    }
-
 }

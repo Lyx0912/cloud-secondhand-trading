@@ -43,6 +43,10 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
                 .like(StringUtils.isNotEmpty(req.getEmail()),Member::getEmail,req.getEmail());
         baseMapper.selectPage(page,wrapper);
         PageUtils<MemberVO> pageUtils = new PageUtils<>();
+        // 手机号加密
+        page.getRecords().forEach(item->{
+            item.setMobile(item.getMobile().replaceAll("(\\d{3})\\d{4}(\\d{4})","$1****$2"));
+        });
         // 转换vo
         pageUtils.setList(memberMapStruct.memberToMemberVO(page.getRecords()));
         pageUtils.setPageNo(page.getCurrent());
