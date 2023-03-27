@@ -5,6 +5,7 @@ import com.lyx.common.web.utils.UserContext;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -21,11 +22,8 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
      */
     @Override
     public void insertFill(MetaObject metaObject) {
-        this.strictInsertFill(metaObject, "createTime", () -> new Date(), Date.class);
-        this.strictInsertFill(metaObject, "updateTime", () -> new Date(), Date.class);
-        this.strictInsertFill(metaObject, "createBy", () -> UserContext.getCurrentUserId(), Long.class);
-        this.strictInsertFill(metaObject, "updateBy", () -> UserContext.getCurrentUserId(), Long.class);
-        System.out.println(metaObject);
+        this.strictInsertFill(metaObject, "createTime", () -> LocalDateTime.now(),LocalDateTime.class);
+        this.strictInsertFill(metaObject, "updateTime", () -> LocalDateTime.now(),LocalDateTime.class);
     }
 
     /**
@@ -35,7 +33,7 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
      */
     @Override
     public void updateFill(MetaObject metaObject) {
-        this.strictUpdateFill(metaObject, "updateTime", () -> new Date(), Date.class);
+        this.strictUpdateFill(metaObject, "updateTime", () -> LocalDateTime.now(),LocalDateTime.class);
         this.strictUpdateFill(metaObject, "updateBy", () -> UserContext.getCurrentUserId(), Long.class);
     }
 

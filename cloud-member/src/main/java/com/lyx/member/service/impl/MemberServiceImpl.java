@@ -40,7 +40,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         wrapper.like(StringUtils.isNotEmpty(req.getUsername()),Member::getUsername,req.getUsername())
                 .like(StringUtils.isNotEmpty(req.getNickname()),Member::getNickname,req.getNickname())
                 .like(StringUtils.isNotEmpty(req.getMobile()),Member::getMobile,req.getMobile())
-                .like(StringUtils.isNotEmpty(req.getEmail()),Member::getEmail,req.getEmail());
+                .like(StringUtils.isNotEmpty(req.getEmail()),Member::getEmail,req.getEmail())
+                .orderByAsc(Member::getId);
         baseMapper.selectPage(page,wrapper);
         PageUtils<MemberVO> pageUtils = new PageUtils<>();
         // 手机号加密

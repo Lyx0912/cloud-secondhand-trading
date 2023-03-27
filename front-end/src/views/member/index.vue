@@ -109,6 +109,21 @@
         <el-form-item label="手机号">
           <el-input v-model="userForm.mobile"></el-input>
         </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="userForm.email"></el-input>
+        </el-form-item>
+        <el-form-item label="生日">
+          <el-date-picker v-model="userForm.birth"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="注册时间">
+          <el-date-picker v-model="userForm.createTime"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="最近更新">
+          <el-date-picker v-model="userForm.updateTime"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="最近登陆">
+          <el-date-picker v-model="userForm.lastLoginTime"></el-date-picker>
+        </el-form-item>
         <el-form-item label="状态">
           <el-switch
             v-model="userForm.status"
@@ -117,14 +132,6 @@
             active-color="#13ce66"
             inactive-color="#ff4949">
           </el-switch>
-        </el-form-item>
-        <el-form-item label="邮箱">
-          <el-input v-model="userForm.email"></el-input>
-        </el-form-item>
-        <el-form-item label="角色">
-          <el-checkbox-group v-model="userForm.roleIds">
-            <el-checkbox v-for="role in roleSelect" :key="role.id" :label="role.id">{{ role.name }}</el-checkbox>
-          </el-checkbox-group>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -136,7 +143,7 @@
 </template>
 
 <script>
-import { list } from '@/api/member/member'
+import { list, remove, memberDetail } from '@/api/member/member'
 import { roleSelect } from '@/api/admin/role'
 import pagination from '@/components/Pagination'
 
@@ -225,7 +232,7 @@ export default {
         cancelButtonText: '算了吧',
         type: 'warning'
       }).then(() => {
-        deletes(this.checkedIds).then(res => {
+        remove(this.checkedIds).then(res => {
           this.$message({
             type: 'success',
             message: '操作成功!'
@@ -297,7 +304,7 @@ export default {
     handleEdit(id) {
       this.$common.clear(this.userForm)
       this.userFormTitle = '编辑用户信息'
-      userDetail(id).then(res => {
+      memberDetail(id).then(res => {
         this.userForm = res.data
         this.userFormShow = true
       })
@@ -308,7 +315,7 @@ export default {
         cancelButtonText: '算了吧',
         type: 'warning'
       }).then(() => {
-        deletes([row.id]).then(res => {
+        remove([row.id]).then(res => {
           this.$message({
             type: 'success',
             message: '操作成功!'

@@ -26,7 +26,7 @@ public class Member implements Serializable {
     /**
      * id
      */
-    @TableId(type = IdType.INPUT)
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**

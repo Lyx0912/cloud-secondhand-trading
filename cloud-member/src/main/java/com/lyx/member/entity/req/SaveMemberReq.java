@@ -2,6 +2,7 @@ package com.lyx.member.entity.req;
 
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
  * @author 黎勇炫
  * @date 2023年03月26日 21:10
  */
+@Data
 public class SaveMemberReq {
     /**
      * 用户名
@@ -66,22 +68,8 @@ public class SaveMemberReq {
     private Integer status = 1;
 
     /**
-     * 最近登陆时间
-     */
-    private LocalDateTime lastLoginTime;
-    /**
      * 删除状态
      */
     private Integer deleted;
 
-    /**
-     * 创建时间
-     */
-    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createTime;
-
-    /**
-     * 修改时间
-     */
-    private LocalDateTime updateTime;
 }

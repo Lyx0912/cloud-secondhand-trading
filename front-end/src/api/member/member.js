@@ -11,3 +11,26 @@ export function list(params) {
     params
   })
 }
+
+/**
+ * 删除会员
+ * @returns {AxiosPromise}
+ */
+export function remove(ids) {
+  return request({
+    url: '/cloud-member/member/' + ids,
+    method: 'delete'
+  })
+}
+
+/**
+ * 删除会员
+ * @returns {AxiosPromise}
+ */
+export function memberDetail(id) {
+  return request({
+    url: '/cloud-member/member/' + id,
+    method: 'get'
+  })
+}
+

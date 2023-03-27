@@ -19,6 +19,7 @@ import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -53,9 +54,10 @@ public class MemberController {
        * 获取会员详情
        */
     @GetMapping("/{id}")
-    public R getById(@NotBlank(message = "id can not be null!") @PathVariable Long id){
+    public R getById(@NotNull(message = "id can not be null!") @PathVariable Long id){
         MemberVO vo = new MemberVO();
         BeanUtils.copyProperties(memberService.getById(id),vo);
+        vo.setMobile(vo.getMobile().replaceAll("(\\d{3})\\d{4}(\\d{4})","$1****$2"));
         return R.ok(vo);
     }
 
@@ -80,11 +82,19 @@ public class MemberController {
     }
 
     @PutMapping("/{id}")
-    public R update(@Validated @RequestBody SaveMemberReq req, @PathVariable Long userId){
-        // todo 更新会员信息
+    public R update(@Validated @RequestBody SaveMemberReq req, @PathVariable Long id){
+        // 更新member信息
+        Member member = new Member();
+        member.setId(id);
+        BeanUtils.copyProperties(req,member);
+        // 更新用户信息
+        memberService.updateById(member);
         return R.ok();
     }
 
+     /**
+       * 随机生成1000个会员入库
+       */
     @PostMapping
     public R saveMember(){
         // 随机生成1000个会员并插入数据库
