@@ -8,7 +8,7 @@ import java.util.List;
  */
 @Data
 public class PageUtils<T> {
-    private Long total;
+    private Long total = 0L;
     private Long pageNo;
     private Long pageSize;
     private List<T> list;

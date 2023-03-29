@@ -1,7 +1,12 @@
 package com.lyx.member.service;
 
+import com.lyx.common.base.entity.PageUtils;
 import com.lyx.member.entity.MemberAddr;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.lyx.member.entity.req.MemberAddrPageReq;
+import com.lyx.member.entity.req.SaveMemberAddrReq;
+import com.lyx.member.entity.vo.MemberAddrVO;
+import com.lyx.member.entity.vo.MemberVO;
 
 /**
  * <p>
@@ -13,4 +18,13 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface MemberAddrService extends IService<MemberAddr> {
 
+     /**
+       * 分页查询会员的收获地址
+       */
+    PageUtils<MemberAddrVO> pageMemberAddr(MemberAddrPageReq req);
+
+     /**
+       * 添加收货地址
+       */
+    void saveMemberAddr(SaveMemberAddrReq req);
 }

@@ -1,7 +1,8 @@
 import axios from 'axios'
-import { MessageBox, Message } from 'element-ui'
+import { MessageBox, Message, Loading } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
+import { config } from '@vue/test-utils'
 
 // create an axios instance
 const service = axios.create({
@@ -44,7 +45,10 @@ service.interceptors.response.use(
    */
   response => {
     const res = response.data
-    console.log(res)
+    // 二进制数据则直接返回
+    if (response.request.responseType === 'blob' || response.request.responseType === 'arraybuffer') {
+      return res
+    }
     // if the custom code is not 20000, it is judged as an error.
     if (res.code !== '000000') {
       Message({
@@ -73,12 +77,37 @@ service.interceptors.response.use(
   },
   error => { // for debug
     Message({
-      message: error.response.data.msg||error,
+      message: error.response.data.msg || error,
       type: 'error',
       duration: 5 * 1000
     })
     return Promise.reject(error)
   }
 )
+
+// 导出Excel公用方法
+export function exportFile(url,fileName) {
+  var downloadLoadingInstance = Loading.service({ text: '正在下载数据，请稍候', spinner: 'el-icon-loading', background: 'rgba(0, 0, 0, 0.7)' })
+  return service.get(url, {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    responseType: 'blob',
+    ...config
+  }).then(async(response) => {
+    const link = document.createElement('a')
+    const blob = new Blob([response], { type: 'application/xlsx' })
+    link.style.display = 'none'
+    link.href = URL.createObjectURL(blob)
+
+    link.download = fileName + '.xlsx' //下载后文件名
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    downloadLoadingInstance.close()
+  }).catch((r) => {
+    console.error(r)
+    Message.error('下载文件出现错误，请联系管理员！')
+    downloadLoadingInstance.close()
+  })
+}
 
 export default service

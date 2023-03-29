@@ -44,6 +44,12 @@
 
         <dependency>
             <groupId>com.lyx</groupId>
+            <artifactId>common-excel</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.lyx</groupId>
             <artifactId>common-mybatis-plus</artifactId>
             <version>1.0.0</version>
         </dependency>

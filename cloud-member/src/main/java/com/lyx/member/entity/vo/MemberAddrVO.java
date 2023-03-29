@@ -1,45 +1,25 @@
-package com.lyx.member.entity;
+package com.lyx.member.entity.vo;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.Data;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
- * <p>
- * 用户地址
- * </p>
- *
  * @author 黎勇炫
- * @since 2023-03-25 09:42:34
+ * @date 2023年03月29日 11:47
  */
-@Getter
-@Setter
-@TableName("ums_member_addr")
-public class MemberAddr implements Serializable {
+@Data
+public class MemberAddrVO {
 
     private static final long serialVersionUID = 1L;
 
     /**
      * ID
      */
-    @TableId(value = "addr_id", type = IdType.AUTO)
     private Long addrId;
-
-    /**
-     * 建立时间
-     */
-    @TableField(value = "CREATE_TIME",fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
-
-    /**
-     * 更新时间
-     */
-    @TableField(value = "UPDATE_TIME",fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
 
     /**
      * 用户ID

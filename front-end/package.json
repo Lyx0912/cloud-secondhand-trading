@@ -21,7 +21,7 @@
     "camunda-bpmn-moddle": "^7.0.1",
     "core-js": "3.6.5",
     "echarts": "^4.8.0",
-    "element-ui": "2.13.2",
+    "element-ui": "^2.15.7",
     "js-cookie": "2.2.0",
     "normalize.css": "7.0.0",
     "nprogress": "0.2.0",

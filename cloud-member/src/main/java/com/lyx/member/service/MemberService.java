@@ -20,4 +20,9 @@ public interface MemberService extends IService<Member> {
        * 分页查询会员
        */
     PageUtils<MemberVO> pageMember(MemberListPageReq req);
+
+     /**
+       * 会员详情
+       */
+    MemberVO getMemberVO(Long id);
 }

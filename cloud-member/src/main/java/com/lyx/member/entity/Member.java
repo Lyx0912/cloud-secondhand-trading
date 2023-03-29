@@ -1,14 +1,21 @@
 package com.lyx.member.entity;
 
+import com.alibaba.excel.annotation.ExcelIgnore;
+import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.format.DateTimeFormat;
+import com.alibaba.excel.annotation.write.style.ColumnWidth;
+import com.alibaba.excel.annotation.write.style.HeadRowHeight;
 import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Getter;
-import lombok.Setter;
+import converter.GenderConverter;
+import converter.LocalDateConverter;
+import converter.LocalDateTimeConverter;
+import converter.StatusConverter;
+import lombok.Data;
 
 /**
  * <p>
@@ -19,6 +26,7 @@ import lombok.Setter;
  * @since 2023-03-25 09:39:17
  */
 @TableName("ums_member")
+@Data
 public class Member implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -27,67 +35,95 @@ public class Member implements Serializable {
      * id
      */
     @TableId(type = IdType.AUTO)
+    @ExcelIgnore
     private Long id;
 
     /**
      * 用户名
      */
+    @ExcelProperty(value = "用户名")
+    @ColumnWidth(20)
     private String username;
 
     /**
      * 密码
      */
+    @ExcelIgnore
     private String password;
 
     /**
      * 昵称
      */
+    @ExcelProperty("昵称")
+    @ColumnWidth(20)
     private String nickname;
 
     /**
      * 手机号码
      */
+    @ExcelProperty("手机号")
+    @ColumnWidth(20)
     private String mobile;
 
     /**
      * 邮箱
      */
+    @ExcelProperty("邮箱")
+    @ColumnWidth(20)
     private String email;
 
     /**
      * 头像
      */
+    @ExcelIgnore
     private String avatar;
 
     /**
      * 性别
      */
+    @ExcelProperty(value = "性别", converter = GenderConverter.class)
+    @ColumnWidth(10)
     private Integer gender;
 
     /**
      * 生日
      */
+    @ExcelProperty(value = "生日",converter = LocalDateConverter.class)
+    @ColumnWidth(15)
+    @DateTimeFormat("yyyy-MM-dd")
     private LocalDate birth;
 
     /**
      * 账号状态
      */
+    @ExcelProperty(value = "账号状态",converter = StatusConverter.class)
+    @ColumnWidth(10)
+    @DateTimeFormat("yyyy-MM-dd")
     private Integer status;
 
     /**
      * 最近登陆时间
      */
+    @ExcelProperty(value = "最近登陆时间",converter = LocalDateTimeConverter.class)
+    @ColumnWidth(20)
+    @DateTimeFormat("yyyy-MM-dd hh:mm:ss")
     private LocalDateTime lastLoginTime;
+
      /**
        * 删除状态
        */
     @TableLogic(value = "0", delval = "1")
+    @ExcelIgnore
     private Integer deleted;
 
     @TableField(value = "CREATE_TIME",fill = FieldFill.INSERT)
+    @ExcelProperty(value = "注册时间",converter = LocalDateTimeConverter.class)
+    @ColumnWidth(20)
+    @DateTimeFormat("yyyy-MM-dd hh:mm:ss")
     private LocalDateTime createTime;
 
     @TableField(value = "UPDATE_TIME",fill = FieldFill.INSERT_UPDATE)
+    @ExcelIgnore
     private LocalDateTime updateTime;
 
 

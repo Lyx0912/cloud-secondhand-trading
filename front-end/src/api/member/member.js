@@ -24,7 +24,7 @@ export function remove(ids) {
 }
 
 /**
- * 删除会员
+ * 会员详情
  * @returns {AxiosPromise}
  */
 export function memberDetail(id) {
@@ -34,3 +34,25 @@ export function memberDetail(id) {
   })
 }
 
+/**
+ * 导出会员列表
+ * @returns {AxiosPromise}
+ */
+export function exportMember() {
+  return request({
+    url: '/cloud-member/member/export',
+    method: 'get'
+  })
+}
+
+/**
+ * 查询会员的收获地址列表
+ * @returns {AxiosPromise}
+ */
+export function queryMemberAddr(params) {
+  return request({
+    url: '/cloud-member/memberAddr/list',
+    method: 'get',
+    params
+  })
+}

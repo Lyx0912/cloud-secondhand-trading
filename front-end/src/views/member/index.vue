@@ -2,7 +2,10 @@
   <div class="app-container">
     <el-row style="margin-bottom: 12px">
       <el-col :span="5">
-        <el-button icon="el-icon-plus" size="mini" type="warning" @click="handleAdd()" v-permission="'admin:user:add'">新增</el-button>
+        <el-button icon="el-icon-download" size="mini" type="warning" @click="handleExport()"
+                   v-permission="'admin:user:add'"
+        >导出
+        </el-button>
         <el-button icon="el-icon-delete" size="mini" type="danger" @click="handleDeletes()">删除</el-button>
       </el-col>
       <el-col :span="19">
@@ -59,15 +62,16 @@
     >
       <el-table-column
         type="selection"
-        width="55">
+        width="55"
+      >
       </el-table-column>
-      <el-table-column align="center" label="用户名" prop="username" />
+      <el-table-column align="center" label="用户名" prop="username"/>
       <el-table-column label="昵称" align="center" prop="nickname" v-permission="'admin:user:add'"/>
       <el-table-column label="手机号" align="center" prop="mobile" width="150"/>
-      <el-table-column label="邮箱"  align="center" prop="email" />
+      <el-table-column label="邮箱" align="center" prop="email"/>
       <el-table-column class-name="status-col" label="性别" width="110" align="center">
         <template v-slot="scope">
-          <el-tag :type="scope.row.gender===1?'primary':'success'">{{scope.row.gender===1?'男':'女'}}</el-tag>
+          <el-tag :type="scope.row.gender===1?'primary':'success'">{{ scope.row.gender === 1 ? '男' : '女' }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column align="center" prop="created_at" label="账号状态" width="80">
@@ -78,74 +82,189 @@
             :inactive-value="0"
             active-color="#13ce66"
             inactive-color="#ff4949"
-            @change="handleStatusChange(scope.row)">
+            @change="handleStatusChange(scope.row)"
+          >
           </el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="注册时间"  align="center" prop="createTime" width="180"/>
-      <el-table-column align="center" prop="created_at" label="操作" >
+      <el-table-column label="注册时间" align="center" prop="createTime" width="180"/>
+      <el-table-column align="center" prop="created_at" label="操作">
         <template v-slot="scope">
-          <el-button type="success" size="mini" @click="handleEdit(scope.row.id)" icon="el-icon-plus">详情</el-button>
-          <el-button type="primary" size="mini" @click="handleEdit(scope.row.id)" icon="el-icon-edit">编辑</el-button>
+          <el-button type="primary" size="mini" @click="handleEdit(scope.row.id)" icon="el-icon-search">详情</el-button>
           <el-button type="danger" size="mini" @click="handleDelete(scope.row)" icon="el-icon-delete">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize" @pagination="getList" />
-    <el-dialog :title="userFormTitle" :visible.sync="userFormShow" width="500px">
-      <el-form :model="userForm" label-width="80px">
-        <el-form-item label="账号">
-          <el-input v-model="userForm.username" wu></el-input>
-        </el-form-item>
-        <el-form-item label="用户名">
-          <el-input v-model="userForm.nickname"></el-input>
-        </el-form-item>
-        <el-form-item label="性别">
-          <template>
-            <el-radio v-model="userForm.gender" :label="0">男</el-radio>
-            <el-radio v-model="userForm.gender" :label="1">女</el-radio>
+    <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize" @pagination="getList"/>
+    <el-dialog :title="userFormTitle" :visible.sync="userFormShow">
+      <div style="text-align: center;margin-bottom: 20px">
+        <el-image
+          :preview-src-list="['https://ichef.bbci.co.uk/news/1024/branded_zhongwen/17DE8/production/_102686779_momo.jpg']"
+          src="https://ichef.bbci.co.uk/news/1024/branded_zhongwen/17DE8/production/_102686779_momo.jpg"
+          style="width: 120px;height: 120px;border-radius: 100px"
+        ></el-image>
+      </div>
+      <el-descriptions class="margin-top" :column="3" :size="15" border>
+        <el-descriptions-item>
+          <template slot="label">
+            <i class="el-icon-user"></i>
+            用户名
           </template>
-        </el-form-item>
-        <el-form-item label="手机号">
-          <el-input v-model="userForm.mobile"></el-input>
-        </el-form-item>
-        <el-form-item label="邮箱">
-          <el-input v-model="userForm.email"></el-input>
-        </el-form-item>
-        <el-form-item label="生日">
-          <el-date-picker v-model="userForm.birth"></el-date-picker>
-        </el-form-item>
-        <el-form-item label="注册时间">
-          <el-date-picker v-model="userForm.createTime"></el-date-picker>
-        </el-form-item>
-        <el-form-item label="最近更新">
-          <el-date-picker v-model="userForm.updateTime"></el-date-picker>
-        </el-form-item>
-        <el-form-item label="最近登陆">
-          <el-date-picker v-model="userForm.lastLoginTime"></el-date-picker>
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-switch
-            v-model="userForm.status"
-            :active-value="1"
-            :inactive-value="0"
-            active-color="#13ce66"
-            inactive-color="#ff4949">
-          </el-switch>
-        </el-form-item>
-      </el-form>
+          {{ userForm.username }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            <i class="el-icon-user"></i>
+            昵称
+          </template>
+          {{ userForm.nickname }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            <i class="el-icon-male"></i>
+            性别
+          </template>
+          <el-tag size="small">{{ userForm.gender == 1 ? '男' : '女' }}</el-tag>
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template slot="label">
+            <i class="el-icon-mobile-phone"></i>
+            手机号
+          </template>
+          {{ userForm.mobile }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template slot="label">
+            <i class="el-icon-message"></i>
+            邮箱
+          </template>
+          {{ userForm.email }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template slot="label">
+            <i class="el-icon-date"></i>
+            生日
+          </template>
+          {{ userForm.birth }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template slot="label">
+            <i class="el-icon-bank-card"></i>
+            注册时间
+          </template>
+          {{ userForm.createTime }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template slot="label">
+            <i class="el-icon-edit"></i>
+            修改时间
+          </template>
+          {{ userForm.updateTime }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template slot="label">
+            <i class="el-icon-s-promotion"></i>
+            最近登陆时间
+          </template>
+          {{ userForm.updateTime }}
+        </el-descriptions-item>
+        <el-descriptions-item :span="2">
+          <template slot="label">
+            <i class="el-icon-office-building"></i>
+            默认地址
+          </template>
+          {{
+            userForm.memberAddr ? userForm.memberAddr.province + '-' + userForm.memberAddr.city + '-' + userForm.memberAddr.area + '-' + userForm.memberAddr.addr : '暂无'
+          }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template slot="label">
+            <i class="el-icon-office-building"></i>
+            其他地址
+          </template>
+          <el-link type="primary" @click="handleQueryAddr(userForm.id)" >查看</el-link>
+        </el-descriptions-item>
+      </el-descriptions>
+
       <div slot="footer" class="dialog-footer">
-        <el-button @click="userFormShow = false">取 消</el-button>
-        <el-button type="primary" @click="saveUserInfo()">提 交</el-button>
+        <el-button type="primary" @click="userFormShow = false">关 闭</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog
+      title="收货地址列表"
+      :visible.sync="addrVisible"
+    >
+      <el-table
+        :data="addrList"
+        border>
+        <el-table-column  label="收件人" width="100">
+          <template v-slot="scope">
+            {{scope.row.consignee}}<el-tag v-if="scope.row.isDefault" size="mini" effect="plain">默认</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="mobile"
+          label="手机号"
+          width="100">
+        </el-table-column>
+        <el-table-column
+          :show-overflow-tooltip="true"
+          prop="province"
+          label="省份"
+          width="100">
+        </el-table-column>
+        <el-table-column
+          :show-overflow-tooltip="true"
+          prop="city"
+          label="城市"
+          width="100">
+        </el-table-column>
+        <el-table-column
+          prop="area"
+          label="地区"
+          width="100">
+        </el-table-column>
+        <el-table-column
+          :show-overflow-tooltip="true"
+          prop="addr"
+          label="地址">
+        </el-table-column>
+        <el-table-column
+          prop="postCode"
+          label="邮编"
+          width="80">
+        </el-table-column>
+<!--        <el-table-column-->
+<!--          label="操作"-->
+<!--          width="100">-->
+<!--          <template slot-scope="scope">-->
+<!--            <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>-->
+<!--            <el-button type="text" size="small">编辑</el-button>-->
+<!--          </template>-->
+<!--        </el-table-column>-->
+      </el-table>
+      <span slot="footer" class="dialog-footer">
+    <el-button @click="addrVisible = false">取 消</el-button>
+  </span>
+      <pagination v-show="addrTotal>0" :total="addrTotal" :page.sync="addrQueryParams.pageNo" :limit.sync="addrQueryParams.pageSize" @pagination="handleQueryAddr"/>
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
-import { list, remove, memberDetail } from '@/api/member/member'
+import { list, remove, memberDetail, queryMemberAddr } from '@/api/member/member'
 import { roleSelect } from '@/api/admin/role'
 import pagination from '@/components/Pagination'
+import { exportFile } from '@/utils/request'
 
 export default {
   components: { pagination },
@@ -161,6 +280,9 @@ export default {
   },
   data() {
     return {
+      addrTotal: 0,
+      addrList: [],
+      addrVisible: false,
       roleSelect: [],
       checkedIds: [],
       userFormTitle: '',
@@ -173,7 +295,7 @@ export default {
         mobile: '',
         status: 1,
         email: '',
-        roleIds: []
+        memberAddr: {}
       },
       total: 0,
       queryParams: {
@@ -184,6 +306,11 @@ export default {
         pageNo: 1,
         pageSize: 15
       },
+      addrQueryParams: {
+        pageNo: 1,
+        pageSize: 10,
+        memberId: ''
+      },
       list: null,
       listLoading: true
     }
@@ -193,6 +320,15 @@ export default {
     this.loadRoleIds()
   },
   methods: {
+    handleQueryAddr(memberId) {
+      this.addrQueryParams.memberId = memberId
+      // 查询收获地址
+      queryMemberAddr(this.addrQueryParams).then(res => {
+        this.addrList = res.data.list
+        this.addrTotal = res.data.total
+        this.addrVisible = true
+      })
+    },
     /** 搜索按钮操作 */
     handleQuery() {
       this.getList()
@@ -213,11 +349,8 @@ export default {
       this.checkedIds = []
       values.map(res => this.checkedIds.push(res.id))
     },
-    handleAdd() {
-      this.$common.clear(this.userForm)
-      this.userForm.status = 1
-      this.userFormTitle = '添加用户信息'
-      this.userFormShow = true
+    handleExport() {
+      exportFile('/cloud-member//member/export', '会员列表')
     },
     handleDeletes() {
       if (this.checkedIds.length === 0) {
@@ -303,7 +436,7 @@ export default {
     },
     handleEdit(id) {
       this.$common.clear(this.userForm)
-      this.userFormTitle = '编辑用户信息'
+      this.userFormTitle = '用户详情'
       memberDetail(id).then(res => {
         this.userForm = res.data
         this.userFormShow = true
