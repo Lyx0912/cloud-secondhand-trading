@@ -114,12 +114,7 @@ public class MemberController {
         response.setContentType("application/vnd.ms-excel");// 设置文本内省
         response.setCharacterEncoding("utf-8");// 设置字符编码
         response.setHeader("Content-disposition", "attachment;filename=demo.xlsx"); // 设置响应头
-        EasyExcel.write(response.getOutputStream(), Member.class)
-                .excelType(ExcelTypeEnum.XLSX)
-                .autoCloseStream(true)
-                .sheet("会员列表")
-                .needHead(true)
-                .doWrite(members); //用io流来写入数据
+        ExcelUtils.export(response.getOutputStream(),Member.class,members,"会员列表");
     }
 
      /**

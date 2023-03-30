@@ -261,7 +261,9 @@
 </template>
 
 <script>
-import { list, remove, memberDetail, queryMemberAddr } from '@/api/member/member'
+import { list, remove, memberDetail } from '@/api/member/member'
+import { queryMemberAddr } from '@/api/member/addr'
+
 import { roleSelect } from '@/api/admin/role'
 import pagination from '@/components/Pagination'
 import { exportFile } from '@/utils/request'
@@ -379,27 +381,6 @@ export default {
         })
       })
     },
-    saveUserInfo() {
-      if (this.userForm.id) {
-        updateUserInfo(this.userForm.id, this.userForm).then(res => {
-          this.$message({
-            type: 'success',
-            message: '更新成功!'
-          })
-          this.userFormShow = false
-          this.getList()
-        })
-      } else {
-        createUserInfo(this.userForm).then(res => {
-          this.$message({
-            type: 'success',
-            message: '添加成功!'
-          })
-          this.userFormShow = false
-          this.getList()
-        })
-      }
-    },
     getList() {
       this.listLoading = true
       list(this.queryParams).then(response => {
@@ -415,7 +396,7 @@ export default {
     },
     handleStatusChange(row) {
       const statusText = row.status === 1 ? '启用' : '禁用'
-      this.$confirm(`此操作将${statusText}该用户`, '是否继续?', '提示', {
+      this.$confirm(`此操作将${statusText}该会员`, '是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'

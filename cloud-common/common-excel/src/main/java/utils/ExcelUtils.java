@@ -1,6 +1,7 @@
 package utils;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.support.ExcelTypeEnum;
 import org.apache.poi.ss.formula.functions.T;
 
 import java.io.OutputStream;
@@ -18,7 +19,11 @@ public class ExcelUtils<T> {
      * @param
      */
     public static void export(OutputStream outputStream, Class clazz, List data,String sheetName){
-        //给定导出实体类
-        EasyExcel.write(outputStream, clazz).sheet(sheetName).doWrite(data);
+        EasyExcel.write(outputStream, clazz)
+                .excelType(ExcelTypeEnum.XLSX)
+                .autoCloseStream(true)
+                .sheet(sheetName)
+                .needHead(true)
+                .doWrite(data); //用io流来写入数据
     }
 }

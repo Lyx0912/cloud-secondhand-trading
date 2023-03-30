@@ -49,7 +49,10 @@ public class MemberAddrServiceImpl extends ServiceImpl<MemberAddrMapper, MemberA
         Page<MemberAddr> page = new Page<>(req.getPageNo(),req.getPageSize());
         // 构建查询条件
         LambdaQueryWrapper<MemberAddr> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(MemberAddr::getMemberId,req.getMemberId()).orderByDesc(MemberAddr::getIsDefault);
+        wrapper.eq(req.getMemberId()!=null,MemberAddr::getMemberId,req.getMemberId())
+                .like(StringUtils.isNotEmpty(req.getConsignee()),MemberAddr::getConsignee,req.getConsignee())
+                .eq(StringUtils.isNotEmpty(req.getMobile()),MemberAddr::getMobile,req.getMobile())
+                .orderByDesc(MemberAddr::getIsDefault);
         baseMapper.selectPage(page,wrapper);
         PageUtils<MemberAddrVO> pageUtils = new PageUtils<>();
         // 手机号加密
@@ -78,5 +81,6 @@ public class MemberAddrServiceImpl extends ServiceImpl<MemberAddrMapper, MemberA
         BeanUtils.copyProperties(req,memberAddr);
         save(memberAddr);
     }
+
 
 }
