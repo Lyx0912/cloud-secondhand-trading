@@ -1,28 +1,22 @@
 package com.lyx.member.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.cloud.commons.lang.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lyx.common.base.entity.PageUtils;
-import com.lyx.common.base.result.R;
 import com.lyx.member.config.MemberMapStruct;
-import com.lyx.member.entity.Member;
 import com.lyx.member.entity.MemberAddr;
 import com.lyx.member.entity.req.MemberAddrPageReq;
 import com.lyx.member.entity.req.SaveMemberAddrReq;
 import com.lyx.member.entity.vo.MemberAddrVO;
-import com.lyx.member.entity.vo.MemberVO;
 import com.lyx.member.mapper.MemberAddrMapper;
 import com.lyx.member.service.MemberAddrService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lyx.member.utils.MobileEncrypt;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
 
 /**
  * <p>

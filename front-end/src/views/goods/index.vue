@@ -143,7 +143,7 @@ export default {
         mobile: '',
         consignee: ''
       },
-      this.handleQuery()
+        this.handleQuery()
     },
     handleDeletes() {
       if (this.checkedIds.length === 0) {

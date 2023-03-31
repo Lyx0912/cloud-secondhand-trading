@@ -91,5 +91,127 @@ public class MemberAddrVO {
      */
     private BigDecimal lat;
 
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
 
+    public Long getAddrId() {
+        return addrId;
+    }
+
+    public void setAddrId(Long addrId) {
+        this.addrId = addrId;
+    }
+
+    public Long getMemberId() {
+        return memberId;
+    }
+
+    public void setMemberId(Long memberId) {
+        this.memberId = memberId;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public Integer getIsDefault() {
+        return isDefault;
+    }
+
+    public void setIsDefault(Integer isDefault) {
+        this.isDefault = isDefault;
+    }
+
+    public String getConsignee() {
+        return consignee;
+    }
+
+    public void setConsignee(String consignee) {
+        this.consignee = consignee;
+    }
+
+    public Long getProvinceId() {
+        return provinceId;
+    }
+
+    public void setProvinceId(Long provinceId) {
+        this.provinceId = provinceId;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public Long getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(Long cityId) {
+        this.cityId = cityId;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public Long getAreaId() {
+        return areaId;
+    }
+
+    public void setAreaId(Long areaId) {
+        this.areaId = areaId;
+    }
+
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
+    }
+
+    public String getPostCode() {
+        return postCode;
+    }
+
+    public void setPostCode(String postCode) {
+        this.postCode = postCode;
+    }
+
+    public String getAddr() {
+        return addr;
+    }
+
+    public void setAddr(String addr) {
+        this.addr = addr;
+    }
+
+    public BigDecimal getLng() {
+        return lng;
+    }
+
+    public void setLng(BigDecimal lng) {
+        this.lng = lng;
+    }
+
+    public BigDecimal getLat() {
+        return lat;
+    }
+
+    public void setLat(BigDecimal lat) {
+        this.lat = lat;
+    }
 }
