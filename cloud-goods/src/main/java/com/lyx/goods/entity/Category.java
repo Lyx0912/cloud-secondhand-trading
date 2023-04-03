@@ -1,9 +1,12 @@
 package com.lyx.goods.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,7 +28,7 @@ public class Category implements Serializable {
     /**
      * 分类id
      */
-      @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -68,5 +71,10 @@ public class Category implements Serializable {
      */
     private Integer productCount;
 
+     /**
+       * 子菜单
+       */
+    @TableField(exist = false)
+    private List<Category> childrens;
 
 }
