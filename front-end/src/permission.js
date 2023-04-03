@@ -115,6 +115,5 @@ function handleMenus(routes, currentUserMenus) {
       }
     }
   })
-  console.log(routes);
   return routes
 }

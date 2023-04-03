@@ -1,29 +1,19 @@
 package com.lyx.member.controller;
 
 
-import com.alibaba.cloud.commons.lang.StringUtils;
-import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.support.ExcelTypeEnum;
-import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.lyx.common.base.entity.PageUtils;
 import com.lyx.common.base.result.R;
-import com.lyx.common.web.config.WebConfig;
 import com.lyx.member.entity.Member;
-import com.lyx.member.entity.MemberAddr;
 import com.lyx.member.entity.req.MemberListPageReq;
 import com.lyx.member.entity.req.SaveMemberReq;
 import com.lyx.member.entity.vo.MemberVO;
 import com.lyx.member.service.MemberAddrService;
 import com.lyx.member.service.MemberService;
-import com.lyx.member.utils.MobileEncrypt;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.stereotype.Controller;
 import utils.ExcelUtils;
 
 import javax.annotation.Resource;
@@ -32,12 +22,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * <p>

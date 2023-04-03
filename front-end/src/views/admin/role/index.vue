@@ -236,7 +236,6 @@ export default {
         })
         row.status = row.status === 1 ? 0 : 1
       })
-      console.log(row.status, '======')
     },
     saveRoleInfo() {
       if (this.roleForm.id) {

@@ -279,7 +279,6 @@ export default {
   },
   methods: {
     handleChangeStatus(row) {
-      console.log(row)
       const statusText = row.status === 1 ? '启用' : '禁用'
       this.$confirm(`此操作将${statusText}该菜单`, '是否继续?', '提示', {
         confirmButtonText: '确定',
@@ -329,7 +328,6 @@ export default {
       }
     },
     saveMenuInfo() {
-      console.log(this.menuForm.parentId)
       if (this.menuForm.parentId instanceof Array) {
         const parentId = this.menuForm.parentId
         this.menuForm.parentId = parentId.length === 1 ? parentId[0] : parentId[parentId.length-1]
@@ -413,7 +411,6 @@ export default {
     },
     fetchPermissionList(menuId) {
       permissionList(menuId).then(res => {
-        console.log(res.data)
         this.permissionList = res.data
       })
     },

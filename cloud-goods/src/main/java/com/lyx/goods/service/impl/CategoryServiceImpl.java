@@ -32,7 +32,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         // 查询所有的分类
         List<Category> allRes = lambdaQuery().eq(Category::getShowStatus, GlobalConstants.STATUS_ON).orderByAsc(Category::getSort).list();
         // 遍历分类列表 构建树形结构
-        List<Category> parents = allRes.stream().filter(item -> item.getCatLevel() == 0).map(item->{
+        List<Category> parents = allRes.stream().filter(item -> item.getParentCid() == 0).map(item->{
             item.setChildrens(buildParentCategory(item.getId(),allRes));
             return item;
         }).collect(Collectors.toList());

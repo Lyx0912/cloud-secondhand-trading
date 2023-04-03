@@ -7,8 +7,6 @@ import com.lyx.goods.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -32,7 +30,7 @@ public class CategoryController {
     public R list(){
         // todo 分类查询
         List<Category> res = categoryService.categoryTree();
-        return R.ok();
+        return R.ok(res);
     }
 }
 

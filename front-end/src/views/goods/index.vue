@@ -176,7 +176,6 @@ export default {
       this.listLoading = true
       queryMemberAddr(this.queryParams).then(response => {
         this.list = response.data.list
-        console.log(this.list)
         this.total = response.data.total
         this.listLoading = false
       })
