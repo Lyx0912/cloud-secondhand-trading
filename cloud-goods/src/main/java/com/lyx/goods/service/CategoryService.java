@@ -19,4 +19,6 @@ public interface CategoryService extends IService<Category> {
        * 构建商品分类(树形结构)
        */
     List<Category> categoryTree();
+
+    void removeCategory(Long id);
 }

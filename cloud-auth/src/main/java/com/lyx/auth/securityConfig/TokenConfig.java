@@ -21,6 +21,7 @@ public class TokenConfig {
     @Autowired
     public TokenStore tokenStore(RedisConnectionFactory redisConnectionFactory) {
         // Redis存 token一是性能比较好，二是自动过期的机制，符合token的特性
-        return new RedisTokenStore(redisConnectionFactory);
+        RedisTokenStore redisTokenStore = new RedisTokenStore(redisConnectionFactory);
+        return redisTokenStore;
     }
 }

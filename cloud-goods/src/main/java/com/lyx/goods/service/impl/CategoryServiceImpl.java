@@ -5,6 +5,8 @@ import com.lyx.goods.entity.Category;
 import com.lyx.goods.mapper.CategoryMapper;
 import com.lyx.goods.service.CategoryService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,8 +27,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
 
     /**
      * 构建商品分类(树形结构)
-     * todo 可以把这些数据存到redis
+     * todo 分布式场景下会有并发问题，需要引入分布式锁
      */
+    @Cacheable(value={"category"}, key="#root.method.name", sync = true)
     @Override
     public List<Category> categoryTree() {
         // 查询所有的分类
@@ -40,7 +43,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         return parents;
     }
 
-     /**
+    /**
        * 查找所属子分类
        */
     private List<Category> buildParentCategory(Long parentId, List<Category> allCat) {
@@ -58,5 +61,14 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         //排序
         childrenList.sort(Comparator.comparingInt(item-> item.getSort()==null?0:item.getSort()));
         return childrenList;
+    }
+
+     /**
+       * 逻辑删除分类 同时删除缓存中的数据
+       */
+    @Override
+    @CacheEvict(value = "category",allEntries = true)
+    public void removeCategory(Long id) {
+        lambdaUpdate().eq(Category::getId,id).eq(Category::getParentCid,id).remove();
     }
 }

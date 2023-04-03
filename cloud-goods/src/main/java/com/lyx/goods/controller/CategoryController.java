@@ -1,13 +1,13 @@
 package com.lyx.goods.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lyx.common.base.result.R;
 import com.lyx.goods.entity.Category;
 import com.lyx.goods.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,11 +26,24 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
+     /**
+       * 查询分类菜单树
+       */
     @GetMapping("/list")
     public R list(){
-        // todo 分类查询
         List<Category> res = categoryService.categoryTree();
         return R.ok(res);
     }
+
+     /**
+       * 删除一个分类(包括子分类)
+       */
+    @DeleteMapping("/{id}")
+    public R delete(@PathVariable Long id){
+        // 删除对应的分类(逻辑删除)
+        categoryService.removeCategory(id);
+        return R.ok();
+    }
+
 }
 
