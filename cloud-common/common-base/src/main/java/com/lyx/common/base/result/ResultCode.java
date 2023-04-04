@@ -30,6 +30,8 @@ public enum ResultCode implements IResultCode, Serializable {
     SERVICE_NO_AUTHORITY("B0221", "服务未授权"),
     KEY_IS_DUPLICATED("C0221", "模型标识不能重复"),
     PROCESS_NOT_EXIST("C0221", "该流程不存"),
+    // 商品模块
+    CATEGORY_HAS_CHILD("D0221", "该流程不存"),
     ;
     @Override
     public String getCode() {

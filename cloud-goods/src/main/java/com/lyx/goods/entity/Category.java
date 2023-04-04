@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.List;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,8 +19,7 @@ import lombok.Setter;
  * @author 黎勇炫
  * @since 2023-03-31 11:16:28
  */
-@Getter
-@Setter
+@Data
 @TableName("gms_category")
 public class Category implements Serializable {
 

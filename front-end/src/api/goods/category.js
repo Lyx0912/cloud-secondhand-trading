@@ -11,3 +11,26 @@ export function list(params) {
     params
   })
 }
+
+/**
+ * 删除分类
+ * @returns {AxiosPromise}
+ */
+export function remove(id) {
+  return request({
+    url: '/cloud-goods/category/'+id,
+    method: 'delete'
+  })
+}
+
+/**
+ * 添加分类
+ * @returns {AxiosPromise}
+ */
+export function save(data) {
+  return request({
+    url: '/cloud-goods/category/',
+    method: 'put',
+    data
+  })
+}

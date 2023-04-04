@@ -1,10 +1,15 @@
 package com.lyx.goods.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lyx.common.base.constant.GlobalConstants;
+import com.lyx.common.base.exception.BizException;
+import com.lyx.common.base.result.ResultCode;
 import com.lyx.goods.entity.Category;
+import com.lyx.goods.entity.req.CategorySaveReq;
 import com.lyx.goods.mapper.CategoryMapper;
 import com.lyx.goods.service.CategoryService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -69,6 +74,25 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     @Override
     @CacheEvict(value = "category",allEntries = true)
     public void removeCategory(Long id) {
-        lambdaUpdate().eq(Category::getId,id).eq(Category::getParentCid,id).remove();
+        // 先查看是否有子分类
+        Integer count = lambdaQuery().eq(Category::getParentCid, id).count();
+        // 如果还有子分类就无法删除，需要先删除子分类
+        if( count > 0 ){
+            throw new BizException(ResultCode.CATEGORY_HAS_CHILD);
+        }
+        removeById(id);
+    }
+
+    /**
+     * 添加分类
+     *
+     * @param req
+     */
+    @Override
+    @CacheEvict(value = "category",allEntries = true)
+    public void saveCategory(CategorySaveReq req) {
+        Category category = new Category();
+        BeanUtils.copyProperties(req,category);
+        save(category);
     }
 }

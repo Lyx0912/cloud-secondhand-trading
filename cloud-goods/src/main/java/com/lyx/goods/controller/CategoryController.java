@@ -5,8 +5,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lyx.common.base.result.R;
 import com.lyx.goods.entity.Category;
+import com.lyx.goods.entity.req.CategorySaveReq;
 import com.lyx.goods.service.CategoryService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,10 +43,20 @@ public class CategoryController {
        */
     @DeleteMapping("/{id}")
     public R delete(@PathVariable Long id){
-        // 删除对应的分类(逻辑删除)
         categoryService.removeCategory(id);
         return R.ok();
     }
+
+    /**
+     * 添加分类
+     */
+    @PutMapping()
+    public R save(@Validated @RequestBody CategorySaveReq req){
+        categoryService.saveCategory(req);
+        return R.ok();
+    }
+    
+    // todo 批量删除分类
 
 }
 

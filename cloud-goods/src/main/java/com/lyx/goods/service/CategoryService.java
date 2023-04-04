@@ -2,6 +2,7 @@ package com.lyx.goods.service;
 
 import com.lyx.goods.entity.Category;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.lyx.goods.entity.req.CategorySaveReq;
 
 import java.util.List;
 
@@ -21,4 +22,9 @@ public interface CategoryService extends IService<Category> {
     List<Category> categoryTree();
 
     void removeCategory(Long id);
+
+     /**
+       * 添加分类
+       */
+    void saveCategory(CategorySaveReq req);
 }
