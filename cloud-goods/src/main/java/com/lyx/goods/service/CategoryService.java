@@ -27,4 +27,9 @@ public interface CategoryService extends IService<Category> {
        * 添加分类
        */
     void saveCategory(CategorySaveReq req);
+
+     /**
+       * 批量删除
+       */
+    void batchDelete(List<Long> ids);
 }

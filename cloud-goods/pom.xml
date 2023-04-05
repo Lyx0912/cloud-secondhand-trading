@@ -17,6 +17,12 @@
     </properties>
 
     <dependencies>
+        <!-- excel -->
+        <dependency>
+            <groupId>com.lyx</groupId>
+            <artifactId>common-excel</artifactId>
+            <version>1.0.0</version>
+        </dependency>
         <!-- MP -->
         <dependency>
             <groupId>com.lyx</groupId>

@@ -352,7 +352,7 @@ export default {
       values.map(res => this.checkedIds.push(res.id))
     },
     handleExport() {
-      exportFile('/cloud-member//member/export', '会员列表')
+      exportFile('/cloud-member/member/export', '会员列表')
     },
     handleDeletes() {
       if (this.checkedIds.length === 0) {

@@ -1,34 +1,18 @@
-package com.lyx.goods.entity;
+package com.lyx.goods.entity.vo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
- * <p>
- * 
- * </p>
- *
  * @author 黎勇炫
- * @since 2023-03-31 11:16:28
+ * @date 2023年04月05日 14:37
  */
-@Getter
-@Setter
-@TableName("gms_goods")
-public class Goods implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * id
-     */
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+@Data
+public class GoodsVO {
 
     /**
      * 物品名称
@@ -46,11 +30,6 @@ public class Goods implements Serializable {
     private BigDecimal price;
 
     /**
-     * 卖家
-     */
-    private Integer sellerId;
-
-    /**
      * 浏览量
      */
     private Integer viewCount;
@@ -58,7 +37,7 @@ public class Goods implements Serializable {
     /**
      * 是否上架
      */
-    private Boolean isOnSell;
+    private Integer isOnSell;
 
     /**
      * 发布时间
@@ -70,5 +49,8 @@ public class Goods implements Serializable {
      */
     private LocalDateTime updateTime;
 
-
+     /**
+       * 默认的图片地址
+       */
+    private String url;
 }

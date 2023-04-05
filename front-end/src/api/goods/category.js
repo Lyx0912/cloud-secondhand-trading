@@ -34,3 +34,14 @@ export function save(data) {
     data
   })
 }
+
+/**
+ * 批量删除
+ * @returns {AxiosPromise}
+ */
+export function batchDelete(ids) {
+  return request({
+    url: '/cloud-goods/category/batchDelete/' + ids,
+    method: 'delete'
+  })
+}

@@ -95,4 +95,15 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         BeanUtils.copyProperties(req,category);
         save(category);
     }
+
+    /**
+     * 批量删除
+     *
+     * @param ids
+     */
+    @Override
+    @CacheEvict(value = "category",allEntries = true)
+    public void batchDelete(List<Long> ids) {
+        removeByIds(ids);
+    }
 }

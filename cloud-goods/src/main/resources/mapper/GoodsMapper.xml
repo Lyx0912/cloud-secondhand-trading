@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lyx.goods.mapper.GoodsMapper">
+
+    <select id="listPage" resultType="com.lyx.goods.entity.vo.GoodsVO">
+        SELECT g.name,g.description,g.price,g.view_count,g.is_on_sell,g.create_time,g.update_time,i.url
+        FROM gms_goods g LEFT JOIN gms_goods_images i ON g.id = i.goods_id
+    </select>
+</mapper>

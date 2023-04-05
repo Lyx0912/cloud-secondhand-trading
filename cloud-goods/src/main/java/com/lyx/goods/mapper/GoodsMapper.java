@@ -1,10 +1,13 @@
 package com.lyx.goods.mapper;
 
-import com.lyx.goods.entity.Goods;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.lyx.goods.service.CategoryService;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lyx.goods.entity.Goods;
+import com.lyx.goods.entity.vo.GoodsVO;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 /**
  * <p>
@@ -17,5 +20,5 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Mapper
 public interface GoodsMapper extends BaseMapper<Goods> {
 
-
+    List<GoodsVO> listPage(Page<GoodsVO> page);
 }

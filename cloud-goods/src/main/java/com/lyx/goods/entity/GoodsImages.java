@@ -23,16 +23,17 @@ public class GoodsImages implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-      @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     private Long goodsId;
 
     private String url;
 
-    private LocalDateTime createdAt;
+    private LocalDateTime createdTime;
 
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedTime;
 
+    private Integer isDefault;
 
 }

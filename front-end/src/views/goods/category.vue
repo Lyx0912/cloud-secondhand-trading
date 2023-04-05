@@ -53,8 +53,8 @@
 </template>
 
 <script>
-import { list, remove, save } from '@/api/goods/category'
-import { deletes } from '@/api/admin/user'
+import { list, remove, save, batchDelete } from '@/api/goods/category'
+import { exportFile } from '@/utils/request'
 export default {
   data() {
     return {
@@ -89,9 +89,28 @@ export default {
     }
   },
   methods: {
+    handleExport() {
+      exportFile('/cloud-goods/category/export', '分类列表')
+    },
     handleBatchDelete() {
-      // 获取选中的节点
-      console.log(this.$refs.tree.getCheckedKeys())
+      this.$confirm(`确定删除该分类及子分类吗`, '是否继续?', '提示', {
+        confirmButtonText: '删除',
+        cancelButtonText: '算了吧',
+        type: 'warning'
+      }).then(() => {
+        batchDelete(this.$refs.tree.getCheckedKeys()).then(res => {
+          this.$message({
+            type: 'success',
+            message: '操作成功!'
+          })
+          this.getList()
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消操作'
+        })
+      })
     },
     handleAdd() {
       this.CategoryFormShow = true

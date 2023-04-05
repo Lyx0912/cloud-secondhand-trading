@@ -3,6 +3,7 @@ package com.lyx.member.controller;
 
 import com.lyx.common.base.entity.PageUtils;
 import com.lyx.common.base.result.R;
+import com.lyx.common.web.utils.ResponseUtils;
 import com.lyx.member.entity.Member;
 import com.lyx.member.entity.req.MemberListPageReq;
 import com.lyx.member.entity.req.SaveMemberReq;
@@ -40,8 +41,6 @@ public class MemberController {
 
     @Resource
     private MemberService memberService;
-    @Autowired
-    private MemberAddrService memberAddrService;
 
      /**
        * 分页查询会员列表
@@ -98,10 +97,7 @@ public class MemberController {
     @GetMapping ("/export")
     public void export(HttpServletResponse response) throws IOException {
         List<Member> members = memberService.list();
-        response.setContentType("application/vnd.ms-excel");// 设置文本内省
-        response.setCharacterEncoding("utf-8");// 设置字符编码
-        response.setHeader("Content-disposition", "attachment;filename=demo.xlsx"); // 设置响应头
-        ExcelUtils.export(response.getOutputStream(),Member.class,members,"会员列表");
+        ExcelUtils.export(ResponseUtils.excelResponse(response).getOutputStream(),Member.class,members,"会员列表");
     }
 
      /**

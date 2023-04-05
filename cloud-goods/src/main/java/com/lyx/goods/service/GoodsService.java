@@ -1,7 +1,10 @@
 package com.lyx.goods.service;
 
+import com.lyx.common.base.entity.PageUtils;
 import com.lyx.goods.entity.Goods;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.lyx.goods.entity.req.GoodsListPageReq;
+import com.lyx.goods.entity.vo.GoodsVO;
 
 /**
  * <p>
@@ -13,4 +16,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface GoodsService extends IService<Goods> {
 
+     /**
+       * 分页查询商品
+       */
+    PageUtils<GoodsVO> listPage(GoodsListPageReq req);
 }
