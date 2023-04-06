@@ -8,26 +8,26 @@
       </el-col>
       <el-col :span="19">
         <el-form ref="queryForm" :model="queryParams" size="small" style="float: right" :inline="true">
-          <el-form-item label="用户号" prop="deptName">
+          <el-form-item label="商品名称" >
             <el-input
-              v-model="queryParams.memberId"
-              placeholder="请输入会员编号"
+              v-model="queryParams.name"
+              placeholder="请输入商品名称"
               clearable
               @keyup.enter.native="handleQuery"
             />
           </el-form-item>
-          <el-form-item label="收货人" prop="status">
+          <el-form-item label="卖家" >
             <el-input
-              v-model="queryParams.consignee"
-              placeholder="请输入收货人"
+              v-model="queryParams.seller"
+              placeholder="请输入卖家名称"
               clearable
               @keyup.enter.native="handleQuery"
             />
           </el-form-item>
-          <el-form-item label="手机号" prop="status">
+          <el-form-item label="上架状态">
             <el-input
-              v-model="queryParams.mobile"
-              placeholder="请输入手机号"
+              v-model="queryParams.isOnSell"
+              placeholder="请输入上架状态"
               clearable
               @keyup.enter.native="handleQuery"
             />
@@ -44,24 +44,34 @@
         type="selection"
         width="55"
       />
-      <el-table-column align="center" label="会员编号" prop="memberId" width="100" />
-      <el-table-column align="center" label="收货人" prop="consignee" width="100" />
-      <el-table-column label="手机号" align="center" prop="mobile" width="120" />
-      <el-table-column label="省编号" align="center" prop="provinceId" width="60" :show-overflow-tooltip="true" />
-      <el-table-column label="省份" align="center" prop="province" width="100" :show-overflow-tooltip="true" />
-      <el-table-column label="市编号" align="center" prop="cityId" width="60" :show-overflow-tooltip="true" />
-      <el-table-column label="城市" align="center" prop="city" width="100" :show-overflow-tooltip="true" />
-      <el-table-column label="区" align="center" prop="area" width="150" :show-overflow-tooltip="true" />
-      <el-table-column label="详细地址" align="center" prop="addr" :show-overflow-tooltip="true" />
-      <el-table-column label="邮编" align="center" prop="postCode" width="120" />
-      <el-table-column label="默认" align="center" width="60">
+      <el-table-column align="center" label="商品名称" prop="name" width="150 " :show-overflow-tooltip="true" />
+      <el-table-column align="center" label="卖家" prop="seller" width="100"  :show-overflow-tooltip="true" />
+      <el-table-column label="图片" align="center" width="150">
         <template v-slot="scope">
-          <el-tag>{{ scope.row.isDefault == 1?'是':'否' }}</el-tag>
+          <el-image :src="scope.row.url" style="width:64px;height:64px;"></el-image>
         </template>
       </el-table-column>
-      <el-table-column align="center" prop="created_at" label="操作" width="150">
+      <el-table-column label="描述" align="center" prop="description"  />
+      <el-table-column label="价格" align="center" prop="price" width="100" :show-overflow-tooltip="true" />
+      <el-table-column label="上架状态" align="center" width="100" >
         <template v-slot="scope">
-          <el-button type="danger" size="mini" @click="handleDelete(scope.row)">删除</el-button>
+          <el-switch
+            v-model="scope.row.status"
+            :active-value="1"
+            :inactive-value="0"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            @change="handleStatusChange(scope.row)">
+          </el-switch>
+        </template>
+      </el-table-column>
+      <el-table-column label="浏览量" align="center" prop="viewCount" width="100" :show-overflow-tooltip="true" />
+      <el-table-column label="发布时间" align="center" prop="createTime" width="164" :show-overflow-tooltip="true" />
+      <el-table-column label="更新时间" align="center" prop="updateTime"  width="164" :show-overflow-tooltip="true" />
+      <el-table-column align="center" prop="created_at" label="操作" >
+        <template v-slot="scope">
+          <el-button type="primary" icon="el-icon-edit" size="mini" @click="handleDelete(scope.row)">编辑</el-button>
+          <el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -70,7 +80,7 @@
 </template>
 
 <script>
-import { queryMemberAddr, deletes } from '@/api/member/addr'
+import { list } from '@/api/goods/goods'
 import pagination from '@/components/Pagination'
 import { exportFile } from '@/utils/request'
 
@@ -108,11 +118,8 @@ export default {
       },
       total: 0,
       queryParams: {
-        memberId: '',
         pageNo: 1,
-        pageSize: 10,
-        mobile: '',
-        consignee: ''
+        pageSize: 10
       },
       list: null,
       listLoading: true
@@ -137,11 +144,8 @@ export default {
     /** 重置按钮操作 */
     resetQuery() {
       this.queryParams = {
-        memberId: '',
         pageNo: 1,
-        pageSize: 10,
-        mobile: '',
-        consignee: ''
+        pageSize: 10
       },
         this.handleQuery()
     },
@@ -174,7 +178,7 @@ export default {
     },
     getList() {
       this.listLoading = true
-      queryMemberAddr(this.queryParams).then(response => {
+      list(this.queryParams).then(response => {
         this.list = response.data.list
         this.total = response.data.total
         this.listLoading = false

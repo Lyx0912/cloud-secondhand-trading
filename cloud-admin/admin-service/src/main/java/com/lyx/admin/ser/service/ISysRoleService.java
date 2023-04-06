@@ -5,8 +5,7 @@ import com.lyx.admin.ser.entity.SysRole;
 import com.lyx.admin.ser.entity.req.RoleListPageReq;
 import com.lyx.admin.ser.entity.req.SaveSysRoleReq;
 import com.lyx.admin.ser.entity.vo.SysRoleVO;
-import com.lyx.common.base.entity.PageUtils;
-import org.springframework.cloud.openfeign.FeignClient;
+import com.lyx.common.mp.utils.PageUtils;
 
 import java.util.List;
 

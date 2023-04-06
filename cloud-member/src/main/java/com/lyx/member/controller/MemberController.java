@@ -1,18 +1,16 @@
 package com.lyx.member.controller;
 
 
-import com.lyx.common.base.entity.PageUtils;
+import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.common.base.result.R;
 import com.lyx.common.web.utils.ResponseUtils;
 import com.lyx.member.entity.Member;
 import com.lyx.member.entity.req.MemberListPageReq;
 import com.lyx.member.entity.req.SaveMemberReq;
 import com.lyx.member.entity.vo.MemberVO;
-import com.lyx.member.service.MemberAddrService;
 import com.lyx.member.service.MemberService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import utils.ExcelUtils;

@@ -6,12 +6,8 @@ import com.lyx.admin.dto.UserAuthDTO;
 import com.lyx.admin.ser.entity.SysUser;
 import com.lyx.admin.ser.entity.req.SaveUserReq;
 import com.lyx.admin.ser.entity.req.UserListPageReq;
-import com.lyx.admin.ser.entity.vo.SysMenuSelectVO;
 import com.lyx.admin.ser.entity.vo.SysUserVO;
-import com.lyx.common.base.entity.PageUtils;
-import org.springframework.cloud.openfeign.FeignClient;
-
-import java.util.List;
+import com.lyx.common.mp.utils.PageUtils;
 
 /**
  * @author： 黎勇炫

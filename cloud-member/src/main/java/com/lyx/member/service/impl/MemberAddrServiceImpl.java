@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.lyx.common.base.entity.PageUtils;
+import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.member.config.MemberMapStruct;
 import com.lyx.member.entity.MemberAddr;
 import com.lyx.member.entity.req.MemberAddrPageReq;

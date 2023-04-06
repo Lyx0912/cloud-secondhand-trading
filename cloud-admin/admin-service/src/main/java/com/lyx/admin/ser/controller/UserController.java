@@ -1,19 +1,15 @@
 package com.lyx.admin.ser.controller;
 
 import com.lyx.admin.dto.UserAuthDTO;
-import com.lyx.admin.ser.entity.SysMenu;
 import com.lyx.admin.ser.entity.SysUser;
 import com.lyx.admin.ser.entity.req.SaveUserReq;
 import com.lyx.admin.ser.entity.req.UserListPageReq;
-import com.lyx.admin.ser.entity.vo.SysMenuSelectVO;
 import com.lyx.admin.ser.entity.vo.SysUserVO;
 import com.lyx.admin.ser.service.ISysUserService;
-import com.lyx.common.base.entity.PageUtils;
+import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.common.base.result.R;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

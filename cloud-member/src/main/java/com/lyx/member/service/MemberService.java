@@ -1,6 +1,6 @@
 package com.lyx.member.service;
 
-import com.lyx.common.base.entity.PageUtils;
+import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.member.entity.Member;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lyx.member.entity.req.MemberListPageReq;

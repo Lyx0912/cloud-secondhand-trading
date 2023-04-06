@@ -13,8 +13,6 @@ import java.math.BigDecimal;
 public class GoodsListPageReq extends PageReq {
     // 商品名称
     private String name;
-    // 价格
-    private BigDecimal price;
     // 上架状态
     private Integer isOnSell;
     // 卖家

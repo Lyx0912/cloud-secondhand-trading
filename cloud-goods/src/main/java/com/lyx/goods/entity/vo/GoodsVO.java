@@ -2,6 +2,8 @@ package com.lyx.goods.entity.vo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -18,6 +20,11 @@ public class GoodsVO {
      * 物品名称
      */
     private String name;
+
+     /**
+       * 卖家
+       */
+    private String seller;
 
     /**
      * 描述
@@ -42,15 +49,18 @@ public class GoodsVO {
     /**
      * 发布时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private LocalDateTime createTime;
 
     /**
      * 更新时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private LocalDateTime updateTime;
 
      /**
        * 默认的图片地址
        */
     private String url;
+
 }

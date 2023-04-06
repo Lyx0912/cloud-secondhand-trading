@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: '林涉外考勤管理信息系统',
+  title: 'SHOP',
 
   /**
    * @type {boolean} true | false

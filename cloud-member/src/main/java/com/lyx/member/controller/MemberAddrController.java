@@ -1,10 +1,9 @@
 package com.lyx.member.controller;
 
 
-import com.lyx.common.base.entity.PageUtils;
+import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.common.base.result.R;
 import com.lyx.common.web.utils.ResponseUtils;
-import com.lyx.member.entity.Member;
 import com.lyx.member.entity.MemberAddr;
 import com.lyx.member.entity.req.MemberAddrPageReq;
 import com.lyx.member.entity.req.SaveMemberAddrReq;

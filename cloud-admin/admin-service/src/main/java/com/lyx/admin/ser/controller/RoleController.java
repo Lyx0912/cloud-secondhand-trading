@@ -1,16 +1,13 @@
 package com.lyx.admin.ser.controller;
 
-import com.lyx.admin.ser.entity.SysRole;
 import com.lyx.admin.ser.entity.req.RoleListPageReq;
 import com.lyx.admin.ser.entity.req.SaveSysRoleReq;
-import com.lyx.admin.ser.entity.vo.SysRoleSelectVO;
 import com.lyx.admin.ser.entity.vo.SysRoleVO;
 import com.lyx.admin.ser.service.ISysRoleService;
-import com.lyx.common.base.entity.PageUtils;
+import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.common.base.result.R;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

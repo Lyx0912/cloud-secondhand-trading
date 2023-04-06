@@ -1,6 +1,6 @@
 package com.lyx.goods.service;
 
-import com.lyx.common.base.entity.PageUtils;
+import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.goods.entity.Goods;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lyx.goods.entity.req.GoodsListPageReq;

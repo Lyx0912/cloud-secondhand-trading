@@ -1,8 +1,7 @@
 package com.lyx.goods.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -34,6 +33,11 @@ public class Goods implements Serializable {
      * 物品名称
      */
     private String name;
+
+     /**
+       * 卖家
+       */
+    private String seller;
 
     /**
      * 描述
@@ -69,6 +73,12 @@ public class Goods implements Serializable {
      * 更新时间
      */
     private LocalDateTime updateTime;
+
+     /**
+       * 是否删除
+       */
+    @TableLogic(value = "0", delval = "1")
+    private Integer deleted;
 
 
 }

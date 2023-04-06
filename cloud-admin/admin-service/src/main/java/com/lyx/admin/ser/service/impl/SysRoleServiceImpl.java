@@ -18,7 +18,7 @@ import com.lyx.admin.ser.service.ISysRoleMenuService;
 import com.lyx.admin.ser.service.ISysRolePermissionService;
 import com.lyx.admin.ser.service.ISysRoleService;
 import com.lyx.common.base.constant.GlobalConstants;
-import com.lyx.common.base.entity.PageUtils;
+import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.common.base.result.ResultCode;
 import com.lyx.common.base.utils.AssertUtil;
 import lombok.RequiredArgsConstructor;

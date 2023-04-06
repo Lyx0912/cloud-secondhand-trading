@@ -1,12 +1,11 @@
 package com.lyx.member.service;
 
-import com.lyx.common.base.entity.PageUtils;
+import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.member.entity.MemberAddr;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lyx.member.entity.req.MemberAddrPageReq;
 import com.lyx.member.entity.req.SaveMemberAddrReq;
 import com.lyx.member.entity.vo.MemberAddrVO;
-import com.lyx.member.entity.vo.MemberVO;
 
 /**
  * <p>

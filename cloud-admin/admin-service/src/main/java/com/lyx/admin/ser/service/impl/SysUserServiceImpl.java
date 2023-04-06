@@ -5,7 +5,6 @@ import cn.hutool.core.lang.Assert;
 import com.alibaba.cloud.commons.lang.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lyx.admin.dto.UserAuthDTO;
@@ -13,12 +12,11 @@ import com.lyx.admin.ser.config.AdminMapStruct;
 import com.lyx.admin.ser.entity.*;
 import com.lyx.admin.ser.entity.req.SaveUserReq;
 import com.lyx.admin.ser.entity.req.UserListPageReq;
-import com.lyx.admin.ser.entity.vo.SysMenuSelectVO;
 import com.lyx.admin.ser.entity.vo.SysUserVO;
 import com.lyx.admin.ser.mapper.SysUserMapper;
 import com.lyx.admin.ser.service.*;
 import com.lyx.common.base.constant.GlobalConstants;
-import com.lyx.common.base.entity.PageUtils;
+import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.common.base.result.ResultCode;
 import com.lyx.common.base.utils.AssertUtil;
 import com.lyx.common.web.utils.UserContext;
@@ -27,11 +25,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
