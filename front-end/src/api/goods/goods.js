@@ -25,3 +25,14 @@ export function changeStatus(goodsId, isOnSell) {
     }
   })
 }
+
+/**
+ * 更新商品上架状态
+ * @returns {AxiosPromise}
+ */
+export function info(goodsId) {
+  return request({
+    url: '/cloud-goods/goods/' + goodsId,
+    method: 'get'
+  })
+}

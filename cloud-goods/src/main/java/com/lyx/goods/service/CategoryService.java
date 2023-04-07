@@ -33,7 +33,6 @@ public interface CategoryService extends IService<Category> {
        */
     void batchDelete(List<Long> ids);
 
-    Category findParentCategory(Category category,List<Category> allCategory);
+    Long[] findParentCategory(Long cid);
 
-    Category findBelongCategory(Long cid);
 }

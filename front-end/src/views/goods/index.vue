@@ -43,6 +43,7 @@
         width="55"
       />
       <el-table-column align="center" label="商品名称" prop="name" width="150 " :show-overflow-tooltip="true" />
+      <el-table-column label="分类" align="center" prop="categoryName"  width="130" :show-overflow-tooltip="true" />
       <el-table-column align="center" label="卖家" prop="seller" width="100"  :show-overflow-tooltip="true" />
       <el-table-column label="图片" align="center" width="150">
         <template v-slot="scope">
@@ -68,7 +69,7 @@
       <el-table-column label="更新时间" align="center" prop="updateTime"  width="164" :show-overflow-tooltip="true" />
       <el-table-column align="center" prop="created_at" label="操作" >
         <template v-slot="scope">
-          <el-button type="primary" icon="el-icon-edit" size="mini" @click="handleDelete(scope.row)">编辑</el-button>
+          <el-button type="primary" icon="el-icon-edit" size="mini" @click="handleEdit(scope.row.id)">编辑</el-button>
           <el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -78,7 +79,7 @@
 </template>
 
 <script>
-import { list, changeStatus } from '@/api/goods/goods'
+import { list, changeStatus, info } from '@/api/goods/goods'
 import pagination from '@/components/Pagination'
 import { exportFile } from '@/utils/request'
 
@@ -127,6 +128,11 @@ export default {
     this.getList()
   },
   methods: {
+    handleEdit(id) {
+      info(id).then(res => {
+        console.log(res)
+      })
+    },
     handleStatusChange(row) {
       // 切换商品上架下架状态
       changeStatus(row.id, row.isOnSell).then(res => {

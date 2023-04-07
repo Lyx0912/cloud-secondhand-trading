@@ -34,11 +34,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
      * 构建商品分类(树形结构)
      * todo 分布式场景下会有并发问题，需要引入分布式锁
      */
-    @Cacheable(value={"category"}, key="#root.method.name", sync = true)
     @Override
     public List<Category> categoryTree() {
-        // 查询所有的分类
-        List<Category> allRes = lambdaQuery().eq(Category::getShowStatus, GlobalConstants.STATUS_ON).orderByAsc(Category::getSort).list();
+        List<Category> allRes = getCategoryList();
         // 遍历分类列表 构建树形结构
         List<Category> parents = allRes.stream().filter(item -> item.getParentCid() == 0).map(item->{
             item.setChildrens(buildParentCategory(item.getId(),allRes));
@@ -46,6 +44,13 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         }).collect(Collectors.toList());
         // 构建树形结构
         return parents;
+    }
+
+    @Cacheable(value={"category"}, key="#root.method.name", sync = true)
+    public List<Category> getCategoryList() {
+        // 查询所有的分类
+        List<Category> allRes = lambdaQuery().eq(Category::getShowStatus, GlobalConstants.STATUS_ON).orderByAsc(Category::getSort).list();
+        return allRes;
     }
 
     /**
@@ -97,27 +102,33 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     }
 
      /**
-       * 递归查找负父分类
+       * 查找父分类
        */
     @Override
-    public Category findParentCategory(Category category, List<Category> allCategory){
-        for (Category item : allCategory) {
-            if(item.getId().equals(category.getParentCid())){
-                List<Category> childrens = new ArrayList<>();
-                childrens.add(category);
-                item.setChildrens(childrens);
-                return findParentCategory(item,allCategory);
-            }
-        }
-        return null;
+    public Long[] findParentCategory(Long cid){
+        List<Long> paths = new ArrayList<>();
+        // 找到对应的实体
+        Category category = baseMapper.selectById(cid);
+        //找到所有父节点
+        paths = this.doFindCateParent(paths, category);
+        return paths.toArray(new Long[3]);
     }
 
-    @Override
-    public Category findBelongCategory(Long cid) {
-        List<Category> categories = this.categoryTree();
-        // todo 找到叶子节点(找到所有二级节点，遍历他们的childrens)
-
-        return null;
+     /**
+       * 递归查找父分类
+       */
+    private List<Long> doFindCateParent(List<Long> paths, Category category) {
+        // 如果是一级分类就直接添加并返回
+        if(category.getCatLevel() == 1){
+            paths.add(category.getId());
+            return paths;
+        }else {
+            // 如果不是就继续找父分类
+            Category parent = this.getById(category.getParentCid());
+            paths = doFindCateParent(paths,parent);
+            paths.add(category.getId());
+            return paths;
+        }
     }
 
 

@@ -3,14 +3,15 @@
 <mapper namespace="com.lyx.goods.mapper.GoodsMapper">
 
     <select id="listPage" resultType="com.lyx.goods.entity.vo.GoodsVO">
-        SELECT g.id,g.name,g.seller,g.description,g.price,g.view_count,g.is_on_sell,g.create_time,g.update_time,i.url
+        SELECT g.id,g.name,g.seller,g.description,g.price,g.view_count,g.is_on_sell,g.create_time,g.update_time,i.url,c.name as categoryName
         FROM gms_goods g
+            LEFT JOIN gms_category c on g.cid = c.id
             LEFT JOIN gms_goods_images i ON g.id = i.goods_id ${ew.customSqlSegment}
     </select>
 
     <select id="getGoodsVOById" resultType="com.lyx.goods.entity.vo.GoodsVO">
         SELECT g.id,g.cid,g.name,g.seller,g.description,g.price,g.view_count,g.is_on_sell,g.create_time,g.update_time,i.url
         FROM gms_goods g
-                 LEFT JOIN gms_goods_images i ON g.id = i.goods_id WHERE g.id = #{id}
+            LEFT JOIN gms_goods_images i ON g.id = i.goods_id WHERE g.id = #{id}
     </select>
 </mapper>

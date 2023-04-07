@@ -88,12 +88,10 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         GoodsVO goodsVO = baseMapper.getGoodsVOById(id);
         // 查询VO所在分类
         List<Category> categories = categoryService.categoryTree();
-        // todo 递归遍历分类，定位所在分类
-
         // 递归查找父分类
-        if(null != goodsVO.getCategory()){
-            goodsVO.setCategory(categoryService.findParentCategory(goodsVO.getCategory(),categories));
-        }
+
+        goodsVO.setCategoryPath(categoryService.findParentCategory(goodsVO.getCid()));
+
         return goodsVO;
     }
 }

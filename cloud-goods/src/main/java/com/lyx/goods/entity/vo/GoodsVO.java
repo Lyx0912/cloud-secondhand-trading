@@ -76,7 +76,12 @@ public class GoodsVO {
     private Long cid;
 
      /**
-       * 商品所属分类
+       * 分类名称
        */
-    private Category category;
+    private String categoryName;
+
+     /**
+       * 商品所属分类路径
+       */
+    private Long[] categoryPath;
 }
