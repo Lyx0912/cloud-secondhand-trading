@@ -22,4 +22,6 @@ import java.util.List;
 public interface GoodsMapper extends BaseMapper<Goods> {
 
     Page<GoodsVO> listPage(Page<GoodsVO> page,@Param("ew")  Wrapper<Goods> wrapper);
+
+    GoodsVO getGoodsVOById(Long id);
 }

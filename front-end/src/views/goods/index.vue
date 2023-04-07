@@ -25,12 +25,10 @@
             />
           </el-form-item>
           <el-form-item label="上架状态">
-            <el-input
-              v-model="queryParams.isOnSell"
-              placeholder="请输入上架状态"
-              clearable
-              @keyup.enter.native="handleQuery"
-            />
+            <el-select v-model="queryParams.isOnSell" placeholder="请选择上架状态">
+              <el-option label="上架" :value="1"></el-option>
+              <el-option label="下架" :value="0"></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -56,7 +54,7 @@
       <el-table-column label="上架状态" align="center" width="100" >
         <template v-slot="scope">
           <el-switch
-            v-model="scope.row.status"
+            v-model="scope.row.isOnSell"
             :active-value="1"
             :inactive-value="0"
             active-color="#13ce66"
@@ -80,7 +78,7 @@
 </template>
 
 <script>
-import { list } from '@/api/goods/goods'
+import { list, changeStatus } from '@/api/goods/goods'
 import pagination from '@/components/Pagination'
 import { exportFile } from '@/utils/request'
 
@@ -129,6 +127,15 @@ export default {
     this.getList()
   },
   methods: {
+    handleStatusChange(row) {
+      // 切换商品上架下架状态
+      changeStatus(row.id, row.isOnSell).then(res => {
+        this.$message({
+          type: 'success',
+          message: '操作成功!'
+        })
+      })
+    },
     handleSelectionChange(values) {
       this.checkedIds = []
       values.map(res => this.checkedIds.push(res.id))

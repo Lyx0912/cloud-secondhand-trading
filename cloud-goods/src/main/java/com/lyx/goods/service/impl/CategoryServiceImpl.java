@@ -96,9 +96,33 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         save(category);
     }
 
+     /**
+       * 递归查找负父分类
+       */
+    @Override
+    public Category findParentCategory(Category category, List<Category> allCategory){
+        for (Category item : allCategory) {
+            if(item.getId().equals(category.getParentCid())){
+                List<Category> childrens = new ArrayList<>();
+                childrens.add(category);
+                item.setChildrens(childrens);
+                return findParentCategory(item,allCategory);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Category findBelongCategory(Long cid) {
+        List<Category> categories = this.categoryTree();
+        // todo 找到叶子节点(找到所有二级节点，遍历他们的childrens)
+
+        return null;
+    }
+
+
     /**
      * 批量删除
-     *
      * @param ids
      */
     @Override

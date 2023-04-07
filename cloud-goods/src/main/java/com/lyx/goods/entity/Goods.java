@@ -62,7 +62,7 @@ public class Goods implements Serializable {
     /**
      * 是否上架
      */
-    private Boolean isOnSell;
+    private Integer isOnSell;
 
     /**
      * 发布时间
@@ -79,6 +79,11 @@ public class Goods implements Serializable {
        */
     @TableLogic(value = "0", delval = "1")
     private Integer deleted;
+
+     /**
+       * 所属分类
+       */
+    private Long cid;
 
 
 }

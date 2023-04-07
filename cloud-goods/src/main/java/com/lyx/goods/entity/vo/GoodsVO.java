@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.lyx.goods.entity.Category;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -15,6 +16,12 @@ import java.time.LocalDateTime;
  */
 @Data
 public class GoodsVO {
+
+
+     /**
+       * 编号
+       */
+    private Long id;
 
     /**
      * 物品名称
@@ -63,4 +70,13 @@ public class GoodsVO {
        */
     private String url;
 
+    /**
+     * 所属分类
+     */
+    private Long cid;
+
+     /**
+       * 商品所属分类
+       */
+    private Category category;
 }

@@ -32,4 +32,8 @@ public interface CategoryService extends IService<Category> {
        * 批量删除
        */
     void batchDelete(List<Long> ids);
+
+    Category findParentCategory(Category category,List<Category> allCategory);
+
+    Category findBelongCategory(Long cid);
 }

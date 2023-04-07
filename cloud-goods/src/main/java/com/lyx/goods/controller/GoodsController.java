@@ -53,8 +53,17 @@ public class GoodsController {
        */
     @GetMapping("/{id}")
     public R info(@PathVariable Long id){
-        Goods byId = goodsService.getById(id);
+        GoodsVO byId = goodsService.getGoodsVOById(id);
         return R.ok(byId);
+    }
+
+     /**
+       * 切换商品上架状态
+       */
+    @PatchMapping("/{goodsId}")
+    public R changeIsOnSell(@PathVariable Long goodsId , Integer isOnSell){
+        goodsService.changeIsOnSell(goodsId,isOnSell);
+        return R.ok();
     }
 
 

@@ -11,3 +11,17 @@ export function list(params) {
     params
   })
 }
+
+/**
+ * 更新商品上架状态
+ * @returns {AxiosPromise}
+ */
+export function changeStatus(goodsId, isOnSell) {
+  return request({
+    url: '/cloud-goods/goods/' + goodsId,
+    method: 'patch',
+    params: {
+      isOnSell
+    }
+  })
+}

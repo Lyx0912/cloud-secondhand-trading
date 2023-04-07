@@ -20,4 +20,14 @@ public interface GoodsService extends IService<Goods> {
        * 分页查询商品
        */
     PageUtils<GoodsVO> listPage(GoodsListPageReq req);
+
+     /**
+       * 切换商品上架状态
+       */
+    void changeIsOnSell(Long goodsId, Integer isOnSell);
+
+     /**
+       * 查询商品详情
+       */
+    GoodsVO getGoodsVOById(Long id);
 }
