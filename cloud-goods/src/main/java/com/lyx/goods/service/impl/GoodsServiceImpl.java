@@ -7,10 +7,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.goods.entity.Category;
 import com.lyx.goods.entity.Goods;
+import com.lyx.goods.entity.GoodsDetails;
+import com.lyx.goods.entity.GoodsImages;
 import com.lyx.goods.entity.req.GoodsListPageReq;
 import com.lyx.goods.entity.vo.GoodsVO;
 import com.lyx.goods.mapper.GoodsMapper;
 import com.lyx.goods.service.CategoryService;
+import com.lyx.goods.service.GoodsDetailsService;
+import com.lyx.goods.service.GoodsImagesService;
 import com.lyx.goods.service.GoodsService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +37,10 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
 
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private GoodsImagesService imagesService;
+    @Autowired
+    private GoodsDetailsService detailsService;
 
     /**
      * 分页查询商品
@@ -86,12 +94,14 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     public GoodsVO getGoodsVOById(Long id) {
         // 查询VO
         GoodsVO goodsVO = baseMapper.getGoodsVOById(id);
-        // 查询VO所在分类
-        List<Category> categories = categoryService.categoryTree();
         // 递归查找父分类
-
         goodsVO.setCategoryPath(categoryService.findParentCategory(goodsVO.getCid()));
-
+        // 设置商品图片
+        List<GoodsImages> images = imagesService.lambdaQuery().eq(GoodsImages::getGoodsId, id).orderByAsc(GoodsImages::getIsDefault).select().list();
+        goodsVO.setImages(images);
+        // 设置商品详情
+        GoodsDetails goodsDetails = detailsService.lambdaQuery().eq(GoodsDetails::getGoodsId, id).one();
+        goodsVO.setDetails(goodsDetails);
         return goodsVO;
     }
 }

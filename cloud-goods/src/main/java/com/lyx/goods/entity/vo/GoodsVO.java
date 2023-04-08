@@ -5,10 +5,13 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.lyx.goods.entity.Category;
+import com.lyx.goods.entity.GoodsDetails;
+import com.lyx.goods.entity.GoodsImages;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author 黎勇炫
@@ -69,6 +72,16 @@ public class GoodsVO {
        * 默认的图片地址
        */
     private String url;
+
+    /**
+     * 图片列表
+     */
+    private List<GoodsImages> images;
+
+     /**
+       * 商品详情
+       */
+    private GoodsDetails details;
 
     /**
      * 所属分类

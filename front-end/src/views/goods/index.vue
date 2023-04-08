@@ -8,7 +8,7 @@
       </el-col>
       <el-col :span="19">
         <el-form ref="queryForm" :model="queryParams" size="small" style="float: right" :inline="true">
-          <el-form-item label="商品名称" >
+          <el-form-item label="商品名称">
             <el-input
               v-model="queryParams.name"
               placeholder="请输入商品名称"
@@ -16,7 +16,7 @@
               @keyup.enter.native="handleQuery"
             />
           </el-form-item>
-          <el-form-item label="卖家" >
+          <el-form-item label="卖家">
             <el-input
               v-model="queryParams.seller"
               placeholder="请输入卖家名称"
@@ -26,8 +26,8 @@
           </el-form-item>
           <el-form-item label="上架状态">
             <el-select v-model="queryParams.isOnSell" placeholder="请选择上架状态">
-              <el-option label="上架" :value="1"></el-option>
-              <el-option label="下架" :value="0"></el-option>
+              <el-option label="上架" :value="1" />
+              <el-option label="下架" :value="0" />
             </el-select>
           </el-form-item>
           <el-form-item>
@@ -43,16 +43,16 @@
         width="55"
       />
       <el-table-column align="center" label="商品名称" prop="name" width="150 " :show-overflow-tooltip="true" />
-      <el-table-column label="分类" align="center" prop="categoryName"  width="130" :show-overflow-tooltip="true" />
-      <el-table-column align="center" label="卖家" prop="seller" width="100"  :show-overflow-tooltip="true" />
+      <el-table-column label="分类" align="center" prop="categoryName" width="130" :show-overflow-tooltip="true" />
+      <el-table-column align="center" label="卖家" prop="seller" width="100" :show-overflow-tooltip="true" />
       <el-table-column label="图片" align="center" width="150">
         <template v-slot="scope">
-          <el-image :src="scope.row.url" style="width:64px;height:64px;"></el-image>
+          <el-image :src="scope.row.url" style="width:64px;height:64px;" />
         </template>
       </el-table-column>
-      <el-table-column label="描述" align="center" prop="description"  />
+      <el-table-column label="描述" align="center" prop="description" />
       <el-table-column label="价格" align="center" prop="price" width="100" :show-overflow-tooltip="true" />
-      <el-table-column label="上架状态" align="center" width="100" >
+      <el-table-column label="上架状态" align="center" width="100">
         <template v-slot="scope">
           <el-switch
             v-model="scope.row.isOnSell"
@@ -60,14 +60,14 @@
             :inactive-value="0"
             active-color="#13ce66"
             inactive-color="#ff4949"
-            @change="handleStatusChange(scope.row)">
-          </el-switch>
+            @change="handleStatusChange(scope.row)"
+          />
         </template>
       </el-table-column>
       <el-table-column label="浏览量" align="center" prop="viewCount" width="100" :show-overflow-tooltip="true" />
       <el-table-column label="发布时间" align="center" prop="createTime" width="164" :show-overflow-tooltip="true" />
-      <el-table-column label="更新时间" align="center" prop="updateTime"  width="164" :show-overflow-tooltip="true" />
-      <el-table-column align="center" prop="created_at" label="操作" >
+      <el-table-column label="更新时间" align="center" prop="updateTime" width="164" :show-overflow-tooltip="true" />
+      <el-table-column align="center" prop="created_at" label="操作">
         <template v-slot="scope">
           <el-button type="primary" icon="el-icon-edit" size="mini" @click="handleEdit(scope.row.id)">编辑</el-button>
           <el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDelete(scope.row)">删除</el-button>
@@ -75,6 +75,52 @@
       </el-table-column>
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize" @pagination="getList" />
+    <el-dialog :title="goodsFormTitle" :visible.sync="goodsFormShow">
+      <el-form :model="goodsForm" label-width="80px">
+        <el-form-item label="所属分类">
+          <el-input v-model="goodsForm.cid" />
+        </el-form-item>
+        <el-form-item label="名称">
+          <el-input v-model="goodsForm.name" />
+        </el-form-item>
+        <el-form-item label="描述">
+          <el-input v-model="goodsForm.description" />
+        </el-form-item>
+        <el-form-item label="价格">
+          <el-input v-model="goodsForm.price" />
+        </el-form-item>
+        <el-form-item label="上架状态">
+          <el-switch
+            v-model="goodsForm.isOnSell"
+            :active-value="1"
+            :inactive-value="0"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+          />
+        </el-form-item>
+        <el-form-item label="图片">
+          <el-upload
+            action="https://jsonplaceholder.typicode.com/posts/"
+            multiple
+            accept="jpg,jpeg,png,PNG"
+            list-type="picture-card"
+            :file-list="goodsForm.images"
+            :on-preview="handlePictureCardPreview"
+            :on-remove="handleRemove">
+            <i class="el-icon-plus"></i>
+          </el-upload>
+          <el-dialog :visible.sync="dialogVisible">
+            <img width="100%" :src="dialogImageUrl" alt="">
+          </el-dialog>
+        </el-form-item>
+        <el-form-item label="详情">
+            <we-editor  :toolbar-option="toolbar" style="width: 100%;height: 400px;border: #DCDFE6 1px solid;border-radius: 4px" :editable-option="editable" :mode="mode" v-bind:html.sync="goodsForm.details.content"  />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="goodsFormShow = false">关 闭</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -82,6 +128,7 @@
 import { list, changeStatus, info } from '@/api/goods/goods'
 import pagination from '@/components/Pagination'
 import { exportFile } from '@/utils/request'
+import { useWangEditor } from 'wangeditor5-for-vue2'
 
 export default {
   components: { pagination },
@@ -97,6 +144,84 @@ export default {
   },
   data() {
     return {
+      dialogImageUrl: '',
+      dialogVisible: false,
+      mode: 'simple',
+      ...useWangEditor({
+        config: {
+          MENU_CONF: {
+            uploadImage: {
+              // 后端上传地址，必填
+              server: '/api/upload/image',
+              // form-data fieldName，后端接口参数名称，默认值wangeditor-uploaded-image
+              fieldName: 'file',
+              // 1M，单个文件的最大体积限制，默认为 2M
+              maxFileSize: 1 * 1024 * 1024,
+              // 最多可上传几个文件，默认为 100
+              maxNumberOfFiles: 10,
+              // 选择文件时的类型限制，默认为 ['image/*'] 。如不想限制，则设置为 []
+              allowedFileTypes: ['image/*'],
+              // 15 秒，超时时间，默认为 10 秒
+              timeout: 15 * 1000
+              // 自定义上传参数，例如传递验证的 token 等。参数会被添加到 formData 中，一起上传到服务端。
+              // meta: {
+              //     token: 'xxx',
+              //     otherKey: 'yyy'
+              // },
+              // 将 meta 拼接到 url 参数中，默认 false
+              // metaWithUrl: false,
+              // 自定义增加 http  header
+              // headers: {
+              //     Accept: 'text/x-json',
+              //     otherKey: 'xxx'
+              // },
+              // 跨域是否传递 cookie ，默认为 false
+              // withCredentials: false,
+            },
+            uploadVideo: {
+              // 后端上传地址，必填
+              server: '/api/upload/video',
+              // form-data fieldName，后端接口参数名称，默认值wangeditor-uploaded-video
+              fieldName: 'file',
+              // 5M，文件大小限制，默认10M
+              maxFileSize: 5 * 1024 * 1024,
+              // 最多可上传几个文件，默认为 5
+              maxNumberOfFiles: 3,
+              // 选择文件时的类型限制，默认为 ['video/*'] 。如不想限制，则设置为 []
+              allowedFileTypes: ['video/*'],
+              // 15 秒，超时时间，默认为 30 秒
+              timeout: 15 * 1000
+              // 自定义上传参数，例如传递验证的 token 等。参数会被添加到 formData 中，一起上传到服务端。
+              // meta: {
+              //     token: 'xxx',
+              //     otherKey: 'yyy'
+              // },
+              // 将 meta 拼接到 url 参数中，默认 false
+              // metaWithUrl: false,
+              // 自定义增加 http  header
+              // headers: {
+              //     Accept: 'text/x-json',
+              //     otherKey: 'xxx'
+              // },
+              // 跨域是否传递 cookie ，默认为 false
+              // withCredentials: false,
+            }
+          }
+          // onCreated: (inst) => {
+          // }
+        }
+      }),
+      data: {
+        json: '',
+        html: ''
+      },
+      goodsFormTitle: '编辑商品',
+      goodsFormShow: false,
+      goodsForm: {
+        details: {
+          content: ''
+        }
+      },
       roleSelect: [],
       checkedIds: [],
       addrForm: {
@@ -128,9 +253,17 @@ export default {
     this.getList()
   },
   methods: {
+    handleRemove(file, fileList) {
+      console.log(file, fileList)
+    },
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = file.url
+      this.dialogVisible = true
+    },
     handleEdit(id) {
+      this.goodsFormShow = true
       info(id).then(res => {
-        console.log(res)
+        this.goodsForm = res.data
       })
     },
     handleStatusChange(row) {
@@ -160,7 +293,7 @@ export default {
         pageNo: 1,
         pageSize: 10
       },
-        this.handleQuery()
+      this.handleQuery()
     },
     handleDeletes() {
       if (this.checkedIds.length === 0) {
@@ -220,3 +353,4 @@ export default {
   }
 }
 </script>
+<style src="@wangeditor/editor/dist/css/style.css"></style>

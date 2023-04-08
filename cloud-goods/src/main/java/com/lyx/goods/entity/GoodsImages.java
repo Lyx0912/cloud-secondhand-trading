@@ -30,9 +30,9 @@ public class GoodsImages implements Serializable {
 
     private String url;
 
-    private LocalDateTime createdTime;
+    private LocalDateTime createTime;
 
-    private LocalDateTime updatedTime;
+    private LocalDateTime updateTime;
 
     private Integer isDefault;
 
