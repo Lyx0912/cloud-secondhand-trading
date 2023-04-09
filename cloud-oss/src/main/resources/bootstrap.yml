@@ -19,13 +19,3 @@ spring:
 logging:
   level:
     spring.: info
-alibaba:
-  cloud:
-    oss:
-      sts:
-        access-key: LTAI5tALJCdX7icm9Z4CYXPM
-        secret-key: zWzEAyIrIMWZFXxytXK44arkXcM9lr
-      endpoint: oss-cn-shanghai.aliyuncs.com
-      bucket: cloud-secondhand-trading
-    access-key: LTAI5tALJCdX7icm9Z4CYXPM
-    secret-key: zWzEAyIrIMWZFXxytXK44arkXcM9lr
