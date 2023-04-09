@@ -99,14 +99,19 @@
           />
         </el-form-item>
         <el-form-item label="图片">
+<!--          <multi-upload v-model="goodsForm.images"></multi-upload>-->
           <el-upload
-            action="https://jsonplaceholder.typicode.com/posts/"
+            :data="dataObj"
+            action="http://cloud-secondhand-trading.oss-cn-shanghai.aliyuncs.com"
             multiple
             accept="jpg,jpeg,png,PNG"
             list-type="picture-card"
+            :on-success="handleUploadSuccess"
             :file-list="goodsForm.images"
+            :before-upload="beforeUpload"
             :on-preview="handlePictureCardPreview"
-            :on-remove="handleRemove">
+            :on-remove="handleRemove"
+          >
             <i class="el-icon-plus"></i>
           </el-upload>
           <el-dialog :visible.sync="dialogVisible">
@@ -126,12 +131,15 @@
 
 <script>
 import { list, changeStatus, info } from '@/api/goods/goods'
+import multiUpload from '@/views/component/multiUpload'
 import pagination from '@/components/Pagination'
 import { exportFile } from '@/utils/request'
 import { useWangEditor } from 'wangeditor5-for-vue2'
+import { policy } from '@/api/oss/policy'
+import { getUUID } from '@/utils'
 
 export default {
-  components: { pagination },
+  components: { pagination, multiUpload },
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -215,6 +223,7 @@ export default {
         json: '',
         html: ''
       },
+      dataObj: {},
       goodsFormTitle: '编辑商品',
       goodsFormShow: false,
       goodsForm: {
@@ -253,6 +262,32 @@ export default {
     this.getList()
   },
   methods: {
+    beforeUpload(file) {
+      let _self = this
+      return new Promise((resolve, reject) => {
+        policy()
+          .then(response => {
+            _self.dataObj.policy = response.data.policy
+            _self.dataObj.signature = response.data.signature
+            _self.dataObj.ossaccessKeyId = response.data.accessid
+            _self.dataObj.key = response.data.dir + getUUID()
+            _self.dataObj.dir = response.data.dir
+            _self.dataObj.host = response.data.host
+            resolve(true)
+          })
+          .catch(err => {
+            console.log('出错了...', err)
+            reject(false)
+          })
+      })
+    },
+    handleUploadSuccess(res, file) {
+      this.goodsForm.images.push({
+        // url: this.dataObj.host + "/" + this.dataObj.dir + "/" + file.name； 替换${filename}为真正的文件名
+        url: this.dataObj.host + '/' + this.dataObj.key
+      })
+      console.log(this.goodsForm)
+    },
     handleRemove(file, fileList) {
       console.log(file, fileList)
     },

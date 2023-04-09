@@ -32,6 +32,7 @@ public enum ResultCode implements IResultCode, Serializable {
     PROCESS_NOT_EXIST("C0221", "该流程不存"),
     // 商品模块
     CATEGORY_HAS_CHILD("D0221", "该流程不存"),
+    OSS_FAILED_TO_GETPOLICY("E0221", "获取aliyun oss文件上传签名失败"),
     ;
     @Override
     public String getCode() {

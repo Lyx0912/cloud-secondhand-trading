@@ -81,6 +81,14 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!--在2.2.0.RELEASE以后的版本中，OSS依赖被转移到了alibaba/aliyun-spring-boot仓库中-->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>aliyun-spring-boot-dependencies</artifactId>
+                <version>1.0.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 </project>
