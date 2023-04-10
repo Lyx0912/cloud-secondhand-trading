@@ -1,2 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.lyx.common.mp.config.MybatisPlusConfig
+  com.lyx.common.mp.config.MybatisPlusConfig,\
+  com.lyx.common.mp.config.CommonConfig,\
+  com.lyx.common.mp.handler.MyMetaObjectHandler

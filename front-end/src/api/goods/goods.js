@@ -27,12 +27,24 @@ export function changeStatus(goodsId, isOnSell) {
 }
 
 /**
- * 更新商品上架状态
+ * 获取商品的详细信息
  * @returns {AxiosPromise}
  */
 export function info(goodsId) {
   return request({
     url: '/cloud-goods/goods/' + goodsId,
     method: 'get'
+  })
+}
+
+/**
+ * 更新商品信息
+ * @returns {AxiosPromise}
+ */
+export function update(data) {
+  return request({
+    url: '/cloud-goods/goods/',
+    method: 'put',
+    data
   })
 }

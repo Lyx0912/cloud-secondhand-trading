@@ -1,7 +1,7 @@
-package com.lyx.member.config;
+package com.lyx.common.mp.config;
 
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
-import com.lyx.member.handler.MyMetaObjectHandler;
+import com.lyx.common.mp.handler.MyMetaObjectHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

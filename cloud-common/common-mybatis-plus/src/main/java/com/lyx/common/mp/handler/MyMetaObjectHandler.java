@@ -1,12 +1,10 @@
-package com.lyx.member.handler;
+package com.lyx.common.mp.handler;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
-import com.lyx.common.web.utils.UserContext;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * @author 黎勇炫
@@ -34,7 +32,6 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
     @Override
     public void updateFill(MetaObject metaObject) {
         this.strictUpdateFill(metaObject, "updateTime", () -> LocalDateTime.now(),LocalDateTime.class);
-        this.strictUpdateFill(metaObject, "updateBy", () -> UserContext.getCurrentUserId(), Long.class);
     }
 
 }

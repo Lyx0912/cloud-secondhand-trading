@@ -4,6 +4,7 @@ import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.goods.entity.Goods;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lyx.goods.entity.req.GoodsListPageReq;
+import com.lyx.goods.entity.req.GoodsSaveReq;
 import com.lyx.goods.entity.vo.GoodsVO;
 
 /**
@@ -30,4 +31,9 @@ public interface GoodsService extends IService<Goods> {
        * 查询商品详情
        */
     GoodsVO getGoodsVOById(Long id);
+
+     /**
+       * 更新商品详情
+       */
+    void updateGoodsIno(GoodsSaveReq req);
 }

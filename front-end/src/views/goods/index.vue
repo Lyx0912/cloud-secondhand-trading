@@ -76,20 +76,20 @@
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize" @pagination="getList" />
     <el-dialog :title="goodsFormTitle" :visible.sync="goodsFormShow">
-      <el-form :model="goodsForm" label-width="80px">
-        <el-form-item label="所属分类">
+      <el-form :rules="rules" :model="goodsForm" label-width="80px">
+        <el-form-item prop="cid" label="所属分类">
           <el-input v-model="goodsForm.cid" />
         </el-form-item>
-        <el-form-item label="名称">
+        <el-form-item prop="name" label="名称">
           <el-input v-model="goodsForm.name" />
         </el-form-item>
-        <el-form-item label="描述">
+        <el-form-item prop="description" label="描述">
           <el-input v-model="goodsForm.description" />
         </el-form-item>
-        <el-form-item label="价格">
+        <el-form-item prop="price" label="价格">
           <el-input v-model="goodsForm.price" />
         </el-form-item>
-        <el-form-item label="上架状态">
+        <el-form-item prop="isOnSell" label="上架状态">
           <el-switch
             v-model="goodsForm.isOnSell"
             :active-value="1"
@@ -98,7 +98,7 @@
             inactive-color="#ff4949"
           />
         </el-form-item>
-        <el-form-item label="图片">
+        <el-form-item prop="images" label="图片">
 <!--          <multi-upload v-model="goodsForm.images"></multi-upload>-->
           <el-upload
             :data="dataObj"
@@ -115,22 +115,23 @@
             <i class="el-icon-plus"></i>
           </el-upload>
           <el-dialog :visible.sync="dialogVisible">
-            <img width="100%" :src="dialogImageUrl" alt="">
+            <el-image width="100%" :src="dialogImageUrl" alt=""/>
           </el-dialog>
         </el-form-item>
-        <el-form-item label="详情">
+        <el-form-item prop="details.content" label="详情">
             <we-editor  :toolbar-option="toolbar" style="width: 100%;height: 400px;border: #DCDFE6 1px solid;border-radius: 4px" :editable-option="editable" :mode="mode" v-bind:html.sync="goodsForm.details.content"  />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="goodsFormShow = false">关 闭</el-button>
+        <el-button  @click="goodsFormShow = false">关 闭</el-button>
+        <el-button type="primary" @click="handleSave()">关 闭</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { list, changeStatus, info } from '@/api/goods/goods'
+import { list, changeStatus, info, update } from '@/api/goods/goods'
 import multiUpload from '@/views/component/multiUpload'
 import pagination from '@/components/Pagination'
 import { exportFile } from '@/utils/request'
@@ -231,6 +232,14 @@ export default {
           content: ''
         }
       },
+      // 表单校验规则
+      rules: {
+        cid: [{ required: true, trigger: 'blur', message: '请先选择所属分类' }],
+        name: [{ required: true, trigger: 'blur', message: '名称不能为空' }],
+        description: [{ required: true, trigger: 'blur', message: '描述不能为空' }],
+        price: [{ required: true, trigger: 'blur', message: '价格不能为空' }],
+        images: [{ required: true, trigger: 'blur', message: '请上传图片集' }]
+      },
       roleSelect: [],
       checkedIds: [],
       addrForm: {
@@ -270,7 +279,7 @@ export default {
             _self.dataObj.policy = response.data.policy
             _self.dataObj.signature = response.data.signature
             _self.dataObj.ossaccessKeyId = response.data.accessid
-            _self.dataObj.key = response.data.dir + getUUID()
+            _self.dataObj.key = response.data.dir + getUUID() + file.name
             _self.dataObj.dir = response.data.dir
             _self.dataObj.host = response.data.host
             resolve(true)
@@ -282,14 +291,25 @@ export default {
       })
     },
     handleUploadSuccess(res, file) {
-      this.goodsForm.images.push({
+      var imageObj = {
         // url: this.dataObj.host + "/" + this.dataObj.dir + "/" + file.name； 替换${filename}为真正的文件名
-        url: this.dataObj.host + '/' + this.dataObj.key
-      })
-      console.log(this.goodsForm)
+        url: this.dataObj.host + '/' + this.dataObj.key,
+        goodsId: this.goodsForm.id
+      }
+      // 上传成功后加入images集合，暂时不保存到db，方便后续更新
+      this.goodsForm.images.push(imageObj)
     },
     handleRemove(file, fileList) {
       console.log(file, fileList)
+    },
+    handleSave() {
+      // 保存商品信息
+      update(this.goodsForm).then(res => {
+        this.$message({
+          type: 'success',
+          message: '操作成功!'
+        })
+      })
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url

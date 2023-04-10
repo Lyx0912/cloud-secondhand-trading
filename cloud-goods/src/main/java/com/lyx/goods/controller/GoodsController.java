@@ -6,11 +6,14 @@ import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.common.base.result.R;
 import com.lyx.goods.entity.Goods;
 import com.lyx.goods.entity.req.GoodsListPageReq;
+import com.lyx.goods.entity.req.GoodsSaveReq;
 import com.lyx.goods.entity.vo.GoodsVO;
 import com.lyx.goods.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.sql.Wrapper;
 import java.util.List;
 
@@ -63,6 +66,15 @@ public class GoodsController {
     @PatchMapping("/{goodsId}")
     public R changeIsOnSell(@PathVariable Long goodsId , Integer isOnSell){
         goodsService.changeIsOnSell(goodsId,isOnSell);
+        return R.ok();
+    }
+
+    /**
+     * 更新商品信息
+     */
+    @PutMapping()
+    public R update(@Validated @RequestBody GoodsSaveReq req) {
+        goodsService.updateGoodsIno(req);
         return R.ok();
     }
 

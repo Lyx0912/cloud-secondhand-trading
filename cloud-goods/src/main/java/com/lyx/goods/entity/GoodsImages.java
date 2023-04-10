@@ -1,8 +1,7 @@
 package com.lyx.goods.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -30,8 +29,10 @@ public class GoodsImages implements Serializable {
 
     private String url;
 
+    @TableField(value = "CREATE_TIME",fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
+    @TableField(value = "CREATE_TIME",fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 
     private Integer isDefault;
