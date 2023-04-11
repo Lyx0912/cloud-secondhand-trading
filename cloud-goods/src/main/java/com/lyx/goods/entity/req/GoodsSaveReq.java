@@ -65,4 +65,10 @@ public class GoodsSaveReq {
     @NotNull(message = "请先上传图片集")
     private List<GoodsImages> images;
 
+    /**
+     * 展示图片
+     */
+    private String defaultImg;
+
+
 }

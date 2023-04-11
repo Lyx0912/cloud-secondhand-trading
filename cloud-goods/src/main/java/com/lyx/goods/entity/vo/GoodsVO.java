@@ -71,7 +71,7 @@ public class GoodsVO {
      /**
        * 默认的图片地址
        */
-    private String url;
+    private String defaultImg;
 
     /**
      * 图片列表

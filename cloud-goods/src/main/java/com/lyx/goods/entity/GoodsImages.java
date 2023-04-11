@@ -32,7 +32,7 @@ public class GoodsImages implements Serializable {
     @TableField(value = "CREATE_TIME",fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    @TableField(value = "CREATE_TIME",fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "UPDATE_TIME",fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 
     private Integer isDefault;

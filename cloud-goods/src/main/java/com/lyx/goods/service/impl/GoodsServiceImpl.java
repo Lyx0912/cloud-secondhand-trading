@@ -106,7 +106,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         // 递归查找父分类
         goodsVO.setCategoryPath(categoryService.findParentCategory(goodsVO.getCid()));
         // 设置商品图片
-        List<GoodsImages> images = imagesService.lambdaQuery().eq(GoodsImages::getGoodsId, id).orderByAsc(GoodsImages::getIsDefault).select().list();
+        List<GoodsImages> images = imagesService.lambdaQuery().eq(GoodsImages::getGoodsId, id).orderByAsc(GoodsImages::getCreateTime).select().list();
         goodsVO.setImages(images);
         // 设置商品详情
         GoodsDetails goodsDetails = detailsService.lambdaQuery().eq(GoodsDetails::getGoodsId, id).one();
@@ -121,7 +121,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateGoodsIno(GoodsSaveReq req) {
+    public void updateGoodsInfo(GoodsSaveReq req) {
         // 先拿到商品图片集合,拿到所有没id的对象进行入库操作。
         List<GoodsImages> images = req.getImages();
         List<GoodsImages> newImages = images.stream().filter(item -> item.getId() == null).collect(Collectors.toList());

@@ -35,5 +35,5 @@ public interface GoodsService extends IService<Goods> {
      /**
        * 更新商品详情
        */
-    void updateGoodsIno(GoodsSaveReq req);
+    void updateGoodsInfo(GoodsSaveReq req);
 }

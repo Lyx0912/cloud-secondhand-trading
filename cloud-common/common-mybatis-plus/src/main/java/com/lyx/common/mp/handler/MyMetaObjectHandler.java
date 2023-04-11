@@ -2,6 +2,7 @@ package com.lyx.common.mp.handler;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import org.apache.ibatis.reflection.MetaObject;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
  * @date 2022年10月08日 18:35
  */
 @Component
+@ConditionalOnMissingBean(name = "myMetaObjectHandler" )
 public class MyMetaObjectHandler implements MetaObjectHandler {
 
     /**

@@ -4,6 +4,7 @@ package com.lyx.goods.controller;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.common.base.result.R;
+import com.lyx.common.web.utils.ResponseUtils;
 import com.lyx.goods.entity.Goods;
 import com.lyx.goods.entity.req.GoodsListPageReq;
 import com.lyx.goods.entity.req.GoodsSaveReq;
@@ -12,8 +13,11 @@ import com.lyx.goods.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import utils.ExcelUtils;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.sql.Wrapper;
 import java.util.List;
 
@@ -74,8 +78,14 @@ public class GoodsController {
      */
     @PutMapping()
     public R update(@Validated @RequestBody GoodsSaveReq req) {
-        goodsService.updateGoodsIno(req);
+        goodsService.updateGoodsInfo(req);
         return R.ok();
+    }
+
+    @GetMapping("/export")
+    public void export(HttpServletResponse response) throws IOException {
+        List<Goods> goodvos = goodsService.list();
+        ExcelUtils.export(ResponseUtils.excelResponse(response).getOutputStream(),Goods.class,goodvos,"商品列表");
     }
 
 

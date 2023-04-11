@@ -47,7 +47,7 @@
       <el-table-column align="center" label="卖家" prop="seller" width="100" :show-overflow-tooltip="true" />
       <el-table-column label="图片" align="center" width="150">
         <template v-slot="scope">
-          <el-image :src="scope.row.url" style="width:64px;height:64px;" />
+          <el-image :src="scope.row.defaultImg" style="width:64px;height:64px;"  :preview-src-list="[scope.row.defaultImg]" />
         </template>
       </el-table-column>
       <el-table-column label="描述" align="center" prop="description" />
@@ -98,8 +98,21 @@
             inactive-color="#ff4949"
           />
         </el-form-item>
-        <el-form-item prop="images" label="图片">
-<!--          <multi-upload v-model="goodsForm.images"></multi-upload>-->
+        <el-form-item prop="defaultImg" label="展示图">
+          <el-upload
+            :data="dataObj"
+            action="http://cloud-secondhand-trading.oss-cn-shanghai.aliyuncs.com"
+            multiple
+            accept="jpg,jpeg,png,PNG"
+            list-type="picture-card"
+            :on-success="handleDefaultImgUploadSuccess"
+            :show-file-list="false"
+            :before-upload="beforeUpload">
+            <img v-if="goodsForm.defaultImg" :src="goodsForm.defaultImg" class="avatar">
+            <i v-else class="el-icon-plus"></i>
+          </el-upload>
+        </el-form-item>
+        <el-form-item prop="images" label="图片集">
           <el-upload
             :data="dataObj"
             action="http://cloud-secondhand-trading.oss-cn-shanghai.aliyuncs.com"
@@ -109,14 +122,9 @@
             :on-success="handleUploadSuccess"
             :file-list="goodsForm.images"
             :before-upload="beforeUpload"
-            :on-preview="handlePictureCardPreview"
-            :on-remove="handleRemove"
-          >
+            :on-remove="handleRemove">
             <i class="el-icon-plus"></i>
           </el-upload>
-          <el-dialog :visible.sync="dialogVisible">
-            <el-image width="100%" :src="dialogImageUrl" alt=""/>
-          </el-dialog>
         </el-form-item>
         <el-form-item prop="details.content" label="详情">
             <we-editor  :toolbar-option="toolbar" style="width: 100%;height: 400px;border: #DCDFE6 1px solid;border-radius: 4px" :editable-option="editable" :mode="mode" v-bind:html.sync="goodsForm.details.content"  />
@@ -124,7 +132,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button  @click="goodsFormShow = false">关 闭</el-button>
-        <el-button type="primary" @click="handleSave()">关 闭</el-button>
+        <el-button type="primary" @click="handleSave()">保 存</el-button>
       </div>
     </el-dialog>
   </div>
@@ -140,7 +148,7 @@ import { policy } from '@/api/oss/policy'
 import { getUUID } from '@/utils'
 
 export default {
-  components: { pagination, multiUpload },
+  components: { pagination },
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -299,6 +307,10 @@ export default {
       // 上传成功后加入images集合，暂时不保存到db，方便后续更新
       this.goodsForm.images.push(imageObj)
     },
+    handleDefaultImgUploadSuccess(res, file) {
+      this.goodsForm.defaultImg = this.dataObj.host + '/' + this.dataObj.key
+      console.log(this.goodsForm.defaultImg)
+    },
     handleRemove(file, fileList) {
       console.log(file, fileList)
     },
@@ -309,6 +321,8 @@ export default {
           type: 'success',
           message: '操作成功!'
         })
+        this.getList()
+        this.goodsFormShow = false
       })
     },
     handlePictureCardPreview(file) {
@@ -336,7 +350,7 @@ export default {
     },
     /** 导出excel文件 */
     handleExport() {
-      exportFile('/cloud-member/memberAddr/export', '会员收获地址')
+      exportFile('/cloud-goods/goods/export', '商品列表')
     },
     /** 搜索按钮操作 */
     handleQuery() {
@@ -409,3 +423,10 @@ export default {
 }
 </script>
 <style src="@wangeditor/editor/dist/css/style.css"></style>
+<style scoped>
+.avatar {
+  width: 145px;
+  height: 145px;
+  display: block;
+}
+</style>
