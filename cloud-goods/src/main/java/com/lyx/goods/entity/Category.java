@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -94,6 +95,7 @@ public class Category implements Serializable {
        */
     @TableField(exist = false)
     @ExcelIgnore
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<Category> childrens;
 
 }

@@ -70,5 +70,10 @@ public class GoodsSaveReq {
      */
     private String defaultImg;
 
+     /**
+       * 分类路径
+       */
+    private Long[] categoryPath;
+
 
 }

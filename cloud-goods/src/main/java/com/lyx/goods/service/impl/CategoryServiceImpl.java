@@ -13,6 +13,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -35,6 +36,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
      * todo 分布式场景下会有并发问题，需要引入分布式锁
      */
     @Override
+    @Cacheable(value={"category"}, key="#root.method.name", sync = true)
     public List<Category> categoryTree() {
         List<Category> allRes = getCategoryList();
         // 遍历分类列表 构建树形结构
@@ -67,7 +69,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
                 item.setChildrens(buildParentCategory(item.getId(),allCat));
             };
         });
-
+        if(CollectionUtils.isEmpty(childrenList)) return null;
         //排序
         childrenList.sort(Comparator.comparingInt(item-> item.getSort()==null?0:item.getSort()));
         return childrenList;

@@ -131,7 +131,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         images.addAll(newImages);
         List<Long> allId = images.stream().filter(item -> item.getId() != null).map(item -> item.getId()).collect(Collectors.toList());
         // 从db中删除不存在的图片(前端执行了移除操作后列表中就不存在了)
-        imagesService.lambdaUpdate().notIn(!CollectionUtils.isEmpty(allId),GoodsImages::getId,allId);
+        imagesService.lambdaUpdate().eq(GoodsImages::getGoodsId,req.getId()).notIn(!CollectionUtils.isEmpty(allId),GoodsImages::getId,allId).remove();
 
 
         // 更新商品详情
@@ -139,6 +139,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         // 更新商品信息
         Goods goods = new Goods();
         BeanUtils.copyProperties(req,goods);
+        goods.setCid(req.getCategoryPath()[req.getCategoryPath().length-1]);
         updateById(goods);
         // todo 更新elasticsearch
     }

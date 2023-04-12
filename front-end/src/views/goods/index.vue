@@ -47,7 +47,7 @@
       <el-table-column align="center" label="卖家" prop="seller" width="100" :show-overflow-tooltip="true" />
       <el-table-column label="图片" align="center" width="150">
         <template v-slot="scope">
-          <el-image :src="scope.row.defaultImg" style="width:64px;height:64px;"  :preview-src-list="[scope.row.defaultImg]" />
+          <el-image :src="scope.row.defaultImg" style="width:64px;height:64px;" :preview-src-list="[scope.row.defaultImg]" />
         </template>
       </el-table-column>
       <el-table-column label="描述" align="center" prop="description" />
@@ -78,7 +78,13 @@
     <el-dialog :title="goodsFormTitle" :visible.sync="goodsFormShow">
       <el-form :rules="rules" :model="goodsForm" label-width="80px">
         <el-form-item prop="cid" label="所属分类">
-          <el-input v-model="goodsForm.cid" />
+          <el-cascader
+            :props="props"
+            v-model="goodsForm.categoryPath"
+            placeholder="试试搜索：指南"
+            :options="categoryList"
+            filterable></el-cascader>
+<!--          <el-input v-model="goodsForm.cid" />-->
         </el-form-item>
         <el-form-item prop="name" label="名称">
           <el-input v-model="goodsForm.name" />
@@ -107,9 +113,10 @@
             list-type="picture-card"
             :on-success="handleDefaultImgUploadSuccess"
             :show-file-list="false"
-            :before-upload="beforeUpload">
+            :before-upload="beforeUpload"
+          >
             <img v-if="goodsForm.defaultImg" :src="goodsForm.defaultImg" class="avatar">
-            <i v-else class="el-icon-plus"></i>
+            <i v-else class="el-icon-plus" />
           </el-upload>
         </el-form-item>
         <el-form-item prop="images" label="图片集">
@@ -122,16 +129,17 @@
             :on-success="handleUploadSuccess"
             :file-list="goodsForm.images"
             :before-upload="beforeUpload"
-            :on-remove="handleRemove">
-            <i class="el-icon-plus"></i>
+            :on-remove="handleRemove"
+          >
+            <i class="el-icon-plus" />
           </el-upload>
         </el-form-item>
         <el-form-item prop="details.content" label="详情">
-            <we-editor  :toolbar-option="toolbar" style="width: 100%;height: 400px;border: #DCDFE6 1px solid;border-radius: 4px" :editable-option="editable" :mode="mode" v-bind:html.sync="goodsForm.details.content"  />
+          <we-editor :toolbar-option="toolbar" style="width: 100%;height: 400px;border: #DCDFE6 1px solid;border-radius: 4px" :editable-option="editable" :mode="mode" :html.sync="goodsForm.details.content" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button  @click="goodsFormShow = false">关 闭</el-button>
+        <el-button @click="goodsFormShow = false">关 闭</el-button>
         <el-button type="primary" @click="handleSave()">保 存</el-button>
       </div>
     </el-dialog>
@@ -140,7 +148,7 @@
 
 <script>
 import { list, changeStatus, info, update } from '@/api/goods/goods'
-import multiUpload from '@/views/component/multiUpload'
+import { list as getCategory } from '@/api/goods/category'
 import pagination from '@/components/Pagination'
 import { exportFile } from '@/utils/request'
 import { useWangEditor } from 'wangeditor5-for-vue2'
@@ -245,7 +253,7 @@ export default {
         cid: [{ required: true, trigger: 'blur', message: '请先选择所属分类' }],
         name: [{ required: true, trigger: 'blur', message: '名称不能为空' }],
         description: [{ required: true, trigger: 'blur', message: '描述不能为空' }],
-        price: [{ required: true, trigger: 'blur', message: '价格不能为空' }],
+        price: [{ required: true, trigger: 'blur', message: '价格不能为空' }, { type: 'number', message: '价格必须为数字值' }],
         images: [{ required: true, trigger: 'blur', message: '请上传图片集' }]
       },
       roleSelect: [],
@@ -272,15 +280,23 @@ export default {
         pageSize: 10
       },
       list: null,
-      listLoading: true
+      listLoading: true,
+      categoryList: [],
+      props: {
+        label: 'name',
+        value: 'id',
+        children: 'childrens',
+        expandTrigger: 'hover'
+      }
     }
   },
   created() {
     this.getList()
+    this.getCategoryList()
   },
   methods: {
     beforeUpload(file) {
-      let _self = this
+      const _self = this
       return new Promise((resolve, reject) => {
         policy()
           .then(response => {
@@ -309,10 +325,9 @@ export default {
     },
     handleDefaultImgUploadSuccess(res, file) {
       this.goodsForm.defaultImg = this.dataObj.host + '/' + this.dataObj.key
-      console.log(this.goodsForm.defaultImg)
     },
     handleRemove(file, fileList) {
-      console.log(file, fileList)
+      this.goodsForm.images = fileList
     },
     handleSave() {
       // 保存商品信息
@@ -397,6 +412,12 @@ export default {
         this.list = response.data.list
         this.total = response.data.total
         this.listLoading = false
+      })
+    },
+    getCategoryList() {
+      getCategory(this.queryParams).then(res => {
+        this.categoryList = res.data
+        console.log(this.categoryList)
       })
     },
     handleDelete(row) {

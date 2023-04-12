@@ -85,7 +85,7 @@ public class Goods implements Serializable {
      */
     @ExcelProperty("发布时间")
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
-    @ColumnWidth(15)
+    @ColumnWidth(20)
     private LocalDateTime createTime;
 
     /**
@@ -111,7 +111,7 @@ public class Goods implements Serializable {
      * 默认图片(首页检索展示图)
      */
     @ExcelProperty("默认图片")
-    @ColumnWidth(20)
+    @ColumnWidth(120)
     private String defaultImg;
 
 

@@ -18,7 +18,7 @@ export function list(params) {
  */
 export function remove(id) {
   return request({
-    url: '/cloud-goods/category/'+id,
+    url: '/cloud-goods/category/' + id,
     method: 'delete'
   })
 }
