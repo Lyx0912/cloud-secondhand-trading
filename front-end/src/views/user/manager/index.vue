@@ -50,8 +50,8 @@
       </el-table-column>
       <el-table-column align="center" prop="created_at" label="操作" >
         <template v-slot="scope">
-          <el-button type="primary" size="mini" @click="handleEdit(scope.row.id)">编辑</el-button>
-          <el-button type="danger" size="mini" @click="handleDelete(scope.row)">删除</el-button>
+          <el-button type="primary" icon="el-icon-edit" size="mini" @click="handleEdit(scope.row.id)">编辑</el-button>
+          <el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

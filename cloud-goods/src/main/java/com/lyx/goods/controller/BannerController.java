@@ -8,6 +8,7 @@ import com.lyx.goods.entity.req.BannerListPageReq;
 import com.lyx.goods.entity.req.BannerSaveReq;
 import com.lyx.goods.service.BannerService;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -65,19 +66,18 @@ public class BannerController {
        */
     @PostMapping
     public R save(@Validated @RequestBody BannerSaveReq req){
-        // 随机生成1000个会员并插入数据库
-        List<Banner> list = new ArrayList<>();
-        for (int i = 0; i < 500; i++) {
-            Banner banner = new Banner();
-            banner.setTargetUrl(RandomStringUtils.randomAlphabetic(10));
-            banner.setDescription(RandomStringUtils.randomAlphabetic(10));
-            banner.setImageUrl("https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/6b996f91f354815eb138d63f2e7e9391.jpg?w=2452&h=920");
-            banner.setTargetUrl("https://www.mi.com/shop");
-            banner.setSort(0);
-            banner.setIsActive(0);
-            list.add(banner);
-        }
-        bannerService.saveBatch(list);
+        Banner banner = new Banner();
+        BeanUtils.copyProperties(req,banner);
+        bannerService.save(banner);
+        return R.ok();
+    }
+
+    @PutMapping("/{id}")
+    public R update(@PathVariable Long id,@Validated @RequestBody BannerSaveReq req){
+        Banner banner = new Banner();
+        BeanUtils.copyProperties(req,banner);
+        banner.setId(id);
+        bannerService.updateById(banner);
         return R.ok();
     }
 
