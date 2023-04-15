@@ -34,6 +34,7 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, Banner> impleme
         Page<Banner> page = new Page<>(req.getPageNo(),req.getPageSize());
         LambdaQueryWrapper<Banner> wrapper = Wrappers.lambdaQuery();
         wrapper.like(StringUtils.isNotEmpty(req.getTitle()), Banner::getTitle, req.getTitle())
+                .like(!StringUtils.isEmpty(req.getDescription()),Banner::getDescription,req.getDescription())
                 .eq(req.getIsActivite() != null, Banner::getIsActive, req.getIsActivite());
         this.baseMapper.selectPage(page, wrapper);
         return PageUtils.build(page);

@@ -3,6 +3,7 @@ package com.lyx.goods.entity.req;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -12,7 +13,13 @@ import java.time.LocalDateTime;
  * @author 黎勇炫
  * @date 2023年04月13日 10:37
  */
+@Data
 public class BannerSaveReq {
+
+     /**
+       * 编号
+       */
+    private Long id;
 
     /**
      * 标题

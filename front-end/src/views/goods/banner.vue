@@ -2,32 +2,24 @@
   <div class="app-container">
     <el-row style="margin-bottom: 12px">
       <el-col :span="5">
-        <el-button icon="el-icon-download" size="mini" type="warning" @click="handleExport()">导出
-        </el-button>
+        <el-button icon="el-icon-download" size="mini" type="warning" @click="handleExport()">导出</el-button>
+        <el-button icon="el-icon-plus" size="mini" type="primary" @click="handleAdd()">新增</el-button>
         <el-button icon="el-icon-delete" size="mini" type="danger" @click="handleDeletes()">删除</el-button>
       </el-col>
       <el-col :span="19">
         <el-form ref="queryForm" :model="queryParams" size="small" style="float: right" :inline="true">
-          <el-form-item label="用户号" prop="deptName">
+          <el-form-item label="标题" prop="deptName">
             <el-input
-              v-model="queryParams.memberId"
-              placeholder="请输入会员编号"
+              v-model="queryParams.title"
+              placeholder="请输入标题"
               clearable
               @keyup.enter.native="handleQuery"
             />
           </el-form-item>
-          <el-form-item label="收货人" prop="status">
+          <el-form-item label="描述" prop="status">
             <el-input
-              v-model="queryParams.consignee"
-              placeholder="请输入收货人"
-              clearable
-              @keyup.enter.native="handleQuery"
-            />
-          </el-form-item>
-          <el-form-item label="手机号" prop="status">
-            <el-input
-              v-model="queryParams.mobile"
-              placeholder="请输入手机号"
+              v-model="queryParams.description"
+              placeholder="请输入轮播图描述"
               clearable
               @keyup.enter.native="handleQuery"
             />
@@ -74,56 +66,56 @@
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize" @pagination="getList" />
     <el-dialog :title="bannerFormTitle" :visible.sync="bannerFormShow">
-      <el-form :rules="rules" :model="bannerForm" label-width="80px">
-        <el-form-item prop="title" label="标题">
-          <el-input v-model="bannerForm.title" />
-        </el-form-item>
-        <el-form-item prop="description" label="描述">
-          <el-input v-model="bannerForm.description" />
-        </el-form-item>
-        <el-form-item prop="isOnSell" label="上架状态">
-          <el-switch
-            v-model="bannerForm.isActive"
-            :active-value="1"
-            :inactive-value="0"
-            active-color="#13ce66"
-            inactive-color="#ff4949"
-          />
-        </el-form-item>
-        <el-form-item prop="defaultImg" label="展示图">
-          <el-upload
-            :data="dataObj"
-            action="http://cloud-secondhand-trading.oss-cn-shanghai.aliyuncs.com"
-            multiple
-            accept="jpg,jpeg,png,PNG"
-            list-type="picture-card"
-            :on-success="handleDefaultImgUploadSuccess"
-            :show-file-list="false"
-            :before-upload="beforeUpload"
-          >
-            <img v-if="bannerForm.imageUrl" :src="bannerForm.imageUrl" class="avatar">
-            <i v-else class="el-icon-plus" />
-          </el-upload>
-        </el-form-item>
-        <el-form-item prop="targetUrl" label="跳转地址">
-          <el-input v-model="bannerForm.targetUrl" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="goodsFormShow = false">关 闭</el-button>
-        <el-button type="primary" @click="saveOrUpdate()">保 存</el-button>
-      </div>
+        <el-form :rules="rules"  :model="bannerForm" label-width="80px">
+          <el-form-item prop="title" label="标题">
+            <el-input v-model="bannerForm.title" />
+          </el-form-item>
+          <el-form-item prop="description" label="描述">
+            <el-input v-model="bannerForm.description" />
+          </el-form-item>
+          <el-form-item prop="isOnSell" label="上架状态">
+            <el-switch
+              v-model="bannerForm.isActive"
+              :active-value="1"
+              :inactive-value="0"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+            />
+          </el-form-item>
+          <el-form-item  label="图片">
+            <el-upload
+              :data="dataObj"
+              action="http://cloud-secondhand-trading.oss-cn-shanghai.aliyuncs.com"
+              accept="jpg,jpeg,png,PNG"
+              list-type="picture-card"
+              :on-success="handleImgUploadSuccess"
+              :show-file-list="false"
+              :before-upload="beforeUpload">
+              <el-image v-if="bannerForm.imageUrl" :src="bannerForm.imageUrl" class="avatar" />
+              <i v-else class="el-icon-plus" />
+            </el-upload>
+          </el-form-item>
+          <el-form-item prop="targetUrl" label="跳转地址">
+            <el-input v-model="bannerForm.targetUrl" />
+          </el-form-item>
+          <el-form-item prop="sort" label="排序">
+            <el-input v-model="bannerForm.sort" />
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="bannerFormShow = false">关 闭</el-button>
+          <el-button type="primary" @click="saveOrUpdate()">保 存</el-button>
+        </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { list, info, update } from '@/api/goods/banner'
+import { list, info, update, deletes, save, changeStatus } from '@/api/goods/banner'
 import pagination from '@/components/Pagination'
 import { exportFile } from '@/utils/request'
 import { policy } from '@/api/oss/policy'
 import { getUUID } from '@/utils'
-import {createUserInfo, updateUserInfo} from "@/api/admin/user";
 
 export default {
   components: { pagination },
@@ -140,7 +132,10 @@ export default {
   data() {
     return {
       dataObj: {},
-      bannerForm: {},
+      bannerForm: {
+        imageUrl: '',
+        isActive: 0
+      },
       checkedIds: [],
       bannerFormTitle: '编辑轮播图',
       bannerFormShow: false,
@@ -150,7 +145,15 @@ export default {
         pageSize: 10
       },
       list: null,
-      listLoading: true
+      listLoading: true,
+      // 表单校验规则
+      rules: {
+        title: [{ required: true, trigger: 'blur', message: '请先输入标题' }],
+        description: [{ required: true, trigger: 'blur', message: '请输入描述' }],
+        imageUrl: [{ required: true, trigger: 'blur', message: '请先上传图片' }],
+        sort: [{ required: true, trigger: 'blur', message: '请输入排序值' }, { type: 'number', message: '排序必须为数字值' }],
+        targetUrl: [{ required: true, trigger: 'blur', message: '请输入跳转地址' }]
+      }
     }
   },
   created() {
@@ -163,7 +166,13 @@ export default {
     },
     /** 导出excel文件 */
     handleExport() {
-      exportFile('/cloud-member/memberAddr/export', '会员收获地址')
+      exportFile('/cloud-goods/banner/export', '轮播图')
+    },
+    handleAdd() {
+      this.bannerForm = {
+        isActive: 0
+      }
+      this.bannerFormShow = true
     },
     /** 搜索按钮操作 */
     handleQuery() {
@@ -204,10 +213,18 @@ export default {
         })
       })
     },
+    handleStatusChange(row) {
+      changeStatus(row.id, row.isActive).then(res => {
+        this.$message({
+          type: 'success',
+          message: '操作成功!'
+        })
+        this.getList()
+      })
+    },
     getList() {
       this.listLoading = true
       list(this.queryParams).then(response => {
-        console.log(response)
         this.list = response.data.list
         this.total = response.data.total
         this.listLoading = false
@@ -219,35 +236,33 @@ export default {
         this.bannerFormShow = true
       })
     },
-    saveOrpdate() {
+    saveOrUpdate() {
       if (this.bannerForm.id) {
-        update(this.userForm.id, this.userForm).then(res => {
+        update(this.bannerForm).then(res => {
           this.$message({
             type: 'success',
             message: '更新成功!'
           })
-          this.userFormShow = false
-          this.getList()
         })
       } else {
-        // todo 添加輪播圖
-      }
-      update(id, this.bannerForm).then(res => {
-        this.$message({
-          type: 'success',
-          message: '操作成功!'
+        //  添加轮播图
+        save(this.bannerForm).then(res => {
+          this.$message({
+            type: 'success',
+            message: '添加成功!'
+          })
         })
-        this.bannerFormShow = false
-        this.getList()
-      })
+      }
+      this.bannerFormShow = false
+      this.getList()
     },
     handleDelete(row) {
-      this.$confirm(`确定删除收货人<${row.consignee}>吗？`, '是否继续?', '提示', {
+      this.$confirm(`确定删除该轮播图吗？`, '是否继续?', '提示', {
         confirmButtonText: '删除',
         cancelButtonText: '算了吧',
         type: 'warning'
       }).then(() => {
-        deletes([row.addrId]).then(res => {
+        deletes([row.id]).then(res => {
           this.$message({
             type: 'success',
             message: '操作成功!'
@@ -280,16 +295,17 @@ export default {
           })
       })
     },
-    handleDefaultImgUploadSuccess(res, file) {
+    handleImgUploadSuccess(res, file) {
       this.bannerForm.imageUrl = this.dataObj.host + '/' + this.dataObj.key
+      this.$forceUpdate()
     }
   }
 }
 </script>
 <style scoped>
 .avatar {
-  width: 384px;
-  height: 144px;
+  width: 145px;
+  height: 145px;
   display: block;
 }
 </style>

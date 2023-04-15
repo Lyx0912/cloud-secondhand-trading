@@ -12,4 +12,5 @@ public class BannerListPageReq extends PageReq {
 
     private String title;
     private Integer isActivite;
+    private String description;
 }
