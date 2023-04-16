@@ -2,8 +2,8 @@
   <div class="app-container">
     <el-row style="margin-bottom: 12px">
       <el-col :span="5">
-        <el-button icon="el-icon-download" size="mini" type="warning" @click="handleExport()">导出
-        </el-button>
+        <el-button icon="el-icon-download" size="mini" type="warning" @click="handleExport()">导出</el-button>
+        <el-button type="success" icon="el-icon-thumb" size="mini" @click="handleRecommed()">首页推荐</el-button>
         <el-button icon="el-icon-delete" size="mini" type="danger" @click="handleDeletes()">删除</el-button>
       </el-col>
       <el-col :span="19">
@@ -42,6 +42,7 @@
         type="selection"
         width="55"
       />
+      <el-table-column align="center" label="编号" prop="id" width="100 " :show-overflow-tooltip="true" />
       <el-table-column align="center" label="商品名称" prop="name" width="150 " :show-overflow-tooltip="true" />
       <el-table-column label="分类" align="center" prop="categoryName" width="130" :show-overflow-tooltip="true" />
       <el-table-column align="center" label="卖家" prop="seller" width="100" :show-overflow-tooltip="true" />
@@ -66,8 +67,7 @@
       </el-table-column>
       <el-table-column label="浏览量" align="center" prop="viewCount" width="100" :show-overflow-tooltip="true" />
       <el-table-column label="发布时间" align="center" prop="createTime" width="164" :show-overflow-tooltip="true" />
-      <el-table-column label="更新时间" align="center" prop="updateTime" width="164" :show-overflow-tooltip="true" />
-      <el-table-column align="center" prop="created_at" label="操作">
+      <el-table-column align="center" prop="created_at" label="操作" width="290" >
         <template v-slot="scope">
           <el-button type="primary" icon="el-icon-edit" size="mini" @click="handleEdit(scope.row.id)">编辑</el-button>
           <el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDelete(scope.row)">删除</el-button>
@@ -147,6 +147,7 @@
 </template>
 
 <script>
+import { setRecommed } from '@/api/goods/recommend'
 import { list, changeStatus, info, update } from '@/api/goods/goods'
 import { list as getCategory } from '@/api/goods/category'
 import pagination from '@/components/Pagination'
@@ -378,6 +379,22 @@ export default {
         pageSize: 10
       },
       this.handleQuery()
+    },
+    handleRecommed() {
+      if (this.checkedIds.length === 0) {
+        this.$message({
+          type: 'warning',
+          message: '请勾选需要推荐的物品!'
+        })
+        return
+      }
+      setRecommed(this.checkedIds).then(res => {
+        this.$message({
+          type: 'success',
+          message: '操作成功!'
+        })
+        this.getList()
+      })
     },
     handleDeletes() {
       if (this.checkedIds.length === 0) {

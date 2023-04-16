@@ -25,14 +25,16 @@ public enum ResultCode implements IResultCode, Serializable {
     TOKEN_ACCESS_FORBIDDEN("A00215", "token禁止访问"),
     CAPTCHA_OUTPUT_ERROR("A00216", "验证码生成失败"),
     CAPTCHA_ERROR("A00217", "验证码错误"),
-    FLOW_LIMITING("B0210", "系统限流"),
-    DEGRADATION("B0220", "系统功能降级"),
-    SERVICE_NO_AUTHORITY("B0221", "服务未授权"),
-    KEY_IS_DUPLICATED("C0221", "模型标识不能重复"),
-    PROCESS_NOT_EXIST("C0221", "该流程不存"),
+    FLOW_LIMITING("B00001", "系统限流"),
+    DEGRADATION("B00002", "系统功能降级"),
+    SERVICE_NO_AUTHORITY("B00221", "服务未授权"),
+    KEY_IS_DUPLICATED("C00001", "模型标识不能重复"),
+    PROCESS_NOT_EXIST("C00002", "该流程不存"),
     // 商品模块
-    CATEGORY_HAS_CHILD("D0221", "该流程不存"),
-    OSS_FAILED_TO_GETPOLICY("E0221", "获取aliyun oss文件上传签名失败"),
+    CATEGORY_HAS_CHILD("D00001", "该流程不存在"),
+    OSS_FAILED_TO_GETPOLICY("E00001", "获取aliyun oss文件上传签名失败"),
+    EXCEED_THE_RECOMMEND("F00001", "推荐商品已超过限制数量"),
+    GOODS_ALREADY_EXIST("F00002", "该商品已存在"),
     ;
     @Override
     public String getCode() {

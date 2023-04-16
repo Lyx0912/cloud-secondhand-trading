@@ -86,6 +86,7 @@ public class Goods implements Serializable {
     @ExcelProperty("发布时间")
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     @ColumnWidth(20)
+    @TableField(value = "CREATE_TIME", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
     /**
