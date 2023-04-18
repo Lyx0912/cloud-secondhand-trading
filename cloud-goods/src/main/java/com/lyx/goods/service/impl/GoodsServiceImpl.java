@@ -17,11 +17,9 @@ import com.lyx.goods.entity.req.GoodsListPageReq;
 import com.lyx.goods.entity.req.GoodsSaveReq;
 import com.lyx.goods.entity.vo.GoodsVO;
 import com.lyx.goods.mapper.GoodsMapper;
-import com.lyx.goods.service.CategoryService;
-import com.lyx.goods.service.GoodsDetailsService;
-import com.lyx.goods.service.GoodsImagesService;
-import com.lyx.goods.service.GoodsService;
+import com.lyx.goods.service.*;
 import com.sun.org.apache.bcel.internal.generic.NEW;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +30,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * <p>
@@ -42,6 +41,7 @@ import java.util.stream.Collectors;
  * @since 2023-03-31 11:16:28
  */
 @Service
+@Slf4j
 public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements GoodsService {
 
     @Autowired
@@ -50,6 +50,8 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     private GoodsImagesService imagesService;
     @Autowired
     private GoodsDetailsService detailsService;
+    @Autowired
+    private AuditService auditService;
 
     /**
      * 分页查询商品
@@ -66,7 +68,11 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
                 .like(StringUtils.isNotEmpty(req.getName()),Goods::getName,req.getName())
                 .eq(Goods::getDeleted,0)
                 .eq(req.getIsOnSell()!=null,Goods::getIsOnSell,req.getIsOnSell());
-        baseMapper.listPage(page,wrapper);
+        Page<GoodsVO> goodsVOPage = baseMapper.listPage(page, wrapper);
+        // 过滤还未通过审核的商品
+        List<GoodsVO> goodsVOS = goodsVOPage.getRecords().stream()
+                .filter(goodsVO -> auditService.getById(goodsVO.getId()).getState() == 1).collect(Collectors.toList());
+        page.setRecords(goodsVOS);
         PageUtils<GoodsVO> pageUtils = PageUtils.build(page);
         // 返回分页对象
         return pageUtils;

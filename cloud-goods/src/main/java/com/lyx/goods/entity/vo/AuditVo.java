@@ -86,4 +86,9 @@ public class AuditVo {
      * 审核状态
      */
     private Long state;
+
+    /**
+     * 是否上架
+     */
+    private Integer isOnSell;
 }
