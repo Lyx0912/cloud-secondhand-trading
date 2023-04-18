@@ -1,7 +1,10 @@
 package com.lyx.message.service;
 
+import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.message.entity.SystemMessage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.lyx.message.entity.req.SystemMessageListPageReq;
+import com.lyx.message.entity.vo.SystemMessageVO;
 
 /**
  * <p>
@@ -13,4 +16,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface SystemMessageService extends IService<SystemMessage> {
 
+     /**
+       * 分页查询系统消息
+       */
+    PageUtils<SystemMessageVO> listPage(SystemMessageListPageReq req);
 }

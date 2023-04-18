@@ -17,6 +17,17 @@
     </properties>
 
     <dependencies>
+        <!-- mapStruct 对象转换 -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${org.mapstruct}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>${org.mapstruct}</version>
+        </dependency>
         <!-- excel -->
         <dependency>
             <groupId>com.lyx</groupId>

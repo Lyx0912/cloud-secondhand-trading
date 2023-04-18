@@ -1,8 +1,7 @@
 package com.lyx.message.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -26,7 +25,7 @@ public class SystemMessage implements Serializable {
     /**
      * 消息ID
      */
-      @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
@@ -40,19 +39,30 @@ public class SystemMessage implements Serializable {
     private String content;
 
     /**
-     * 接收消息的用户ID
-     */
-    private Integer receiverId;
-
-    /**
      * 消息创建时间
      */
     private LocalDateTime createTime;
 
-    /**
-     * 是否已读，0未读，1已读
-     */
-    private Boolean isRead;
+     /**
+       * 更新时间
+       */
+    private LocalDateTime updateTime;
+
+     /**
+       * 状态
+       */
+    private Integer status;
+
+     /**
+       * 是否删除
+       */
+    @TableLogic(value = "0",delval = "1")
+    private Integer deleted;
+
+     /**
+       * 发布者
+       */
+    private String creater;
 
 
 }
