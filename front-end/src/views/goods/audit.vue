@@ -25,9 +25,10 @@
             />
           </el-form-item>
           <el-form-item label="上架状态">
-            <el-select v-model="queryParams.isOnSell" placeholder="请选择上架状态">
-              <el-option label="上架" :value="1" />
-              <el-option label="下架" :value="0" />
+            <el-select v-model="queryParams.state" placeholder="请选择上架状态">
+              <el-option label="已通过" :value="1" />
+              <el-option label="待审核" :value="0" />
+              <el-option label="未通过" :value="2" />
             </el-select>
           </el-form-item>
           <el-form-item>
@@ -52,7 +53,7 @@
       </el-table-column>
       <el-table-column label="描述" align="center" prop="description" />
       <el-table-column label="价格" align="center" prop="price" width="100" :show-overflow-tooltip="true" />
-      <el-table-column label="上架状态" align="center" width="100">
+      <el-table-column label="审核状态" align="center" width="100">
         <template  v-slot="scope">
           <el-tag type="success" effect="dark" v-if="scope.row.state==1">已通过</el-tag>
           <el-tag type="warning" effect="dark" v-if="scope.row.state==0">待审核</el-tag>
@@ -65,29 +66,91 @@
       <el-table-column align="center" prop="created_at" label="操作">
         <template v-slot="scope">
           <el-button type="primary" icon="el-icon-edit" size="mini" v-if="scope.row.state==0"
-                     @click="handleEdit(scope.row.id)">同意</el-button>
-          <el-button type="danger" icon="el-icon-delete" size="mini" v-if="scope.row.state==0"
-                     @click="handleDelete(scope.row)">不同意</el-button>
-          <el-button type="warning" icon="el-icon-delete" size="mini" v-if="scope.row.state==1"
-                     @click="handleDelete(scope.row)">下架</el-button>
+                     @click="handleEdit(scope.row.id)">审核</el-button>
+          <el-button type="warning" icon="el-icon-delete" size="mini" v-if="scope.row.state==1 && scope.row.isOnSell==1"
+                     @click="handleStatusChange(scope.row)">下架</el-button>
+          <el-button type="primary" icon="el-icon-delete" size="mini" v-if="scope.row.state==1 && scope.row.isOnSell==0"
+                     @click="handleStatusChange(scope.row)">上架</el-button>
           <el-button type="danger" icon="el-icon-delete" size="mini" v-if="scope.row.state==2"
                      @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize" @pagination="getList" />
+    <el-dialog :title="goodsFormTitle" :visible.sync="goodsFormShow">
+      <el-form :rules="rules" :model="goodsForm" label-width="80px">
+        <el-form-item prop="cid" label="所属分类">
+          <el-cascader
+            :props="props"
+            v-model="goodsForm.categoryPath"
+            placeholder="试试搜索：指南"
+            :options="categoryList"
+            filterable></el-cascader>
+          <!--          <el-input v-model="goodsForm.cid" />-->
+        </el-form-item>
+        <el-form-item prop="name" label="名称">
+          <el-input v-model="goodsForm.name" />
+        </el-form-item>
+        <el-form-item prop="description" label="描述">
+          <el-input v-model="goodsForm.description" />
+        </el-form-item>
+        <el-form-item prop="price" label="价格">
+          <el-input v-model="goodsForm.price" />
+        </el-form-item>
+        <el-form-item prop="defaultImg" label="展示图">
+          <el-upload
+            :data="dataObj"
+            action="http://cloud-secondhand-trading.oss-cn-shanghai.aliyuncs.com"
+            multiple
+            accept="jpg,jpeg,png,PNG"
+            list-type="picture-card"
+            :on-success="handleDefaultImgUploadSuccess"
+            :show-file-list="false"
+            :before-upload="beforeUpload"
+          >
+            <img v-if="goodsForm.defaultImg" :src="goodsForm.defaultImg" class="avatar">
+            <i v-else class="el-icon-plus" />
+          </el-upload>
+        </el-form-item>
+        <el-form-item prop="images" label="图片集">
+          <el-upload
+            :data="dataObj"
+            action="http://cloud-secondhand-trading.oss-cn-shanghai.aliyuncs.com"
+            multiple
+            accept="jpg,jpeg,png,PNG"
+            list-type="picture-card"
+            :on-success="handleUploadSuccess"
+            :file-list="goodsForm.images"
+            :before-upload="beforeUpload"
+            :on-remove="handleRemove"
+          >
+            <i class="el-icon-plus" />
+          </el-upload>
+        </el-form-item>
+        <el-form-item prop="details.content" label="详情">
+          <we-editor :toolbar-option="toolbar" style="width: 100%;height: 400px;border: #DCDFE6 1px solid;border-radius: 4px" :editable-option="editable" :mode="mode" :html.sync="goodsForm.details.content" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="goodsFormShow = false">关 闭</el-button>
+        <el-button type="success" @click="handleSave(1)">通 过</el-button>
+        <el-button type="warning" @click="handleSave(2)">打 回</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { list, changeStatus, info, update } from '@/api/goods/goods'
+
 import { list as getCategory } from '@/api/goods/category'
 import pagination from '@/components/Pagination'
 import { exportFile } from '@/utils/request'
+import { list as getGoods, remove as deletes, changeStatus, update } from '@/api/goods/audit'
+import { info } from '@/api/goods/goods'
 import { useWangEditor } from 'wangeditor5-for-vue2'
 import { policy } from '@/api/oss/policy'
 import { getUUID } from '@/utils'
-import { list as getGoods} from '@/api/goods/audit'
+import { setRecommed } from '@/api/goods/recommend'
 
 export default {
   components: { pagination },
@@ -105,6 +168,7 @@ export default {
     return {
       dialogImageUrl: '',
       dialogVisible: false,
+      formLabelWidth: '120px',
       mode: 'simple',
       ...useWangEditor({
         config: {
@@ -182,6 +246,14 @@ export default {
           content: ''
         }
       },
+      // 表单校验规则
+      rules: {
+        cid: [{ required: true, trigger: 'blur', message: '请先选择所属分类' }],
+        name: [{ required: true, trigger: 'blur', message: '名称不能为空' }],
+        description: [{ required: true, trigger: 'blur', message: '描述不能为空' }],
+        price: [{ required: true, trigger: 'blur', message: '价格不能为空' }, { type: 'number', message: '价格必须为数字值' }],
+        images: [{ required: true, trigger: 'blur', message: '请上传图片集' }]
+      },
       roleSelect: [],
       checkedIds: [],
       addrForm: {
@@ -252,29 +324,9 @@ export default {
     handleDefaultImgUploadSuccess(res, file) {
       this.goodsForm.defaultImg = this.dataObj.host + '/' + this.dataObj.key
     },
-    handleRemove(file, fileList) {
-      this.goodsForm.images = fileList
-    },
-    handleSave() {
-      // 保存商品信息
-      update(this.goodsForm).then(res => {
-        this.$message({
-          type: 'success',
-          message: '操作成功!'
-        })
-        this.getList()
-        this.goodsFormShow = false
-      })
-    },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url
       this.dialogVisible = true
-    },
-    handleEdit(id) {
-      this.goodsFormShow = true
-      info(id).then(res => {
-        this.goodsForm = res.data
-      })
     },
     handleStatusChange(row) {
       // 切换商品上架下架状态
@@ -283,6 +335,14 @@ export default {
           type: 'success',
           message: '操作成功!'
         })
+        this.getList()
+      })
+    },
+    handleEdit(id) {
+      this.goodsFormShow = true
+      info(id).then(res => {
+        this.goodsForm = res.data
+        console.log(this.goodsForm)
       })
     },
     handleSelectionChange(values) {
@@ -297,13 +357,45 @@ export default {
     handleQuery() {
       this.getList()
     },
+    handleRemove(file, fileList) {
+      this.goodsForm.images = fileList
+    },
+    /** 通过按钮 */
+    handleSave(state) {
+      console.log('state==' + state)
+      // 保存商品信息
+      update(this.goodsForm.id, state).then(res => {
+        this.$message({
+          type: 'success',
+          message: '操作成功!'
+        })
+        this.getList()
+        this.goodsFormShow = false
+      })
+    },
     /** 重置按钮操作 */
     resetQuery() {
       this.queryParams = {
         pageNo: 1,
         pageSize: 10
       },
-        this.handleQuery()
+      this.handleQuery()
+    },
+    handleRecommed() {
+      if (this.checkedIds.length === 0) {
+        this.$message({
+          type: 'warning',
+          message: '请勾选需要推荐的物品!'
+        })
+        return
+      }
+      setRecommed(this.checkedIds).then(res => {
+        this.$message({
+          type: 'success',
+          message: '操作成功!'
+        })
+        this.getList()
+      })
     },
     handleDeletes() {
       if (this.checkedIds.length === 0) {
@@ -347,12 +439,12 @@ export default {
       })
     },
     handleDelete(row) {
-      this.$confirm(`确定删除收货人<${row.consignee}>吗？`, '是否继续?', '提示', {
+      this.$confirm(`确定删除卖家为<${row.seller}的${row.name}>吗？`, '是否继续?', '提示', {
         confirmButtonText: '删除',
         cancelButtonText: '算了吧',
         type: 'warning'
       }).then(() => {
-        deletes([row.addrId]).then(res => {
+        deletes([row.id]).then(res => {
           this.$message({
             type: 'success',
             message: '操作成功!'

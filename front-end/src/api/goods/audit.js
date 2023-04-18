@@ -11,3 +11,40 @@ export function list(params) {
     params
   })
 }
+
+/**
+ * 删除申请记录
+ * @returns {AxiosPromise}
+ */
+export function remove(id) {
+  return request({
+    url: '/cloud-goods/audit/' + id,
+    method: 'delete'
+  })
+}
+
+/**
+ * 修改上架状态
+ * @returns {AxiosPromise}
+ */
+export function changeStatus(goodsId, isOnSell) {
+  return request({
+    url: '/cloud-goods/audit/' + goodsId,
+    method: 'patch',
+    params: {
+      isOnSell
+    }
+  })
+}
+
+/**
+ * 更新商品审核信息
+ * @returns {AxiosPromise}
+ */
+export function update(id, state) {
+  return request({
+    url: '/cloud-goods/audit/',
+    method: 'put',
+    data: [id, state]
+  })
+}

@@ -2,16 +2,19 @@ package com.lyx.goods.controller;
 
 import com.lyx.common.base.result.R;
 import com.lyx.common.mp.utils.PageUtils;
+import com.lyx.goods.entity.req.AuditListPageReq;
 import com.lyx.goods.entity.req.GoodsListPageReq;
+import com.lyx.goods.entity.req.GoodsSaveReq;
 import com.lyx.goods.entity.vo.AuditVo;
 import com.lyx.goods.entity.vo.GoodsVO;
 import com.lyx.goods.service.AuditService;
 import com.lyx.goods.service.GoodsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @Author: xhj
@@ -30,15 +33,44 @@ public class AuditController {
     GoodsService goodsService;
 
     /**
-     * 分页查询商品列表
+     * 分页查询商品审核列表
      */
     @GetMapping("/list")
-    public R list(GoodsListPageReq req){
+    public R list(AuditListPageReq req){
         PageUtils<AuditVo> pageUtils = auditService.listPage(req);
         return R.ok(pageUtils);
     }
 
+    /**
+     * 删除审核商品
+     */
+    @DeleteMapping("/{ids}")
+    public R delete(@PathVariable List<Long> ids){
+        // 逻辑删除商品
+        goodsService.removeByIds(ids);
+        return R.ok();
+    }
 
+    /**
+     * 切换商品上架状态
+     */
+    @PatchMapping("/{goodsId}")
+    public R changeIsOnSell(@PathVariable Long goodsId , Integer isOnSell){
+        goodsService.changeIsOnSell(goodsId,isOnSell==1?0:1);
+        return R.ok();
+    }
+
+
+    /**
+     * 更新商品审核状态
+     */
+    @PutMapping()
+    public R update(@RequestBody Long[] state) {
+//        auditService.updateAuditState(id,state);
+        log.info("state{}",state[0]);
+        log.info("state{}",state[1]);
+        return R.ok();
+    }
 
 
 }
