@@ -32,7 +32,7 @@ public class Audit implements Serializable {
     /**
      * 失败原因
      */
-    private String cause;
+    private String mark;
 
     /**
      * 审核状态

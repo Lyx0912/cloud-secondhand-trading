@@ -54,23 +54,23 @@
       <el-table-column label="价格" align="center" prop="price" width="100" :show-overflow-tooltip="true" />
       <el-table-column label="上架状态" align="center" width="100">
         <template  v-slot="scope">
-          <el-tag type="success" effect="dark" v-if="scope.row.isOnSell==1">已通过</el-tag>
-          <el-tag type="warning" effect="dark" v-if="scope.row.isOnSell==0">待审核</el-tag>
-          <el-tag type="danger" effect="dark" v-if="scope.row.isOnSell==2">未通过</el-tag>
+          <el-tag type="success" effect="dark" v-if="scope.row.state==1">已通过</el-tag>
+          <el-tag type="warning" effect="dark" v-if="scope.row.state==0">待审核</el-tag>
+          <el-tag type="danger" effect="dark" v-if="scope.row.state==2">未通过</el-tag>
         </template>
       </el-table-column>
 <!--      <el-table-column label="浏览量" align="center" prop="viewCount" width="100" :show-overflow-tooltip="true" />-->
 <!--      <el-table-column label="发布时间" align="center" prop="createTime" width="164" :show-overflow-tooltip="true" />-->
-      <el-table-column label="提交时间" align="center" prop="updateTime" width="164" :show-overflow-tooltip="true" />
+      <el-table-column label="提交时间" align="center" prop="createTime" width="164" :show-overflow-tooltip="true" />
       <el-table-column align="center" prop="created_at" label="操作">
         <template v-slot="scope">
-          <el-button type="primary" icon="el-icon-edit" size="mini" v-if="scope.row.isOnSell==0"
+          <el-button type="primary" icon="el-icon-edit" size="mini" v-if="scope.row.state==0"
                      @click="handleEdit(scope.row.id)">同意</el-button>
-          <el-button type="danger" icon="el-icon-delete" size="mini" v-if="scope.row.isOnSell==0"
+          <el-button type="danger" icon="el-icon-delete" size="mini" v-if="scope.row.state==0"
                      @click="handleDelete(scope.row)">不同意</el-button>
-          <el-button type="warning" icon="el-icon-delete" size="mini" v-if="scope.row.isOnSell==1"
+          <el-button type="warning" icon="el-icon-delete" size="mini" v-if="scope.row.state==1"
                      @click="handleDelete(scope.row)">下架</el-button>
-          <el-button type="danger" icon="el-icon-delete" size="mini" v-if="scope.row.isOnSell==2"
+          <el-button type="danger" icon="el-icon-delete" size="mini" v-if="scope.row.state==2"
                      @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>

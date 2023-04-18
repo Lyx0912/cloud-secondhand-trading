@@ -3,6 +3,7 @@ package com.lyx.goods.controller;
 import com.lyx.common.base.result.R;
 import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.goods.entity.req.GoodsListPageReq;
+import com.lyx.goods.entity.vo.AuditVo;
 import com.lyx.goods.entity.vo.GoodsVO;
 import com.lyx.goods.service.AuditService;
 import com.lyx.goods.service.GoodsService;
@@ -33,9 +34,11 @@ public class AuditController {
      */
     @GetMapping("/list")
     public R list(GoodsListPageReq req){
-        PageUtils<GoodsVO> pageUtils = goodsService.listPage(req);
+        PageUtils<AuditVo> pageUtils = auditService.listPage(req);
         return R.ok(pageUtils);
     }
+
+
 
 
 }
