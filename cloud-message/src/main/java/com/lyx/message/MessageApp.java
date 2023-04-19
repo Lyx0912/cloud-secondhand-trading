@@ -1,12 +1,8 @@
 package com.lyx.message;
 
-import com.baomidou.mybatisplus.generator.FastAutoGenerator;
-import com.baomidou.mybatisplus.generator.config.OutputFile;
-import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.util.Collections;
+import org.springframework.context.annotation.ComponentScan;
 
 /**
  * @author 黎勇炫

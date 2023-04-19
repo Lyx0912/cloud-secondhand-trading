@@ -3,16 +3,18 @@ package com.lyx.message.controller;
 
 import com.lyx.common.base.result.R;
 import com.lyx.common.mp.utils.PageUtils;
+import com.lyx.common.web.utils.UserContext;
 import com.lyx.message.entity.SystemMessage;
 import com.lyx.message.entity.req.SystemMessageListPageReq;
+import com.lyx.message.entity.req.SystemMessageSaveReq;
 import com.lyx.message.entity.vo.SystemMessageVO;
 import com.lyx.message.service.SystemMessageService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
 
 /**
  * <p>
@@ -38,5 +40,45 @@ public class SystemMessageController {
         return R.ok(pageUtils);
     }
 
+     /**
+       * 获取详情
+       */
+    @GetMapping("/{id}")
+    public R info(@PathVariable Long id){
+        SystemMessage systemMessage = systemMessageService.getById(id);
+        return R.ok(systemMessage);
+    }
+
+     /**
+       * 新增系统公告
+       */
+    @PostMapping
+    public R save(@Validated @RequestBody SystemMessageSaveReq req){
+        req.setCreater(UserContext.getCurrentUserName());
+        SystemMessage systemMessage = new SystemMessage();
+        BeanUtils.copyProperties(req,systemMessage);
+        systemMessageService.save(systemMessage);
+        return R.ok();
+    }
+
+     /**
+       * 更新公告
+       */
+    @PutMapping
+    public R update(@Validated @RequestBody SystemMessageSaveReq req){
+        SystemMessage systemMessage = new SystemMessage();
+        BeanUtils.copyProperties(req,systemMessage);
+        systemMessageService.updateById(systemMessage);
+        return R.ok();
+    }
+
+     /**
+       * 批量删除
+       */
+    @DeleteMapping("/{ids}")
+    public R deletes(@PathVariable List<Long> ids){
+        systemMessageService.removeByIds(ids);
+        return R.ok();
+    }
 }
 

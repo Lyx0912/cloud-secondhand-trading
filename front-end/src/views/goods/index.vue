@@ -257,24 +257,7 @@ export default {
         price: [{ required: true, trigger: 'blur', message: '价格不能为空' }, { type: 'number', message: '价格必须为数字值' }],
         images: [{ required: true, trigger: 'blur', message: '请上传图片集' }]
       },
-      roleSelect: [],
       checkedIds: [],
-      addrForm: {
-        memberId: '',
-        mobile: '',
-        isDefault: 0,
-        consignee: 0,
-        provinceId: 0,
-        province: '',
-        cityId: 0,
-        city: '',
-        areaId: 0,
-        area: '',
-        postCode: '',
-        addr: '',
-        lng: 0.00,
-        lat: 0.00
-      },
       total: 0,
       queryParams: {
         pageNo: 1,
@@ -377,7 +360,7 @@ export default {
       this.queryParams = {
         pageNo: 1,
         pageSize: 10
-      },
+      }
       this.handleQuery()
     },
     handleRecommed() {
