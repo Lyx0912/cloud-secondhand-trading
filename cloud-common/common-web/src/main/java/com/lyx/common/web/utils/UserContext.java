@@ -20,13 +20,35 @@ import java.util.Objects;
  */
 public class UserContext {
 
-    public static Long getCurrentUserId(){
+    public static String getCurrentUserName(){
+        String token = getToken();
+        if(!StringUtils.isEmpty(token)){
+            try {
+                // 解析token
+                JSONObject jsonObject = JWSObject.parse(token).getPayload().toJSONObject();
+                if(!Objects.isNull(jsonObject)){
+                    return (String) jsonObject.get("username");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    private static String getToken() {
         // 获取servlet请求对象
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         // 获取请求中的token
         String token = requestAttributes.getRequest().getHeader(SecurityConstants.AUTHORIZATION_KEY);
         // 截取掉前缀
         token = token.replace(SecurityConstants.JWT_PREFIX,"");
+        return token;
+    }
+
+    public static Long getCurrentUserId(){
+        // 获取servlet请求对象
+        String token = getToken();
         if(!StringUtils.isEmpty(token)){
             try {
                 // 解析token
@@ -36,7 +58,6 @@ public class UserContext {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-//                throw new BizException(ResultCode.TOKEN_INVALID_OR_EXPIRED);
             }
         }
         return null;
@@ -44,11 +65,7 @@ public class UserContext {
 
     public static List<String> getRoleList() {
         // 获取servlet请求对象
-        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        // 获取请求中的token
-        String token = requestAttributes.getRequest().getHeader(SecurityConstants.AUTHORIZATION_KEY);
-        // 截取掉前缀
-        token = token.replace(SecurityConstants.JWT_PREFIX,"");
+        String token = getToken();
         if(!StringUtils.isEmpty(token)){
             try {
                 // 解析token
@@ -58,7 +75,6 @@ public class UserContext {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-//                throw new BizException(ResultCode.TOKEN_INVALID_OR_EXPIRED);
             }
         }
         return null;

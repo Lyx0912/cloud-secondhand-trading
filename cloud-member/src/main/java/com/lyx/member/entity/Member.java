@@ -117,9 +117,9 @@ public class Member implements Serializable {
     private Integer deleted;
 
     @TableField(value = "CREATE_TIME",fill = FieldFill.INSERT)
+    @DateTimeFormat("yyyy-MM-dd hh:mm:ss")
     @ExcelProperty(value = "注册时间",converter = LocalDateTimeConverter.class)
     @ColumnWidth(20)
-    @DateTimeFormat("yyyy-MM-dd hh:mm:ss")
     private LocalDateTime createTime;
 
     @TableField(value = "UPDATE_TIME",fill = FieldFill.INSERT_UPDATE)
