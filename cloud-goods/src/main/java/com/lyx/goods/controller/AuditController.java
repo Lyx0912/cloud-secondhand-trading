@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -60,15 +61,12 @@ public class AuditController {
         return R.ok();
     }
 
-
     /**
      * 更新商品审核状态
      */
     @PutMapping()
-    public R update(@RequestBody Long[] state) {
-//        auditService.updateAuditState(id,state);
-        log.info("state{}",state[0]);
-        log.info("state{}",state[1]);
+    public R update(@RequestBody Long[] state) throws IOException {
+        auditService.updateAuditState(state[0],state[1]);
         return R.ok();
     }
 

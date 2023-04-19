@@ -45,18 +45,6 @@
 
         <dependency>
             <groupId>com.lyx</groupId>
-            <artifactId>common-redis</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.lyx</groupId>
-            <artifactId>admin-api</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.lyx</groupId>
             <artifactId>common-base</artifactId>
             <version>1.0.0</version>
         </dependency>
@@ -84,10 +72,15 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <groupId>com.lyx</groupId>
+            <artifactId>common-web</artifactId>
+            <version>1.0.0</version>
         </dependency>
-
+        <!-- openfeign渚濊禆 1. http瀹㈡埛绔€夋嫨okhttp 2. loadbalancer鏇挎崲ribbon -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

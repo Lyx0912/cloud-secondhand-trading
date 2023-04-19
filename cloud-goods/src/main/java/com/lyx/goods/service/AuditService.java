@@ -8,6 +8,8 @@ import com.lyx.goods.entity.req.AuditListPageReq;
 import com.lyx.goods.entity.req.GoodsListPageReq;
 import com.lyx.goods.entity.vo.AuditVo;
 
+import java.io.IOException;
+
 /**
  * <p>
  *  服务类
@@ -21,4 +23,5 @@ public interface AuditService extends IService<Audit> {
 
     PageUtils<AuditVo> listPage(AuditListPageReq req);
 
+    void updateAuditState(Long id, Long state) throws IOException;
 }
