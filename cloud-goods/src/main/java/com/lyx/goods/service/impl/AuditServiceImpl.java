@@ -8,10 +8,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.goods.entity.Audit;
 import com.lyx.goods.entity.Goods;
+import com.lyx.goods.entity.GoodsEsModel;
 import com.lyx.goods.entity.req.AuditListPageReq;
 import com.lyx.goods.entity.req.GoodsListPageReq;
 import com.lyx.goods.entity.vo.AuditVo;
 import com.lyx.goods.entity.vo.GoodsVO;
+import com.lyx.goods.feign.SearchElasticFeignService;
 import com.lyx.goods.mapper.AuditMapper;
 import com.lyx.goods.service.AuditService;
 import com.lyx.goods.service.CategoryService;
@@ -23,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,6 +48,9 @@ public class AuditServiceImpl extends ServiceImpl<AuditMapper, Audit> implements
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private SearchElasticFeignService feignService;
 
     /**
      *
@@ -79,4 +86,29 @@ public class AuditServiceImpl extends ServiceImpl<AuditMapper, Audit> implements
         page.setTotal(auditVos.stream().count());
         return PageUtils.build(page);
     }
+
+    @Transactional
+    @Override
+    public void updateAuditState(Long id, Long state) throws IOException {
+        LambdaUpdateWrapper<Audit> wrapper = Wrappers.lambdaUpdate();
+        wrapper.set(Audit::getState,state)
+                .eq(Audit::getGoodsId,id);
+        this.update(wrapper);
+        LambdaUpdateWrapper<Goods> updateWrapper = Wrappers.lambdaUpdate();
+        if (state == 1){
+            updateWrapper.set(state==1,Goods::getIsOnSell,1)
+                    .eq(Goods::getId,id);
+            goodsService.update(updateWrapper);
+        }
+        GoodsVO goodsVO = goodsService.getGoodsVOById(id);
+        List<GoodsVO> goodsVOS = new ArrayList<>();
+        goodsVOS.add(goodsVO);
+        List<GoodsEsModel> esModels = goodsVOS.stream().map(goodsVo -> {
+            GoodsEsModel esModel = new GoodsEsModel();
+            BeanUtils.copyProperties(goodsVo, esModel);
+            return esModel;
+        }).collect(Collectors.toList());
+        feignService.goodsStatusUp(esModels);
+    }
+
 }

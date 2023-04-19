@@ -19,27 +19,27 @@ import java.io.IOException;
 @SpringBootApplication
 public class SearchApp {
 
-    static class Users{
-        public String userName;
-        public Integer age;
-
-        public Users(String userName, Integer age) {
-            this.userName = userName;
-            this.age = age;
-        }
-    }
+//    static class Users{
+//        public String userName;
+//        public Integer age;
+//
+//        public Users(String userName, Integer age) {
+//            this.userName = userName;
+//            this.age = age;
+//        }
+//    }
 
     public static void main(String[] args) throws IOException {
         ConfigurableApplicationContext run = SpringApplication.run(SearchApp.class, args);
-        RestHighLevelClient restHighLevelClient = (RestHighLevelClient) run.getBean("restHighLevelClient");
-        IndexRequest indexRequest  = new IndexRequest("users");
-        indexRequest.id("1");
-
-        Users user = new Users("黎勇炫", 18);
-
-        indexRequest.source(JSON.toJSONString(user), XContentType.JSON);
-
-        IndexResponse indexResponse = restHighLevelClient.index(indexRequest,EsConfig.COMMON_OPTIONS);
-        System.out.println(indexResponse);
+//        RestHighLevelClient restHighLevelClient = (RestHighLevelClient) run.getBean("restHighLevelClient");
+//        IndexRequest indexRequest  = new IndexRequest("users");
+//        indexRequest.id("1");
+//
+//        Users user = new Users("黎勇炫", 18);
+//
+//        indexRequest.source(JSON.toJSONString(user), XContentType.JSON);
+//
+//        IndexResponse indexResponse = restHighLevelClient.index(indexRequest,EsConfig.COMMON_OPTIONS);
+//        System.out.println(indexResponse);
     }
 }
