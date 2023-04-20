@@ -89,7 +89,7 @@ export default {
         pageSize: 10
       },
       list: null,
-      listLoading: true,
+      listLoading: true
     }
   },
   created() {
@@ -152,15 +152,6 @@ export default {
         })
       })
     },
-    handleStatusChange(row) {
-      changeStatus(row.id, row.isActive).then(res => {
-        this.$message({
-          type: 'success',
-          message: '操作成功!'
-        })
-        this.getList()
-      })
-    },
     getList() {
       this.listLoading = true
       list(this.queryParams).then(response => {
@@ -174,26 +165,6 @@ export default {
         this.bannerForm = res.data
         this.bannerFormShow = true
       })
-    },
-    saveOrUpdate() {
-      if (this.bannerForm.id) {
-        update(this.bannerForm).then(res => {
-          this.$message({
-            type: 'success',
-            message: '更新成功!'
-          })
-        })
-      } else {
-        //  添加轮播图
-        save(this.bannerForm).then(res => {
-          this.$message({
-            type: 'success',
-            message: '添加成功!'
-          })
-        })
-      }
-      this.bannerFormShow = false
-      this.getList()
     },
     handleDelete(row) {
       this.$confirm(`确定删除吗？`, '是否继续?', '提示', {
