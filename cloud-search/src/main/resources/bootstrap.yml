@@ -16,6 +16,7 @@ spring:
         shared-configs[0]:
           data-id: cloud-common.yaml
           refresh: true
+
 logging:
   level:
     spring.: info

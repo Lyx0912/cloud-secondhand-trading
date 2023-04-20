@@ -1,11 +1,11 @@
 package com.lyx.search.service.ipml;
 
 import com.alibaba.fastjson.JSON;
+
+import com.lyx.common.base.entity.dto.GoodsEsDTO;
 import com.lyx.search.config.EsConfig;
-import com.lyx.search.entity.vo.GoodsEsModel;
 import com.lyx.search.service.GoodsSaveService;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -32,12 +32,12 @@ public class GoodsSaveServiceIpml implements GoodsSaveService {
     private RestHighLevelClient highLevelClient;
 
     @Override
-    public void goodsStatusUp(List<GoodsEsModel> goodsEsModels) throws IOException {
+    public void goodsStatusUp(List<GoodsEsDTO> goodsEsDTOS) throws IOException {
         BulkRequest bulkRequest = new BulkRequest();
-        for (GoodsEsModel goodsEsModel : goodsEsModels) {
+        for (GoodsEsDTO goodsEsDTO : goodsEsDTOS) {
             IndexRequest indexRequest = new IndexRequest("goods");
-            indexRequest.id(goodsEsModel.getId().toString());
-            String s = JSON.toJSONString(goodsEsModel);
+            indexRequest.id(goodsEsDTO.getId().toString());
+            String s = JSON.toJSONString(goodsEsDTO);
             indexRequest.source(s, XContentType.JSON);
             bulkRequest.add(indexRequest);
         }
@@ -48,8 +48,8 @@ public class GoodsSaveServiceIpml implements GoodsSaveService {
         if (hasFailures){
             log.error("商品上架失败{}",hasFailures);
         }
-        List<String> collect = Arrays.asList(bulk.getItems()).stream().map(item -> {
-            return item.getId();
+        List<Object> collect = Arrays.asList(bulk.getItems()).stream().map(item -> {
+            return item.getResponse();
         }).collect(Collectors.toList());
 
         log.info("商品上架完成：{}",collect);

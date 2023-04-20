@@ -67,11 +67,7 @@
         <template v-slot="scope">
           <el-button type="primary" icon="el-icon-edit" size="mini" v-if="scope.row.state==0"
                      @click="handleEdit(scope.row.id)">审核</el-button>
-          <el-button type="warning" icon="el-icon-delete" size="mini" v-if="scope.row.state==1 && scope.row.isOnSell==1"
-                     @click="handleStatusChange(scope.row)">下架</el-button>
-          <el-button type="primary" icon="el-icon-delete" size="mini" v-if="scope.row.state==1 && scope.row.isOnSell==0"
-                     @click="handleStatusChange(scope.row)">上架</el-button>
-          <el-button type="danger" icon="el-icon-delete" size="mini" v-if="scope.row.state==2"
+          <el-button type="danger" icon="el-icon-delete" size="mini" v-if="scope.row.state!=0"
                      @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -170,70 +166,6 @@ export default {
       dialogVisible: false,
       formLabelWidth: '120px',
       mode: 'simple',
-      ...useWangEditor({
-        config: {
-          MENU_CONF: {
-            uploadImage: {
-              // 后端上传地址，必填
-              server: '/api/upload/image',
-              // form-data fieldName，后端接口参数名称，默认值wangeditor-uploaded-image
-              fieldName: 'file',
-              // 1M，单个文件的最大体积限制，默认为 2M
-              maxFileSize: 1 * 1024 * 1024,
-              // 最多可上传几个文件，默认为 100
-              maxNumberOfFiles: 10,
-              // 选择文件时的类型限制，默认为 ['image/*'] 。如不想限制，则设置为 []
-              allowedFileTypes: ['image/*'],
-              // 15 秒，超时时间，默认为 10 秒
-              timeout: 15 * 1000
-              // 自定义上传参数，例如传递验证的 token 等。参数会被添加到 formData 中，一起上传到服务端。
-              // meta: {
-              //     token: 'xxx',
-              //     otherKey: 'yyy'
-              // },
-              // 将 meta 拼接到 url 参数中，默认 false
-              // metaWithUrl: false,
-              // 自定义增加 http  header
-              // headers: {
-              //     Accept: 'text/x-json',
-              //     otherKey: 'xxx'
-              // },
-              // 跨域是否传递 cookie ，默认为 false
-              // withCredentials: false,
-            },
-            uploadVideo: {
-              // 后端上传地址，必填
-              server: '/api/upload/video',
-              // form-data fieldName，后端接口参数名称，默认值wangeditor-uploaded-video
-              fieldName: 'file',
-              // 5M，文件大小限制，默认10M
-              maxFileSize: 5 * 1024 * 1024,
-              // 最多可上传几个文件，默认为 5
-              maxNumberOfFiles: 3,
-              // 选择文件时的类型限制，默认为 ['video/*'] 。如不想限制，则设置为 []
-              allowedFileTypes: ['video/*'],
-              // 15 秒，超时时间，默认为 30 秒
-              timeout: 15 * 1000
-              // 自定义上传参数，例如传递验证的 token 等。参数会被添加到 formData 中，一起上传到服务端。
-              // meta: {
-              //     token: 'xxx',
-              //     otherKey: 'yyy'
-              // },
-              // 将 meta 拼接到 url 参数中，默认 false
-              // metaWithUrl: false,
-              // 自定义增加 http  header
-              // headers: {
-              //     Accept: 'text/x-json',
-              //     otherKey: 'xxx'
-              // },
-              // 跨域是否传递 cookie ，默认为 false
-              // withCredentials: false,
-            }
-          }
-          // onCreated: (inst) => {
-          // }
-        }
-      }),
       data: {
         json: '',
         html: ''
@@ -246,32 +178,8 @@ export default {
           content: ''
         }
       },
-      // 表单校验规则
-      rules: {
-        cid: [{ required: true, trigger: 'blur', message: '请先选择所属分类' }],
-        name: [{ required: true, trigger: 'blur', message: '名称不能为空' }],
-        description: [{ required: true, trigger: 'blur', message: '描述不能为空' }],
-        price: [{ required: true, trigger: 'blur', message: '价格不能为空' }, { type: 'number', message: '价格必须为数字值' }],
-        images: [{ required: true, trigger: 'blur', message: '请上传图片集' }]
-      },
       roleSelect: [],
       checkedIds: [],
-      addrForm: {
-        memberId: '',
-        mobile: '',
-        isDefault: 0,
-        consignee: 0,
-        provinceId: 0,
-        province: '',
-        cityId: 0,
-        city: '',
-        areaId: 0,
-        area: '',
-        postCode: '',
-        addr: '',
-        lng: 0.00,
-        lat: 0.00
-      },
       total: 0,
       queryParams: {
         pageNo: 1,
@@ -327,16 +235,6 @@ export default {
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url
       this.dialogVisible = true
-    },
-    handleStatusChange(row) {
-      // 切换商品上架下架状态
-      changeStatus(row.id, row.isOnSell).then(res => {
-        this.$message({
-          type: 'success',
-          message: '操作成功!'
-        })
-        this.getList()
-      })
     },
     handleEdit(id) {
       this.goodsFormShow = true
