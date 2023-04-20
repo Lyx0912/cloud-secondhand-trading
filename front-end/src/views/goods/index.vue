@@ -139,7 +139,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="goodsFormShow = false">关 闭</el-button>
+        <el-button @click="closeDialog">关 闭</el-button>
         <el-button type="primary" @click="handleSave()">保 存</el-button>
       </div>
     </el-dialog>
@@ -176,6 +176,7 @@ export default {
       ...useWangEditor({
         config: {
           MENU_CONF: {
+            delay: 1000,
             uploadImage: {
               // 后端上传地址，必填
               server: '/api/upload/image',
@@ -237,10 +238,6 @@ export default {
           // }
         }
       }),
-      data: {
-        json: '',
-        html: ''
-      },
       dataObj: {},
       goodsFormTitle: '编辑商品',
       goodsFormShow: false,
@@ -279,6 +276,10 @@ export default {
     this.getCategoryList()
   },
   methods: {
+    closeDialog() {
+      this.reloadEditor()
+      this.goodsFormShow = false
+    },
     beforeUpload(file) {
       const _self = this
       return new Promise((resolve, reject) => {
@@ -314,6 +315,8 @@ export default {
       this.goodsForm.images = fileList
     },
     handleSave() {
+      // 强制同步 v-model 数据
+      this.syncContent()
       // 保存商品信息
       update(this.goodsForm).then(res => {
         this.$message({
@@ -329,10 +332,10 @@ export default {
       this.dialogVisible = true
     },
     handleEdit(id) {
-      this.goodsFormShow = true
       info(id).then(res => {
         this.goodsForm = res.data
       })
+      this.goodsFormShow = true
     },
     handleStatusChange(row) {
       // 切换商品上架下架状态
