@@ -48,7 +48,7 @@ public class AuditController {
     @DeleteMapping("/{ids}")
     public R delete(@PathVariable List<Long> ids){
         // 逻辑删除商品
-        goodsService.removeByIds(ids);
+        auditService.auditremoveByIds(ids);
         return R.ok();
     }
 

@@ -76,11 +76,12 @@
             <artifactId>common-web</artifactId>
             <version>1.0.0</version>
         </dependency>
-        <!-- openfeign渚濊禆 1. http瀹㈡埛绔€夋嫨okhttp 2. loadbalancer鏇挎崲ribbon -->
+        <!-- 远程调用 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
+
     </dependencies>
 
 </project>

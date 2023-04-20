@@ -5,12 +5,12 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+
+import com.lyx.common.base.entity.dto.GoodsEsDTO;
 import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.goods.entity.Audit;
 import com.lyx.goods.entity.Goods;
-import com.lyx.goods.entity.GoodsEsModel;
 import com.lyx.goods.entity.req.AuditListPageReq;
-import com.lyx.goods.entity.req.GoodsListPageReq;
 import com.lyx.goods.entity.vo.AuditVo;
 import com.lyx.goods.entity.vo.GoodsVO;
 import com.lyx.goods.feign.SearchElasticFeignService;
@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -90,25 +91,43 @@ public class AuditServiceImpl extends ServiceImpl<AuditMapper, Audit> implements
     @Transactional
     @Override
     public void updateAuditState(Long id, Long state) throws IOException {
+        // 构建 Audit 更新条件 修改审核状态码
         LambdaUpdateWrapper<Audit> wrapper = Wrappers.lambdaUpdate();
         wrapper.set(Audit::getState,state)
                 .eq(Audit::getGoodsId,id);
         this.update(wrapper);
+        // 构建 Goods 更新条件 修改上架状态码
         LambdaUpdateWrapper<Goods> updateWrapper = Wrappers.lambdaUpdate();
         if (state == 1){
             updateWrapper.set(state==1,Goods::getIsOnSell,1)
                     .eq(Goods::getId,id);
             goodsService.update(updateWrapper);
         }
+        // 获取 id 对应的 goodsVO信息
         GoodsVO goodsVO = goodsService.getGoodsVOById(id);
         List<GoodsVO> goodsVOS = new ArrayList<>();
         goodsVOS.add(goodsVO);
-        List<GoodsEsModel> esModels = goodsVOS.stream().map(goodsVo -> {
-            GoodsEsModel esModel = new GoodsEsModel();
+        List<GoodsEsDTO> esDTOS = goodsVOS.stream().map(goodsVo -> {
+            GoodsEsDTO esModel = new GoodsEsDTO();
             BeanUtils.copyProperties(goodsVo, esModel);
             return esModel;
         }).collect(Collectors.toList());
-        feignService.goodsStatusUp(esModels);
+        // 远程调用 商品上架到 Elasticsave
+        feignService.goodsStatusUp(esDTOS);
+    }
+
+    @Transactional
+    @Override
+    public void auditremoveByIds(List<Long> ids) {
+        // 更改状态为下架状态
+        for (Long id : ids) {
+            LambdaUpdateWrapper<Goods> wrapper = Wrappers.lambdaUpdate();
+            wrapper.set(Goods::getIsOnSell,0)
+                    .eq(Goods::getId,id);
+            goodsService.update(wrapper);
+        }
+        goodsService.removeByIds(ids);
+
     }
 
 }

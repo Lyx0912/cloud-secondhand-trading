@@ -1,14 +1,11 @@
 package com.lyx.goods.feign;
 
+import com.lyx.common.base.entity.dto.GoodsEsDTO;
 import com.lyx.common.base.result.R;
-import com.lyx.goods.entity.GoodsEsModel;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -20,5 +17,5 @@ import java.util.List;
 public interface SearchElasticFeignService {
 
     @PostMapping("/search/goods")
-    public R goodsStatusUp(@RequestBody List<GoodsEsModel> goodsEsModels);
+    public R goodsStatusUp(@RequestBody List<GoodsEsDTO> goodsEsDTOS);
 }

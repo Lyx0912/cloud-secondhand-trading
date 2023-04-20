@@ -1,7 +1,7 @@
 package com.lyx.search.controller;
 
+import com.lyx.common.base.entity.dto.GoodsEsDTO;
 import com.lyx.common.base.result.R;
-import com.lyx.search.entity.vo.GoodsEsModel;
 import com.lyx.search.service.GoodsSaveService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,15 +24,13 @@ public class ElasticSaveController {
     private GoodsSaveService goodsSaveService;
 
     @PostMapping("/goods")
-    public R goodsStatusUp(@RequestBody List<GoodsEsModel> goodsEsModels){
-        System.out.println(goodsEsModels);
-        log.info("goodsEsModels{}","goodsEsModels");
-//        try {
-//            goodsSaveService.goodsStatusUp(goodsEsModels);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        return R.ok("goodsEsModels");
+    public R goodsStatusUp(@RequestBody List<GoodsEsDTO> goodsEsDTOS){
+        try {
+            goodsSaveService.goodsStatusUp(goodsEsDTOS);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return R.ok();
     }
 
 }
