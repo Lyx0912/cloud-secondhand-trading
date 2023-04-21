@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.goods.entity.Audit;
 import com.lyx.goods.entity.req.AuditListPageReq;
+import com.lyx.goods.entity.req.AuditSaveReq;
 import com.lyx.goods.entity.req.GoodsListPageReq;
 import com.lyx.goods.entity.vo.AuditVo;
 
@@ -24,7 +25,7 @@ public interface AuditService extends IService<Audit> {
 
     PageUtils<AuditVo> listPage(AuditListPageReq req);
 
-    void updateAuditState(Long id, Long state) throws IOException;
+    void updateAuditState(AuditSaveReq req) throws IOException;
 
     void auditremoveByIds(List<Long> ids);
 }

@@ -57,7 +57,9 @@
         <template  v-slot="scope">
           <el-tag type="success" effect="dark" v-if="scope.row.state==1">已通过</el-tag>
           <el-tag type="warning" effect="dark" v-if="scope.row.state==0">待审核</el-tag>
-          <el-tag type="danger" effect="dark" v-if="scope.row.state==2">未通过</el-tag>
+          <el-tooltip class="item" effect="dark" :content="scope.row.mark" placement="top">
+            <el-tag type="danger" effect="dark" v-if="scope.row.state==2">未通过</el-tag>
+          </el-tooltip>
         </template>
       </el-table-column>
 <!--      <el-table-column label="浏览量" align="center" prop="viewCount" width="100" :show-overflow-tooltip="true" />-->
@@ -81,50 +83,33 @@
             v-model="goodsForm.categoryPath"
             placeholder="试试搜索：指南"
             :options="categoryList"
-            filterable></el-cascader>
+            filterable
+            disabled
+          style="width: 300px;"></el-cascader>
           <!--          <el-input v-model="goodsForm.cid" />-->
         </el-form-item>
         <el-form-item prop="name" label="名称">
-          <el-input v-model="goodsForm.name" />
+          <el-input v-model="goodsForm.name" disabled="disabled" />
         </el-form-item>
         <el-form-item prop="description" label="描述">
-          <el-input v-model="goodsForm.description" />
+          <el-input v-model="goodsForm.description" disabled="disabled" />
         </el-form-item>
         <el-form-item prop="price" label="价格">
-          <el-input v-model="goodsForm.price" />
+          <el-input v-model="goodsForm.price" disabled="disabled" />
         </el-form-item>
         <el-form-item prop="defaultImg" label="展示图">
-          <el-upload
-            :data="dataObj"
-            action="http://cloud-secondhand-trading.oss-cn-shanghai.aliyuncs.com"
-            multiple
-            accept="jpg,jpeg,png,PNG"
-            list-type="picture-card"
-            :on-success="handleDefaultImgUploadSuccess"
-            :show-file-list="false"
-            :before-upload="beforeUpload"
-          >
-            <img v-if="goodsForm.defaultImg" :src="goodsForm.defaultImg" class="avatar">
-            <i v-else class="el-icon-plus" />
-          </el-upload>
+            <el-image :src="goodsForm.defaultImg" class="avatar" />
         </el-form-item>
         <el-form-item prop="images" label="图片集">
-          <el-upload
-            :data="dataObj"
-            action="http://cloud-secondhand-trading.oss-cn-shanghai.aliyuncs.com"
-            multiple
-            accept="jpg,jpeg,png,PNG"
-            list-type="picture-card"
-            :on-success="handleUploadSuccess"
-            :file-list="goodsForm.images"
-            :before-upload="beforeUpload"
-            :on-remove="handleRemove"
-          >
-            <i class="el-icon-plus" />
-          </el-upload>
+          <template v-for="scope in goodsForm.images">
+            <el-image :src="scope.url" style="width:64px;height:64px;" :preview-src-list="[scope.url]" />
+          </template>
         </el-form-item>
         <el-form-item prop="details.content" label="详情">
           <we-editor :toolbar-option="toolbar" style="width: 100%;height: 400px;border: #DCDFE6 1px solid;border-radius: 4px" :editable-option="editable" :mode="mode" :html.sync="goodsForm.details.content" />
+        </el-form-item>
+        <el-form-item prop="details.content" label="备注">
+          <el-input v-model="audit.mark" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -162,10 +147,79 @@ export default {
   },
   data() {
     return {
+      audit: {
+      },
+      images: '',
+      idialogVisible: false,
       dialogImageUrl: '',
       dialogVisible: false,
       formLabelWidth: '120px',
       mode: 'simple',
+      ...useWangEditor({
+        config: {
+          MENU_CONF: {
+            uploadImage: {
+              readOnly: true,
+              // 后端上传地址，必填
+              server: '/api/upload/image',
+              // form-data fieldName，后端接口参数名称，默认值wangeditor-uploaded-image
+              fieldName: 'file',
+              // 1M，单个文件的最大体积限制，默认为 2M
+              maxFileSize: 1 * 1024 * 1024,
+              // 最多可上传几个文件，默认为 100
+              maxNumberOfFiles: 10,
+              // 选择文件时的类型限制，默认为 ['image/*'] 。如不想限制，则设置为 []
+              allowedFileTypes: ['image/*'],
+              // 15 秒，超时时间，默认为 10 秒
+              timeout: 15 * 1000
+              // 自定义上传参数，例如传递验证的 token 等。参数会被添加到 formData 中，一起上传到服务端。
+              // meta: {
+              //     token: 'xxx',
+              //     otherKey: 'yyy'
+              // },
+              // 将 meta 拼接到 url 参数中，默认 false
+              // metaWithUrl: false,
+              // 自定义增加 http  header
+              // headers: {
+              //     Accept: 'text/x-json',
+              //     otherKey: 'xxx'
+              // },
+              // 跨域是否传递 cookie ，默认为 false
+              // withCredentials: false,
+            },
+            uploadVideo: {
+              // 后端上传地址，必填
+              server: '/api/upload/video',
+              // form-data fieldName，后端接口参数名称，默认值wangeditor-uploaded-video
+              fieldName: 'file',
+              // 5M，文件大小限制，默认10M
+              maxFileSize: 5 * 1024 * 1024,
+              // 最多可上传几个文件，默认为 5
+              maxNumberOfFiles: 3,
+              // 选择文件时的类型限制，默认为 ['video/*'] 。如不想限制，则设置为 []
+              allowedFileTypes: ['video/*'],
+              // 15 秒，超时时间，默认为 30 秒
+              timeout: 15 * 1000
+              // 自定义上传参数，例如传递验证的 token 等。参数会被添加到 formData 中，一起上传到服务端。
+              // meta: {
+              //     token: 'xxx',
+              //     otherKey: 'yyy'
+              // },
+              // 将 meta 拼接到 url 参数中，默认 false
+              // metaWithUrl: false,
+              // 自定义增加 http  header
+              // headers: {
+              //     Accept: 'text/x-json',
+              //     otherKey: 'xxx'
+              // },
+              // 跨域是否传递 cookie ，默认为 false
+              // withCredentials: false,
+            }
+          }
+          // onCreated: (inst) => {
+          // }
+        }
+      }),
       data: {
         json: '',
         html: ''
@@ -178,8 +232,32 @@ export default {
           content: ''
         }
       },
+      // 表单校验规则
+      rules: {
+        cid: [{ required: true, trigger: 'blur', message: '请先选择所属分类' }],
+        name: [{ required: true, trigger: 'blur', message: '名称不能为空' }],
+        description: [{ required: true, trigger: 'blur', message: '描述不能为空' }],
+        price: [{ required: true, trigger: 'blur', message: '价格不能为空' }, { type: 'number', message: '价格必须为数字值' }],
+        images: [{ required: true, trigger: 'blur', message: '请上传图片集' }]
+      },
       roleSelect: [],
       checkedIds: [],
+      addrForm: {
+        memberId: '',
+        mobile: '',
+        isDefault: 0,
+        consignee: 0,
+        provinceId: 0,
+        province: '',
+        cityId: 0,
+        city: '',
+        areaId: 0,
+        area: '',
+        postCode: '',
+        addr: '',
+        lng: 0.00,
+        lat: 0.00
+      },
       total: 0,
       queryParams: {
         pageNo: 1,
@@ -260,13 +338,18 @@ export default {
     },
     /** 通过按钮 */
     handleSave(state) {
-      console.log('state==' + state)
-      // 保存商品信息
-      update(this.goodsForm.id, state).then(res => {
+      this.audit.goodsId = this.goodsForm.id
+      this.audit.state = state
+      console.log('audit==' + this.audit.goodsId)
+      console.log('audit==' + this.audit.mark)
+      console.log('audit==' + this.audit.state)
+      /** 保存商品信息 */
+      update(this.audit).then(res => {
         this.$message({
           type: 'success',
           message: '操作成功!'
         })
+        this.audit = {}
         this.getList()
         this.goodsFormShow = false
       })

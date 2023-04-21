@@ -2,7 +2,9 @@ package com.lyx.goods.controller;
 
 import com.lyx.common.base.result.R;
 import com.lyx.common.mp.utils.PageUtils;
+import com.lyx.goods.entity.Audit;
 import com.lyx.goods.entity.req.AuditListPageReq;
+import com.lyx.goods.entity.req.AuditSaveReq;
 import com.lyx.goods.entity.req.GoodsListPageReq;
 import com.lyx.goods.entity.req.GoodsSaveReq;
 import com.lyx.goods.entity.vo.AuditVo;
@@ -65,8 +67,9 @@ public class AuditController {
      * 更新商品审核状态
      */
     @PutMapping()
-    public R update(@RequestBody Long[] state) throws IOException {
-        auditService.updateAuditState(state[0],state[1]);
+    public R update(@RequestBody AuditSaveReq req) throws IOException {
+        auditService.updateAuditState(req);
+        log.info("AuditSaveReq{}",req);
         return R.ok();
     }
 
