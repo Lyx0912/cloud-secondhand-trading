@@ -19,6 +19,7 @@ public class SystemMessageSaveReq {
     /**
      * 消息ID
      */
+    private Long id;
 
     /**
      * 消息标题
