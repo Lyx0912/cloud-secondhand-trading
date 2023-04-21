@@ -25,7 +25,7 @@ public class SystemMessage implements Serializable {
      * 消息ID
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
     /**
      * 消息标题
@@ -65,11 +65,11 @@ public class SystemMessage implements Serializable {
        */
     private String creater;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

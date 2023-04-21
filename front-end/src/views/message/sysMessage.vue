@@ -76,7 +76,7 @@
           />
         </el-form-item>
         <el-form-item prop="content" label="详情">
-          <we-editor :toolbar-option="toolbar" style="width: 100%;height: 400px;border: #DCDFE6 1px solid;border-radius: 4px" :editable-option="editable" :mode="mode" :html.sync="systemMessageForm.content" />
+          <we-editor :toolbar-option="toolbar" style="width: 100%;height: 400px;border: #DCDFE6 1px solid;border-radius: 4px" :editable-option="editable" :mode="mode" v-bind:html.sync="systemMessageForm.content" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -101,6 +101,7 @@ export default {
       mode: 'simple',
       ...useWangEditor({
         config: {
+          extendCache: false,
           MENU_CONF: {
             uploadImage: {
               // 后端上传地址，必填
@@ -165,9 +166,7 @@ export default {
       }),
       systemMessageFormShow: false,
       systemMessageFormTitle: '编辑公告',
-      systemMessageForm: {
-        content: ''
-      },
+      systemMessageForm: {},
       checkedIds: [],
       total: 0,
       queryParams: {
@@ -194,7 +193,9 @@ export default {
       })
     },
     handleAdd() {
-      this.systemMessageForm = { }
+      this.systemMessageForm = {
+        content: '请输入公告内容'
+      }
       this.systemMessageFormShow = true
     },
     handleSelectionChange(values) {
@@ -226,6 +227,8 @@ export default {
       })
     },
     saveOrUpdate() {
+      // 强制同步 v-model 数据
+      this.syncContent()
       if (this.systemMessageForm.id) {
         update(this.systemMessageForm).then(res => {
           this.$message({
@@ -234,7 +237,6 @@ export default {
           })
         })
       } else {
-        //  添加轮播图
         save(this.systemMessageForm).then(res => {
           this.$message({
             type: 'success',
@@ -242,7 +244,8 @@ export default {
           })
         })
       }
-      this.bannerFormShow = false
+      this.reloadEditor()
+      this.systemMessageFormShow = false
       this.getList()
     },
     handleDeletes() {

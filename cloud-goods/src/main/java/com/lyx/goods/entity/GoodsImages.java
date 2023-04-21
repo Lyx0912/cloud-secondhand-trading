@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +20,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @TableName("gms_goods_images")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GoodsImages implements Serializable {
 
     private static final long serialVersionUID = 1L;

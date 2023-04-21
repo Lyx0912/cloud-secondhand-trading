@@ -1,5 +1,6 @@
 package com.lyx.goods.entity.req;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.lyx.goods.entity.GoodsDetails;
 import com.lyx.goods.entity.GoodsImages;
 import lombok.Data;
@@ -13,6 +14,7 @@ import java.util.List;
  * @author 黎勇炫
  * @date 2023年04月10日 14:58
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class GoodsSaveReq {
 
