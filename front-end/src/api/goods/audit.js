@@ -41,10 +41,10 @@ export function changeStatus(goodsId, isOnSell) {
  * 更新商品审核信息
  * @returns {AxiosPromise}
  */
-export function update(id, state) {
+export function update(audit) {
   return request({
     url: '/cloud-goods/audit/',
     method: 'put',
-    data: [id, state]
+    data: audit
   })
 }

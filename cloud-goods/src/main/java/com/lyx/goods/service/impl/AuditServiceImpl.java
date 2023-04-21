@@ -11,6 +11,7 @@ import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.goods.entity.Audit;
 import com.lyx.goods.entity.Goods;
 import com.lyx.goods.entity.req.AuditListPageReq;
+import com.lyx.goods.entity.req.AuditSaveReq;
 import com.lyx.goods.entity.vo.AuditVo;
 import com.lyx.goods.entity.vo.GoodsVO;
 import com.lyx.goods.feign.SearchElasticFeignService;
@@ -54,7 +55,7 @@ public class AuditServiceImpl extends ServiceImpl<AuditMapper, Audit> implements
     private SearchElasticFeignService feignService;
 
     /**
-     *
+     *  分页查询商品审核列表
      * @param req
      * @return
      */
@@ -78,6 +79,7 @@ public class AuditServiceImpl extends ServiceImpl<AuditMapper, Audit> implements
             auditVo.setMark(audit.getMark());
             // 查询对应分类名称
             auditVo.setCategoryName(categoryService.getById(good.getCid()).getName());
+            log.info("auditVo{}",auditVo);
             return auditVo;
         }).collect(Collectors.toList());
         if (req.getState()!=null){
@@ -90,30 +92,31 @@ public class AuditServiceImpl extends ServiceImpl<AuditMapper, Audit> implements
 
     @Transactional
     @Override
-    public void updateAuditState(Long id, Long state) throws IOException {
+    public void updateAuditState(AuditSaveReq req) throws IOException {
         // 构建 Audit 更新条件 修改审核状态码
         LambdaUpdateWrapper<Audit> wrapper = Wrappers.lambdaUpdate();
-        wrapper.set(Audit::getState,state)
-                .eq(Audit::getGoodsId,id);
+        wrapper.set(Audit::getState,req.getState())
+                .set(StringUtils.isNotEmpty(req.getMark()),Audit::getMark,req.getMark())
+                .eq(Audit::getGoodsId,req.getGoodsId());
         this.update(wrapper);
         // 构建 Goods 更新条件 修改上架状态码
         LambdaUpdateWrapper<Goods> updateWrapper = Wrappers.lambdaUpdate();
-        if (state == 1){
-            updateWrapper.set(state==1,Goods::getIsOnSell,1)
-                    .eq(Goods::getId,id);
+        if (req.getState() == 1){
+            updateWrapper.set(req.getState()==1,Goods::getIsOnSell,1)
+                    .eq(Goods::getId,req.getGoodsId());
             goodsService.update(updateWrapper);
+            // 获取 id 对应的 goodsVO信息
+            GoodsVO goodsVO = goodsService.getGoodsVOById(req.getGoodsId());
+            List<GoodsVO> goodsVOS = new ArrayList<>();
+            goodsVOS.add(goodsVO);
+            List<GoodsEsDTO> esDTOS = goodsVOS.stream().map(goodsVo -> {
+                GoodsEsDTO esModel = new GoodsEsDTO();
+                BeanUtils.copyProperties(goodsVo, esModel);
+                return esModel;
+            }).collect(Collectors.toList());
+            // 远程调用 商品上架到 Elasticsave
+            feignService.goodsStatusUp(esDTOS);
         }
-        // 获取 id 对应的 goodsVO信息
-        GoodsVO goodsVO = goodsService.getGoodsVOById(id);
-        List<GoodsVO> goodsVOS = new ArrayList<>();
-        goodsVOS.add(goodsVO);
-        List<GoodsEsDTO> esDTOS = goodsVOS.stream().map(goodsVo -> {
-            GoodsEsDTO esModel = new GoodsEsDTO();
-            BeanUtils.copyProperties(goodsVo, esModel);
-            return esModel;
-        }).collect(Collectors.toList());
-        // 远程调用 商品上架到 Elasticsave
-        feignService.goodsStatusUp(esDTOS);
     }
 
     @Transactional
