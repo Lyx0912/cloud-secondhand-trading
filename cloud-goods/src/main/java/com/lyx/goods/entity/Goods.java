@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import converter.StatusConverter;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * <p>
@@ -25,6 +26,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @TableName("gms_goods")
+@ToString
 public class Goods implements Serializable {
 
     private static final long serialVersionUID = 1L;

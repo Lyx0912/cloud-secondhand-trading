@@ -12,6 +12,7 @@ import java.util.List;
  */
 public interface GoodsSaveService {
 
-    void goodsStatusUp(List<GoodsEsDTO> goodsEsDTOS) throws IOException;
+    void goodsStatusUp(List<GoodsEsDTO> goodsEsDTOS);
 
+    void goodsDelete(List<Long> ids);
 }

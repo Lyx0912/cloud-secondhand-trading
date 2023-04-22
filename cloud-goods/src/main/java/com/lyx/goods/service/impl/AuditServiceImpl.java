@@ -3,10 +3,13 @@ package com.lyx.goods.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import com.lyx.common.base.entity.dto.GoodsEsDTO;
+import com.lyx.common.base.exception.BizException;
+import com.lyx.common.base.result.ResultCode;
 import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.goods.entity.Audit;
 import com.lyx.goods.entity.Goods;
@@ -90,33 +93,43 @@ public class AuditServiceImpl extends ServiceImpl<AuditMapper, Audit> implements
         return PageUtils.build(page);
     }
 
+    /**
+     * 商品审核
+     * @param reqs
+     */
     @Transactional
     @Override
-    public void updateAuditState(AuditSaveReq req) throws IOException {
-        // 构建 Audit 更新条件 修改审核状态码
-        LambdaUpdateWrapper<Audit> wrapper = Wrappers.lambdaUpdate();
-        wrapper.set(Audit::getState,req.getState())
-                .set(StringUtils.isNotEmpty(req.getMark()),Audit::getMark,req.getMark())
-                .eq(Audit::getGoodsId,req.getGoodsId());
-        this.update(wrapper);
-        // 构建 Goods 更新条件 修改上架状态码
-        LambdaUpdateWrapper<Goods> updateWrapper = Wrappers.lambdaUpdate();
-        if (req.getState() == 1){
-            updateWrapper.set(req.getState()==1,Goods::getIsOnSell,1)
-                    .eq(Goods::getId,req.getGoodsId());
+    public void updateAuditState(List<AuditSaveReq> reqs) {
+
+        List<GoodsEsDTO> goodsEsDTOS = reqs.stream().map(req -> {
+            // 判断是否已经上架
+            Integer count = lambdaQuery().in(Audit::getState, 1)
+                    .eq(Audit::getGoodsId, req.getGoodsId()).count();
+            if (count > 0) {
+                throw new BizException(ResultCode.AUDIT_ALREADY_ON_THE_SHELVES);
+            }
+            // 构建 Audit 更新条件 修改审核状态码
+            LambdaUpdateWrapper<Audit> wrapper = Wrappers.lambdaUpdate();
+            wrapper.set(Audit::getState, req.getState())
+                    .set(StringUtils.isNotEmpty(req.getMark()), Audit::getMark, req.getMark())
+                    .eq(Audit::getGoodsId, req.getGoodsId());
+            this.update(wrapper);
+            // 构建 Goods 更新条件 修改上架状态码
+            LambdaUpdateWrapper<Goods> updateWrapper = Wrappers.lambdaUpdate();
+            updateWrapper.set(Goods::getIsOnSell, req.getState() == 1 ? 1 : 0)
+                    .eq(Goods::getId, req.getGoodsId());
             goodsService.update(updateWrapper);
             // 获取 id 对应的 goodsVO信息
-            GoodsVO goodsVO = goodsService.getGoodsVOById(req.getGoodsId());
-            List<GoodsVO> goodsVOS = new ArrayList<>();
-            goodsVOS.add(goodsVO);
-            List<GoodsEsDTO> esDTOS = goodsVOS.stream().map(goodsVo -> {
-                GoodsEsDTO esModel = new GoodsEsDTO();
-                BeanUtils.copyProperties(goodsVo, esModel);
-                return esModel;
-            }).collect(Collectors.toList());
-            // 远程调用 商品上架到 Elasticsave
-            feignService.goodsStatusUp(esDTOS);
-        }
+            Goods goods = goodsService.getById(req.getGoodsId());
+            return goods;
+        }).map(goods -> {
+            GoodsEsDTO goodsEsDTO = new GoodsEsDTO();
+            BeanUtils.copyProperties(goods, goodsEsDTO);
+            return goodsEsDTO;
+        }).collect(Collectors.toList());
+        log.info("goodsEsDTOS",goodsEsDTOS);
+        // 远程调用 商品上架到 Elasticsave
+        feignService.goodsStatusUp(goodsEsDTOS);
     }
 
     @Transactional

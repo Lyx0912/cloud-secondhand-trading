@@ -7,6 +7,8 @@ import com.lyx.goods.entity.req.GoodsListPageReq;
 import com.lyx.goods.entity.req.GoodsSaveReq;
 import com.lyx.goods.entity.vo.GoodsVO;
 
+import java.util.List;
+
 /**
  * <p>
  *  服务类
@@ -25,7 +27,7 @@ public interface GoodsService extends IService<Goods> {
      /**
        * 切换商品上架状态
        */
-    void changeIsOnSell(Long goodsId, Integer isOnSell);
+    void changeIsOnSell(List<Long> goodsIds, Integer isOnSell);
 
      /**
        * 查询商品详情

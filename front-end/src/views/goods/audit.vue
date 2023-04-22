@@ -5,6 +5,7 @@
         <el-button icon="el-icon-download" size="mini" type="warning" @click="handleExport()">导出
         </el-button>
         <el-button icon="el-icon-delete" size="mini" type="danger" @click="handleDeletes()">删除</el-button>
+        <el-button icon="el-icon-delete" size="mini" type="danger" @click="handlePass()">通过</el-button>
       </el-col>
       <el-col :span="19">
         <el-form ref="queryForm" :model="queryParams" size="small" style="float: right" :inline="true">
@@ -126,7 +127,7 @@
 import { list as getCategory } from '@/api/goods/category'
 import pagination from '@/components/Pagination'
 import { exportFile } from '@/utils/request'
-import { list as getGoods, remove as deletes, changeStatus, update } from '@/api/goods/audit'
+import { list as getGoods, remove as deletes, update } from '@/api/goods/audit'
 import { info } from '@/api/goods/goods'
 import { useWangEditor } from 'wangeditor5-for-vue2'
 import { policy } from '@/api/oss/policy'
@@ -147,8 +148,7 @@ export default {
   },
   data() {
     return {
-      audit: {
-      },
+      audit: {},
       images: '',
       idialogVisible: false,
       dialogImageUrl: '',
@@ -242,6 +242,7 @@ export default {
       },
       roleSelect: [],
       checkedIds: [],
+      audits: [],
       addrForm: {
         memberId: '',
         mobile: '',
@@ -322,8 +323,12 @@ export default {
       })
     },
     handleSelectionChange(values) {
+      this.audits = []
       this.checkedIds = []
       values.map(res => this.checkedIds.push(res.id))
+      values.map(res => {
+        this.audits.push({ 'goodsId': res.id, 'state': 1, 'mark': '成功' })
+      })
     },
     /** 导出excel文件 */
     handleExport() {
@@ -340,11 +345,9 @@ export default {
     handleSave(state) {
       this.audit.goodsId = this.goodsForm.id
       this.audit.state = state
-      console.log('audit==' + this.audit.goodsId)
-      console.log('audit==' + this.audit.mark)
-      console.log('audit==' + this.audit.state)
+      this.audits.push(this.audit)
       /** 保存商品信息 */
-      update(this.audit).then(res => {
+      update(this.audits).then(res => {
         this.$message({
           type: 'success',
           message: '操作成功!'
@@ -362,15 +365,15 @@ export default {
       },
       this.handleQuery()
     },
-    handleRecommed() {
+    handlePass() {
       if (this.checkedIds.length === 0) {
         this.$message({
           type: 'warning',
-          message: '请勾选需要推荐的物品!'
+          message: '请勾选需要通过的物品!'
         })
         return
       }
-      setRecommed(this.checkedIds).then(res => {
+      update(this.audits).then(res => {
         this.$message({
           type: 'success',
           message: '操作成功!'

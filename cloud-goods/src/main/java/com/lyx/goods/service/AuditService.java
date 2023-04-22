@@ -25,7 +25,7 @@ public interface AuditService extends IService<Audit> {
 
     PageUtils<AuditVo> listPage(AuditListPageReq req);
 
-    void updateAuditState(AuditSaveReq req) throws IOException;
+    void updateAuditState(List<AuditSaveReq> req);
 
     void auditremoveByIds(List<Long> ids);
 }
