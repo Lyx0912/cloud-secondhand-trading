@@ -1,12 +1,21 @@
 <template>
   <div class="app-container">
     <el-row style="margin-bottom: 12px">
-      <el-col :span="5">
+      <el-col :span="6">
         <el-button icon="el-icon-download" size="mini" type="warning" @click="handleExport()">导出</el-button>
-        <el-button type="success" icon="el-icon-thumb" size="mini" @click="handleRecommed()">首页推荐</el-button>
+        <el-button type="success" icon="el-icon-thumb" size="mini" @click="handleRecommed()">推荐</el-button>
         <el-button icon="el-icon-delete" size="mini" type="danger" @click="handleDeletes()">删除</el-button>
+        <el-dropdown @command="handleStatusChanges" style="margin-left: 10px" >
+          <el-button type="primary" size="mini">
+            上/下 架操作<i class="el-icon-arrow-down el-icon--right"></i>
+          </el-button>
+          <el-dropdown-menu style="width: 118px;">
+            <el-dropdown-item size="mini" :disabled="statusFilter(1)"  :command="1">上架</el-dropdown-item>
+            <el-dropdown-item size="mini" :disabled="statusFilter(0)" :command="0">下架</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </el-col>
-      <el-col :span="19">
+      <el-col :span="18">
         <el-form ref="queryForm" :model="queryParams" size="small" style="float: right" :inline="true">
           <el-form-item label="商品名称">
             <el-input
@@ -26,7 +35,7 @@
           </el-form-item>
           <el-form-item label="上架状态">
             <el-select v-model="queryParams.isOnSell" placeholder="请选择上架状态">
-              <el-option label="上架" :value="1" />
+              <el-option label="上架" :value="1" divided="" />
               <el-option label="下架" :value="0" />
             </el-select>
           </el-form-item>
@@ -148,7 +157,7 @@
 
 <script>
 import { setRecommed } from '@/api/goods/recommend'
-import { list, changeStatus, info, update } from '@/api/goods/goods'
+import { list, changeStatus, info, update, remove as deletes } from '@/api/goods/goods'
 import { list as getCategory } from '@/api/goods/category'
 import pagination from '@/components/Pagination'
 import { exportFile } from '@/utils/request'
@@ -259,6 +268,7 @@ export default {
       },
       roleSelect: [],
       checkedIds: [],
+      isOnSells: [],
       addrForm: {
         memberId: '',
         mobile: '',
@@ -327,6 +337,9 @@ export default {
     handleDefaultImgUploadSuccess(res, file) {
       this.goodsForm.defaultImg = this.dataObj.host + '/' + this.dataObj.key
     },
+    statusFilter(status) {
+      return this.isOnSells.indexOf(status) != -1
+    },
     handleRemove(file, fileList) {
       this.goodsForm.images = fileList
     },
@@ -352,17 +365,43 @@ export default {
       })
     },
     handleStatusChange(row) {
+      this.checkedIds = []
+      this.isOnSells = []
+      this.checkedIds.push(row.id)
+      this.isOnSells.push(row.isOnSell)
       // 切换商品上架下架状态
-      changeStatus(row.id, row.isOnSell).then(res => {
+      changeStatus(this.checkedIds, row.isOnSell).then(res => {
         this.$message({
           type: 'success',
           message: '操作成功!'
         })
       })
     },
+    handleStatusChanges(command) {
+      if (this.checkedIds.length === 0) {
+        this.$message({
+          type: 'warning',
+          message: '请勾选需要进行操作的物品!'
+        })
+        return
+      }
+      // 切换商品上架下架状态
+      changeStatus(this.checkedIds, command).then(res => {
+        this.$message({
+          type: 'success',
+          message: '操作成功!'
+        })
+        this.getList()
+      })
+    },
     handleSelectionChange(values) {
       this.checkedIds = []
-      values.map(res => this.checkedIds.push(res.id))
+      this.isOnSells = []
+      // eslint-disable-next-line no-undef
+      values.map(res => {
+        this.checkedIds.push(res.id)
+        this.isOnSells.push(res.isOnSell)
+      })
     },
     /** 导出excel文件 */
     handleExport() {

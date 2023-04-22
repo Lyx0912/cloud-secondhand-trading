@@ -3,19 +3,21 @@ package com.lyx.goods.service.impl;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lyx.common.base.entity.dto.GoodsEsDTO;
+import com.lyx.common.base.exception.BizException;
+import com.lyx.common.base.result.ResultCode;
 import com.lyx.common.mp.utils.PageUtils;
-import com.lyx.goods.entity.Category;
-import com.lyx.goods.entity.Goods;
-import com.lyx.goods.entity.GoodsDetails;
-import com.lyx.goods.entity.GoodsImages;
+import com.lyx.goods.entity.*;
 import com.lyx.goods.entity.req.GoodsListPageReq;
 import com.lyx.goods.entity.req.GoodsSaveReq;
 import com.lyx.goods.entity.vo.GoodsVO;
+import com.lyx.goods.feign.SearchElasticFeignService;
 import com.lyx.goods.mapper.GoodsMapper;
 import com.lyx.goods.service.*;
 import com.sun.org.apache.bcel.internal.generic.NEW;
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -52,6 +55,8 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     private GoodsDetailsService detailsService;
     @Autowired
     private AuditService auditService;
+    @Autowired
+    private SearchElasticFeignService searchElasticFeignService;
 
     /**
      * 分页查询商品
@@ -80,24 +85,43 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
 
     /**
      * 切换商品上架状态
-     *
-     * @param goodsId
+     * @param goodsIds
      * @param isOnSell
      */
+    @Transactional
     @Override
-    public void changeIsOnSell(Long goodsId, Integer isOnSell) {
-        Goods goods = new Goods();
-        goods.setId(goodsId);
-        goods.setIsOnSell(isOnSell);
-        baseMapper.updateById(goods);
-        // 如果是下架就从es中删除商品信息并修改db中isOnsell
-        if(isOnSell == 0){
-
-            // todo 远程调用es
+    public void changeIsOnSell(List<Long> goodsIds, Integer isOnSell) {
+        LambdaUpdateWrapper<Goods> updateWrapper = Wrappers.lambdaUpdate();
+        // 上架操作
+        if (isOnSell == 1){
+            List<GoodsEsDTO> goodsEsDTOs = new ArrayList<>();
+            updateWrapper.set(Goods::getIsOnSell,1)
+                    .in(Goods::getId,goodsIds);
+            LambdaQueryWrapper<Goods> wrapper = Wrappers.lambdaQuery();
+            wrapper.eq(Goods::getIsOnSell,0);
+            // 过滤出需要上架的商品
+            List<Goods> goods = this.list(wrapper).stream().filter(goods1 -> {
+                for (Long goodsId : goodsIds) {
+                    if (goods1.getId()==goodsId){
+                        GoodsEsDTO goodsEsDTO = new GoodsEsDTO();
+                        BeanUtils.copyProperties(goods1,goodsEsDTO);
+                        goodsEsDTOs.add(goodsEsDTO);
+                        return goods1.getId()==goodsId;
+                    }
+                }
+                return false;
+            }).collect(Collectors.toList());
+            BeanUtils.copyProperties(goods,goodsEsDTOs);
+            // 远程调用es 上架商品
+            searchElasticFeignService.goodsStatusUp(goodsEsDTOs);
+        // 下架操作
         }else {
-            // 如果是上架就从es中添加商品信息
-            // todo 远程调用es添加
+            updateWrapper.set(Goods::getIsOnSell,0)
+                    .in(Goods::getId,goodsIds);
+            // 远程调用es 下架商品
+            searchElasticFeignService.goodsDelete(goodsIds);
         }
+        this.update(updateWrapper);
     }
 
     /**

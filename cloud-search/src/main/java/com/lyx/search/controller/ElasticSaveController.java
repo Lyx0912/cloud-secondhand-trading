@@ -25,11 +25,13 @@ public class ElasticSaveController {
 
     @PostMapping("/goods")
     public R goodsStatusUp(@RequestBody List<GoodsEsDTO> goodsEsDTOS){
-        try {
-            goodsSaveService.goodsStatusUp(goodsEsDTOS);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        goodsSaveService.goodsStatusUp(goodsEsDTOS);
+        return R.ok();
+    }
+
+    @GetMapping("{ids}")
+    public R goodsDelete(@PathVariable("ids") List<Long> ids){
+        goodsSaveService.goodsDelete(ids);
         return R.ok();
     }
 

@@ -10,6 +10,7 @@ import com.lyx.goods.entity.req.GoodsListPageReq;
 import com.lyx.goods.entity.req.GoodsSaveReq;
 import com.lyx.goods.entity.vo.GoodsVO;
 import com.lyx.goods.service.GoodsService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +32,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/goods")
+@Slf4j
 public class GoodsController {
 
     @Autowired
@@ -67,9 +69,11 @@ public class GoodsController {
      /**
        * 切换商品上架状态
        */
-    @PatchMapping("/{goodsId}")
-    public R changeIsOnSell(@PathVariable Long goodsId , Integer isOnSell){
-        goodsService.changeIsOnSell(goodsId,isOnSell);
+    @PatchMapping("/{isOnSell}")
+    public R changeIsOnSell(@RequestBody List<Long> goodsIds ,@PathVariable("isOnSell")Integer isOnSell){
+        goodsService.changeIsOnSell(goodsIds,isOnSell);
+        log.info("goodsId{}",goodsIds);
+        log.info("isOnSell{}",isOnSell);
         return R.ok();
     }
 

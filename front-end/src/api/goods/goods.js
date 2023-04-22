@@ -16,13 +16,11 @@ export function list(params) {
  * 更新商品上架状态
  * @returns {AxiosPromise}
  */
-export function changeStatus(goodsId, isOnSell) {
+export function changeStatus(goodsIds, isOnSell) {
   return request({
-    url: '/cloud-goods/goods/' + goodsId,
+    url: '/cloud-goods/goods/' + isOnSell,
     method: 'patch',
-    params: {
-      isOnSell
-    }
+    data: goodsIds
   })
 }
 
@@ -46,5 +44,16 @@ export function update(data) {
     url: '/cloud-goods/goods/',
     method: 'put',
     data
+  })
+}
+
+/**
+ * 删除商品信息
+ * @returns {AxiosPromise}
+ */
+export function remove(id) {
+  return request({
+    url: '/cloud-goods/audit/' + id,
+    method: 'delete'
   })
 }

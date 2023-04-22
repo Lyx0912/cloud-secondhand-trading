@@ -35,6 +35,8 @@ public enum ResultCode implements IResultCode, Serializable {
     OSS_FAILED_TO_GETPOLICY("E00001", "获取aliyun oss文件上传签名失败"),
     EXCEED_THE_RECOMMEND("F00001", "推荐商品已超过限制数量"),
     GOODS_ALREADY_EXIST("F00002", "该商品已存在"),
+    AUDIT_ALREADY_ON_THE_SHELVES("F00003", "该商品已上架"),
+    AUDIT_THE_CONNECTION_IS_LOST("F00004", "连接中断"),
     ;
     @Override
     public String getCode() {

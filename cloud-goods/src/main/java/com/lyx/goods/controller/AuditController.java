@@ -55,21 +55,11 @@ public class AuditController {
     }
 
     /**
-     * 切换商品上架状态
-     */
-    @PatchMapping("/{goodsId}")
-    public R changeIsOnSell(@PathVariable Long goodsId , Integer isOnSell){
-        goodsService.changeIsOnSell(goodsId,isOnSell==1?0:1);
-        return R.ok();
-    }
-
-    /**
      * 更新商品审核状态
      */
     @PutMapping()
-    public R update(@RequestBody AuditSaveReq req) throws IOException {
+    public R update(@RequestBody List<AuditSaveReq> req) {
         auditService.updateAuditState(req);
-        log.info("AuditSaveReq{}",req);
         return R.ok();
     }
 
