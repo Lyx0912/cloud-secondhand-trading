@@ -3,6 +3,7 @@ package com.lyx.message.controller;
 
 import com.lyx.common.base.result.R;
 import com.lyx.common.mp.utils.PageUtils;
+import com.lyx.common.web.utils.ResponseUtils;
 import com.lyx.common.web.utils.UserContext;
 import com.lyx.message.entity.SystemMessage;
 import com.lyx.message.entity.req.SystemMessageListPageReq;
@@ -13,7 +14,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import utils.ExcelUtils;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -79,6 +83,15 @@ public class SystemMessageController {
     public R deletes(@PathVariable List<Long> ids){
         systemMessageService.removeByIds(ids);
         return R.ok();
+    }
+
+     /**
+       * 导出
+       */
+    @GetMapping("/export")
+    public void export(HttpServletResponse response) throws IOException {
+        List<SystemMessage> systemMessages = systemMessageService.list();
+        ExcelUtils.export(ResponseUtils.excelResponse(response).getOutputStream(),SystemMessage.class,systemMessages,"系统公告列表");
     }
 }
 
