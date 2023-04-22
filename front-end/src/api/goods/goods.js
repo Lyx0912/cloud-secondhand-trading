@@ -48,12 +48,12 @@ export function update(data) {
 }
 
 /**
- * 删除商品信息
+ * 更新商品信息
  * @returns {AxiosPromise}
  */
-export function remove(id) {
+export function deletes(ids) {
   return request({
-    url: '/cloud-goods/audit/' + id,
+    url: '/cloud-goods/goods/' + ids,
     method: 'delete'
   })
 }

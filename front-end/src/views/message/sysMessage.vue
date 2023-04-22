@@ -56,7 +56,7 @@
       <el-table-column align="center" label="操作" width="280" >
         <template v-slot="scope">
           <el-button type="primary" icon="el-icon-edit" size="mini" @click="handleEdit(scope.row.id)">编辑</el-button>
-          <el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDelete(scope.row)">删除</el-button>
+          <el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDelete(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -204,7 +204,7 @@ export default {
     },
     /** 导出excel文件 */
     handleExport() {
-      exportFile('/cloud-goods/goods/export', '商品列表')
+      exportFile('/cloud-message/systemMessage/export', '系统公告列表')
     },
     /** 搜索按钮操作 */
     handleQuery() {
@@ -247,6 +247,26 @@ export default {
       this.reloadEditor()
       this.systemMessageFormShow = false
       this.getList()
+    },
+    handleDelete(id) {
+      this.$confirm(`确定执行删除操作吗？`, '是否继续?', '提示', {
+        confirmButtonText: '删除',
+        cancelButtonText: '算了吧',
+        type: 'warning'
+      }).then(() => {
+        deletes([id]).then(res => {
+          this.$message({
+            type: 'success',
+            message: '操作成功!'
+          })
+          this.getList()
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消操作'
+        })
+      })
     },
     handleDeletes() {
       if (this.checkedIds.length === 0) {

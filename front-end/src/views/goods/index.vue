@@ -148,7 +148,7 @@
 
 <script>
 import { setRecommed } from '@/api/goods/recommend'
-import { list, changeStatus, info, update } from '@/api/goods/goods'
+import { list, changeStatus, info, update, deletes } from '@/api/goods/goods'
 import { list as getCategory } from '@/api/goods/category'
 import pagination from '@/components/Pagination'
 import { exportFile } from '@/utils/request'

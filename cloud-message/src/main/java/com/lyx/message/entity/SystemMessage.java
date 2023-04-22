@@ -3,8 +3,12 @@ package com.lyx.message.entity;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import com.alibaba.excel.annotation.ExcelIgnore;
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.format.DateTimeFormat;
+import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import com.baomidou.mybatisplus.annotation.*;
+import converter.StatusConverter;
 import lombok.Data;
 
 /**
@@ -25,16 +29,19 @@ public class SystemMessage implements Serializable {
      * 消息ID
      */
     @TableId(value = "id", type = IdType.AUTO)
+    @ExcelProperty("编号")
     private Long id;
 
     /**
      * 消息标题
      */
+    @ExcelProperty("标题")
     private String title;
 
     /**
      * 消息内容
      */
+    @ExcelProperty("内容")
     private String content;
 
     /**
@@ -42,27 +49,33 @@ public class SystemMessage implements Serializable {
      */
     @TableField(value = "CREATE_TIME",fill = FieldFill.INSERT)
     @DateTimeFormat("yyyy-MM-dd hh:mm:ss")
+    @ExcelProperty("发布时间")
+    @ColumnWidth(20)
     private LocalDateTime createTime;
 
      /**
        * 更新时间
        */
+    @ExcelIgnore
     private LocalDateTime updateTime;
 
      /**
        * 状态
        */
+    @ExcelProperty(value = "状态",converter = StatusConverter.class)
     private Integer status;
 
      /**
        * 是否删除
        */
     @TableLogic(value = "0",delval = "1")
+    @ExcelIgnore
     private Integer deleted;
 
      /**
        * 发布者
        */
+    @ExcelProperty("发布者")
     private String creater;
 
     public Long getId() {
