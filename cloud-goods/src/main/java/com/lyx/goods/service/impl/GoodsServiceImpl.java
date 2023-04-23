@@ -69,12 +69,12 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         // 构建分页对象 设置分页参数
         Page<GoodsVO> page = new Page<>(req.getPageNo(), req.getPageSize());
         // 构建查询条件
-        LambdaQueryWrapper<Goods> wrapper = Wrappers.lambdaQuery();
+        QueryWrapper<Goods> wrapper = Wrappers.query();
         wrapper
-                .like(StringUtils.isNotEmpty(req.getSeller()),Goods::getSeller,req.getSeller())
-                .like(StringUtils.isNotEmpty(req.getName()),Goods::getName,req.getName())
-                .eq(Goods::getDeleted,0)
-                .eq(req.getIsOnSell()!=null,Goods::getIsOnSell,req.getIsOnSell());
+                .like(StringUtils.isNotEmpty(req.getSeller()),"g.seller",req.getSeller())
+                .like(StringUtils.isNotEmpty(req.getName()),"g.name",req.getName())
+                .eq("g.deleted",0)
+                .eq(req.getIsOnSell()!=null,"g.isOnSell",req.getIsOnSell());
         Page<GoodsVO> goodsVOPage = baseMapper.listPage(page, wrapper);
         // 过滤还未通过审核的商品
         List<GoodsVO> goodsVOS = goodsVOPage.getRecords().stream()
