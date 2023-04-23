@@ -5,7 +5,7 @@
         <el-button icon="el-icon-download" size="mini" type="warning" @click="handleExport()">导出
         </el-button>
         <el-button icon="el-icon-delete" size="mini" type="danger" @click="handleDeletes()">删除</el-button>
-        <el-button icon="el-icon-delete" size="mini" type="danger" @click="handlePass()">通过</el-button>
+        <el-button icon="el-icon-delete" size="mini" type="success" @click="handlePass()">通过</el-button>
       </el-col>
       <el-col :span="19">
         <el-form ref="queryForm" :model="queryParams" size="small" style="float: right" :inline="true">
@@ -132,7 +132,6 @@ import { info } from '@/api/goods/goods'
 import { useWangEditor } from 'wangeditor5-for-vue2'
 import { policy } from '@/api/oss/policy'
 import { getUUID } from '@/utils'
-import { setRecommed } from '@/api/goods/recommend'
 
 export default {
   components: { pagination },

@@ -29,7 +29,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -170,7 +172,15 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         Goods goods = new Goods();
         BeanUtils.copyProperties(req,goods);
         goods.setCid(req.getCategoryPath()[req.getCategoryPath().length-1]);
+        goods.setUpdateTime(LocalDateTime.now());
         updateById(goods);
-        // todo 更新elasticsearch
+        // 更新elasticsearch
+        if (req.getIsOnSell() == 1){
+            ArrayList<GoodsEsDTO> goodsEsDTOS = new ArrayList<>();
+            GoodsEsDTO goodsEsDTO = new GoodsEsDTO();
+            BeanUtils.copyProperties(goods,goodsEsDTO);
+            goodsEsDTOS.add(goodsEsDTO);
+            searchElasticFeignService.goodsStatusUp(goodsEsDTOS);
+        }
     }
 }

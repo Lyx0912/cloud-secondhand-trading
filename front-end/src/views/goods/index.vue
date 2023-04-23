@@ -1,12 +1,21 @@
 <template>
   <div class="app-container">
     <el-row style="margin-bottom: 12px">
-      <el-col :span="5">
+      <el-col :span="6">
         <el-button icon="el-icon-download" size="mini" type="warning" @click="handleExport()">导出</el-button>
-        <el-button type="success" icon="el-icon-thumb" size="mini" @click="handleRecommed()">首页推荐</el-button>
+        <el-button type="success" icon="el-icon-thumb" size="mini" @click="handleRecommed()">推荐</el-button>
         <el-button icon="el-icon-delete" size="mini" type="danger" @click="handleDeletes()">删除</el-button>
+        <el-dropdown @command="handleStatusChanges" style="margin-left: 10px" >
+          <el-button type="primary" size="mini">
+            上/下 架操作<i class="el-icon-arrow-down el-icon--right"></i>
+          </el-button>
+          <el-dropdown-menu style="width: 118px;">
+            <el-dropdown-item size="mini" :disabled="statusFilter(1)"  :command="1">上架</el-dropdown-item>
+            <el-dropdown-item size="mini" :disabled="statusFilter(0)" :command="0">下架</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </el-col>
-      <el-col :span="19">
+      <el-col :span="18">
         <el-form ref="queryForm" :model="queryParams" size="small" style="float: right" :inline="true">
           <el-form-item label="商品名称">
             <el-input
@@ -84,7 +93,7 @@
             placeholder="试试搜索：指南"
             :options="categoryList"
             filterable></el-cascader>
-<!--          <el-input v-model="goodsForm.cid" />-->
+          <!--          <el-input v-model="goodsForm.cid" />-->
         </el-form-item>
         <el-form-item prop="name" label="名称">
           <el-input v-model="goodsForm.name" />
@@ -139,7 +148,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="closeDialog">关 闭</el-button>
+        <el-button @click="goodsFormShow = false">关 闭</el-button>
         <el-button type="primary" @click="handleSave()">保 存</el-button>
       </div>
     </el-dialog>
@@ -176,7 +185,6 @@ export default {
       ...useWangEditor({
         config: {
           MENU_CONF: {
-            delay: 1000,
             uploadImage: {
               // 后端上传地址，必填
               server: '/api/upload/image',
@@ -238,6 +246,10 @@ export default {
           // }
         }
       }),
+      data: {
+        json: '',
+        html: ''
+      },
       dataObj: {},
       goodsFormTitle: '编辑商品',
       goodsFormShow: false,
@@ -254,7 +266,25 @@ export default {
         price: [{ required: true, trigger: 'blur', message: '价格不能为空' }, { type: 'number', message: '价格必须为数字值' }],
         images: [{ required: true, trigger: 'blur', message: '请上传图片集' }]
       },
+      roleSelect: [],
       checkedIds: [],
+      isOnSells: [],
+      addrForm: {
+        memberId: '',
+        mobile: '',
+        isDefault: 0,
+        consignee: 0,
+        provinceId: 0,
+        province: '',
+        cityId: 0,
+        city: '',
+        areaId: 0,
+        area: '',
+        postCode: '',
+        addr: '',
+        lng: 0.00,
+        lat: 0.00
+      },
       total: 0,
       queryParams: {
         pageNo: 1,
@@ -276,10 +306,6 @@ export default {
     this.getCategoryList()
   },
   methods: {
-    closeDialog() {
-      this.reloadEditor()
-      this.goodsFormShow = false
-    },
     beforeUpload(file) {
       const _self = this
       return new Promise((resolve, reject) => {
@@ -311,12 +337,13 @@ export default {
     handleDefaultImgUploadSuccess(res, file) {
       this.goodsForm.defaultImg = this.dataObj.host + '/' + this.dataObj.key
     },
+    statusFilter(status) {
+      return this.isOnSells.indexOf(status) != -1
+    },
     handleRemove(file, fileList) {
       this.goodsForm.images = fileList
     },
     handleSave() {
-      // 强制同步 v-model 数据
-      this.syncContent()
       // 保存商品信息
       update(this.goodsForm).then(res => {
         this.$message({
@@ -332,23 +359,49 @@ export default {
       this.dialogVisible = true
     },
     handleEdit(id) {
+      this.goodsFormShow = true
       info(id).then(res => {
         this.goodsForm = res.data
       })
-      this.goodsFormShow = true
     },
     handleStatusChange(row) {
+      this.checkedIds = []
+      this.isOnSells = []
+      this.checkedIds.push(row.id)
+      this.isOnSells.push(row.isOnSell)
       // 切换商品上架下架状态
-      changeStatus(row.id, row.isOnSell).then(res => {
+      changeStatus(this.checkedIds, row.isOnSell).then(res => {
         this.$message({
           type: 'success',
           message: '操作成功!'
         })
       })
     },
+    handleStatusChanges(command) {
+      if (this.checkedIds.length === 0) {
+        this.$message({
+          type: 'warning',
+          message: '请勾选需要进行操作的物品!'
+        })
+        return
+      }
+      // 切换商品上架下架状态
+      changeStatus(this.checkedIds, command).then(res => {
+        this.$message({
+          type: 'success',
+          message: '操作成功!'
+        })
+        this.getList()
+      })
+    },
     handleSelectionChange(values) {
       this.checkedIds = []
-      values.map(res => this.checkedIds.push(res.id))
+      this.isOnSells = []
+      // eslint-disable-next-line no-undef
+      values.map(res => {
+        this.checkedIds.push(res.id)
+        this.isOnSells.push(res.isOnSell)
+      })
     },
     /** 导出excel文件 */
     handleExport() {
@@ -363,8 +416,8 @@ export default {
       this.queryParams = {
         pageNo: 1,
         pageSize: 10
-      }
-      this.handleQuery()
+      },
+        this.handleQuery()
     },
     handleRecommed() {
       if (this.checkedIds.length === 0) {

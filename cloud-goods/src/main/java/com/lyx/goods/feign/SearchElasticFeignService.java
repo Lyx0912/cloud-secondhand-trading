@@ -22,5 +22,5 @@ public interface SearchElasticFeignService {
     public R goodsStatusUp(@RequestBody List<GoodsEsDTO> goodsEsDTOS);
 
     @GetMapping("/search/{ids}")
-    public R goodsDelete(List<Long> ids);
+    public R goodsDelete(@PathVariable List<Long> ids);
 }

@@ -48,7 +48,7 @@ export function update(data) {
 }
 
 /**
- * 更新商品信息
+ * 删除信息
  * @returns {AxiosPromise}
  */
 export function deletes(ids) {
