@@ -3,6 +3,7 @@ package com.lyx.goods.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.lyx.goods.entity.Audit;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -15,4 +16,5 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface AuditMapper extends BaseMapper<Audit> {
+    Long getAuditById(@Param("id") Long id);
 }

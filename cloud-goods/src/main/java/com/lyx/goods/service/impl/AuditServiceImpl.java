@@ -66,28 +66,20 @@ public class AuditServiceImpl extends ServiceImpl<AuditMapper, Audit> implements
     @Override
     public PageUtils<AuditVo> listPage(AuditListPageReq req) {
         Page<AuditVo> page = new Page<>(req.getPageNo(),req.getPageSize());
-        // 查询商品列表
-        LambdaQueryWrapper<Goods> wrapper = Wrappers.lambdaQuery();
-        wrapper.like(StringUtils.isNotEmpty(req.getName()),Goods::getName,req.getName())
-                .like(StringUtils.isNotEmpty(req.getSeller()),Goods::getSeller,req.getSeller());
-        List<Goods> goods = goodsService.list(wrapper);
-        // 商品列表遍历
-        List<AuditVo> auditVos = goods.stream().map(good -> {
+        // 查询商品审核列表
+        LambdaQueryWrapper<Audit> wrapper = Wrappers.lambdaQuery();
+        List<Audit> audits = this.list(wrapper);
+        List<AuditVo> auditVos = audits.stream().map(audit -> {
+            Goods goods = goodsService.getById(audit.getGoodsId());
             AuditVo auditVo = new AuditVo();
-            // 属性对拷
-            BeanUtils.copyProperties(good, auditVo);
-            // 查询对应状态信息
-            Audit audit = this.getById(good.getId());
+            BeanUtils.copyProperties(goods, auditVo);
             auditVo.setState(audit.getState());
             auditVo.setMark(audit.getMark());
-            // 查询对应分类名称
-            auditVo.setCategoryName(categoryService.getById(good.getCid()).getName());
-            log.info("auditVo{}",auditVo);
+//          // 查询对应分类名称
+            auditVo.setCategoryName(categoryService.getById(goods.getCid()).getName());
             return auditVo;
         }).collect(Collectors.toList());
-        if (req.getState()!=null){
-            auditVos = auditVos.stream().filter(auditVo -> auditVo.getState() == req.getState()).collect(Collectors.toList());
-        }
+        log.info("auditVos{}",auditVos);
         page.setRecords(auditVos);
         page.setTotal(auditVos.stream().count());
         return PageUtils.build(page);
@@ -135,15 +127,12 @@ public class AuditServiceImpl extends ServiceImpl<AuditMapper, Audit> implements
     @Transactional
     @Override
     public void auditremoveByIds(List<Long> ids) {
-        // 更改状态为下架状态
-        for (Long id : ids) {
-            LambdaUpdateWrapper<Goods> wrapper = Wrappers.lambdaUpdate();
-            wrapper.set(Goods::getIsOnSell,0)
-                    .eq(Goods::getId,id);
-            goodsService.update(wrapper);
-        }
-        goodsService.removeByIds(ids);
+        this.removeByIds(ids);
+    }
 
+    @Override
+    public Long getAuditById(Long id) {
+        return baseMapper.getAuditById(id);
     }
 
 }

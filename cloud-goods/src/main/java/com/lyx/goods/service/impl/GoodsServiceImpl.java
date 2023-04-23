@@ -71,14 +71,19 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         // 构建查询条件
         QueryWrapper<Goods> wrapper = Wrappers.query();
         wrapper
-                .like(StringUtils.isNotEmpty(req.getSeller()),"g.seller",req.getSeller())
-                .like(StringUtils.isNotEmpty(req.getName()),"g.name",req.getName())
-                .eq("g.deleted",0)
-                .eq(req.getIsOnSell()!=null,"g.isOnSell",req.getIsOnSell());
+                .like(StringUtils.isNotEmpty(req.getSeller()), "g.seller", req.getSeller())
+                .like(StringUtils.isNotEmpty(req.getName()), "g.name", req.getName())
+                .eq("g.deleted", 0)
+                .eq(req.getIsOnSell() != null, "g.isOnSell", req.getIsOnSell());
         Page<GoodsVO> goodsVOPage = baseMapper.listPage(page, wrapper);
-        // 过滤还未通过审核的商品
+//        LambdaQueryWrapper<Audit> lambdaQuery = Wrappers.lambdaQuery();
+//        lambdaQuery.eq(Audit::getState, 1);
+//        // 过滤还未通过审核的商品
+//        auditService.list(lambdaQuery);
         List<GoodsVO> goodsVOS = goodsVOPage.getRecords().stream()
-                .filter(goodsVO -> auditService.getById(goodsVO.getId()).getState() == 1).collect(Collectors.toList());
+                .filter(goodsVO -> {
+                    return auditService.getAuditById(goodsVO.getId())!=null;
+                }).collect(Collectors.toList());
         page.setRecords(goodsVOS);
         PageUtils<GoodsVO> pageUtils = PageUtils.build(page);
         // 返回分页对象

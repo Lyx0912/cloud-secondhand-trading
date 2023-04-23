@@ -63,8 +63,6 @@
           </el-tooltip>
         </template>
       </el-table-column>
-<!--      <el-table-column label="浏览量" align="center" prop="viewCount" width="100" :show-overflow-tooltip="true" />-->
-<!--      <el-table-column label="发布时间" align="center" prop="createTime" width="164" :show-overflow-tooltip="true" />-->
       <el-table-column label="提交时间" align="center" prop="createTime" width="164" :show-overflow-tooltip="true" />
       <el-table-column align="center" prop="created_at" label="操作">
         <template v-slot="scope">
@@ -87,7 +85,6 @@
             filterable
             disabled
           style="width: 300px;"></el-cascader>
-          <!--          <el-input v-model="goodsForm.cid" />-->
         </el-form-item>
         <el-form-item prop="name" label="名称">
           <el-input v-model="goodsForm.name" disabled="disabled" />

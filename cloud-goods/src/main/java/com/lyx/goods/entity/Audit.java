@@ -24,21 +24,32 @@ public class Audit implements Serializable {
      * id
      */
     @TableId(value = "id", type = IdType.AUTO)
+    @ExcelIgnore
     private Long id;
 
     /**
      * 商品id
      */
+    @ExcelIgnore
     private Long goodsId;
 
     /**
      * 失败原因
      */
+    @ExcelIgnore
     private String mark;
 
     /**
      * 审核状态
      */
+    @ExcelIgnore
     private Long state;
+
+    /**
+     * 是否删除
+     */
+    @TableLogic(value = "0", delval = "1")
+    @ExcelIgnore
+    private Integer deleted;
 
 }

@@ -28,4 +28,6 @@ public interface AuditService extends IService<Audit> {
     void updateAuditState(List<AuditSaveReq> req);
 
     void auditremoveByIds(List<Long> ids);
+
+    Long getAuditById(Long id);
 }
