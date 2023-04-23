@@ -1,26 +1,22 @@
 package com.lyx.goods.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lyx.common.base.entity.dto.GoodsEsDTO;
-import com.lyx.common.base.exception.BizException;
-import com.lyx.common.base.result.ResultCode;
 import com.lyx.common.mp.utils.PageUtils;
-import com.lyx.goods.entity.*;
+import com.lyx.goods.entity.Goods;
+import com.lyx.goods.entity.GoodsDetails;
+import com.lyx.goods.entity.GoodsImages;
 import com.lyx.goods.entity.req.GoodsListPageReq;
 import com.lyx.goods.entity.req.GoodsSaveReq;
 import com.lyx.goods.entity.vo.GoodsVO;
 import com.lyx.goods.feign.SearchElasticFeignService;
 import com.lyx.goods.mapper.GoodsMapper;
 import com.lyx.goods.service.*;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -31,11 +27,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * <p>
