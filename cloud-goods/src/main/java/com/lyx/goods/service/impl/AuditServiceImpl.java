@@ -66,20 +66,35 @@ public class AuditServiceImpl extends ServiceImpl<AuditMapper, Audit> implements
     @Override
     public PageUtils<AuditVo> listPage(AuditListPageReq req) {
         Page<AuditVo> page = new Page<>(req.getPageNo(),req.getPageSize());
-        // 查询商品审核列表
+        // 创建查询商品审核条件
         LambdaQueryWrapper<Audit> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(req.getState()!=null,Audit::getState,req.getState());
+        // 查询商品审核列表
         List<Audit> audits = this.list(wrapper);
         List<AuditVo> auditVos = audits.stream().map(audit -> {
-            Goods goods = goodsService.getById(audit.getGoodsId());
-            AuditVo auditVo = new AuditVo();
-            BeanUtils.copyProperties(goods, auditVo);
-            auditVo.setState(audit.getState());
-            auditVo.setMark(audit.getMark());
-//          // 查询对应分类名称
-            auditVo.setCategoryName(categoryService.getById(goods.getCid()).getName());
-            return auditVo;
-        }).collect(Collectors.toList());
-        log.info("auditVos{}",auditVos);
+            // 创建Goods 查询条件
+            LambdaQueryWrapper<Goods> lambdaQuery = Wrappers.lambdaQuery();
+            lambdaQuery.like(StringUtils.isNotEmpty(req.getName()),Goods::getName,req.getName())
+                            .like(StringUtils.isNotEmpty(req.getSeller()),Goods::getSeller,req.getSeller())
+                                    .eq(Goods::getId,audit.getGoodsId());
+            // 查询 商品 信息
+            Goods goods = goodsService.getOne(lambdaQuery);
+//            Goods goods = goodsService.getById(audit.getGoodsId());
+            // 如果 goods 不为空
+            if (goods != null) {
+                AuditVo auditVo = new AuditVo();
+                // 属性对拷
+                BeanUtils.copyProperties(goods, auditVo);
+                auditVo.setState(audit.getState());
+                auditVo.setMark(audit.getMark());
+                // 查询对应分类名称
+                auditVo.setCategoryName(categoryService.getById(goods.getCid()).getName());
+                return auditVo;
+            }
+            // goods 为空
+            return null;
+            //过滤掉空值
+        }).filter(auditVo -> auditVo!=null).collect(Collectors.toList());
         page.setRecords(auditVos);
         page.setTotal(auditVos.stream().count());
         return PageUtils.build(page);
@@ -124,12 +139,21 @@ public class AuditServiceImpl extends ServiceImpl<AuditMapper, Audit> implements
         feignService.goodsStatusUp(goodsEsDTOS);
     }
 
+    /**
+     * 删除商品审核列表
+     * @param ids
+     */
     @Transactional
     @Override
     public void auditremoveByIds(List<Long> ids) {
         this.removeByIds(ids);
     }
 
+    /**
+     * 查询 商品审核状态
+     * @param id
+     * @return
+     */
     @Override
     public Long getAuditById(Long id) {
         return baseMapper.getAuditById(id);
