@@ -69,10 +69,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
                 .eq("g.deleted", 0)
                 .eq(req.getIsOnSell() != null, "g.isOnSell", req.getIsOnSell());
         Page<GoodsVO> goodsVOPage = baseMapper.listPage(page, wrapper);
-//        LambdaQueryWrapper<Audit> lambdaQuery = Wrappers.lambdaQuery();
-//        lambdaQuery.eq(Audit::getState, 1);
-//        // 过滤还未通过审核的商品
-//        auditService.list(lambdaQuery);
+        // 过滤还未通过审核的商品
         List<GoodsVO> goodsVOS = goodsVOPage.getRecords().stream()
                 .filter(goodsVO -> {
                     return auditService.getAuditById(goodsVO.getId())!=null;

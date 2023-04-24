@@ -3,7 +3,6 @@ package com.lyx.goods.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
@@ -16,7 +15,6 @@ import com.lyx.goods.entity.Goods;
 import com.lyx.goods.entity.req.AuditListPageReq;
 import com.lyx.goods.entity.req.AuditSaveReq;
 import com.lyx.goods.entity.vo.AuditVo;
-import com.lyx.goods.entity.vo.GoodsVO;
 import com.lyx.goods.feign.SearchElasticFeignService;
 import com.lyx.goods.mapper.AuditMapper;
 import com.lyx.goods.service.AuditService;
@@ -29,9 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 

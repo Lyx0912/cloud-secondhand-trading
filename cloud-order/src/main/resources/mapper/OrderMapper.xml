@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhj.order.mapper.OrderMapper">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.xhj.order.entity.Order" id="orderMap">
+        <result property="id" column="id"/>
+        <result property="memberId" column="member_id"/>
+        <result property="goodsId" column="goods_id"/>
+        <result property="orderSn" column="order_sn"/>
+        <result property="createTime" column="create_time"/>
+        <result property="memberUsername" column="member_username"/>
+        <result property="totalAmount" column="total_amount"/>
+        <result property="payAmount" column="pay_amount"/>
+        <result property="payType" column="pay_type"/>
+        <result property="sourceType" column="source_type"/>
+        <result property="state" column="state"/>
+        <result property="deliveryCompany" column="delivery_company"/>
+        <result property="deliverySn" column="delivery_sn"/>
+        <result property="note" column="note"/>
+        <result property="confirmStatus" column="confirm_status"/>
+        <result property="deleteStatus" column="delete_status"/>
+        <result property="payTime" column="pay_time"/>
+        <result property="deliveryTime" column="delivery_time"/>
+        <result property="finallyTime" column="finally_time"/>
+        <result property="settledTime" column="settled_time"/>
+        <result property="isPayed" column="is_payed"/>
+        <result property="closeType" column="close_type"/>
+        <result property="version" column="version"/>
+        <result property="orderAddrId" column="order_addr_id"/>
+    </resultMap>
+
+    <select id="getOrderList" resultType="com.xhj.order.entity.Order">
+        select id, member_id, goods_id, order_sn, create_time, member_username, total_amount, pay_amount,
+            pay_type, source_type, state, delivery_company, delivery_sn, note, confirm_status, delete_status,
+               pay_time, delivery_time, finally_time, settled_time, is_payed, close_type, version, order_addr_id
+        from oms_order
+    </select>
+</mapper>

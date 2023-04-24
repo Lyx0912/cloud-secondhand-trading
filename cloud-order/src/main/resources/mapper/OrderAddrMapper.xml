@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhj.order.mapper.OrderAddrMapper">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.xhj.order.entity.OrderAddr" id="orderAddrMap">
+        <result property="id" column="id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="memberId" column="member_id"/>
+        <result property="consignee" column="consignee"/>
+        <result property="provinceId" column="province_id"/>
+        <result property="province" column="province"/>
+        <result property="cityId" column="city_id"/>
+        <result property="city" column="city"/>
+        <result property="areaId" column="area_id"/>
+        <result property="area" column="area"/>
+        <result property="addr" column="addr"/>
+        <result property="postCode" column="post_code"/>
+        <result property="mobile" column="mobile"/>
+        <result property="lng" column="lng"/>
+        <result property="lat" column="lat"/>
+    </resultMap>
+
+
+</mapper>

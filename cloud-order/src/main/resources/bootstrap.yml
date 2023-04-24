@@ -1,9 +1,8 @@
 server:
-  port: 20007
-
+  port: 20008
 spring:
   application:
-    name: cloud-message
+    name: cloud-order
   cloud:
     nacos:
       # 注册中心
