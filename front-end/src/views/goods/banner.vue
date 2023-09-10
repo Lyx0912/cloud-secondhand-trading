@@ -290,7 +290,7 @@ export default {
             resolve(true)
           })
           .catch(err => {
-            console.log('出错了...', err)
+            console.log('出错了..', err)
             reject(false)
           })
       })

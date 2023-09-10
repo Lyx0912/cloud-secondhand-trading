@@ -1,0 +1,82 @@
+package com.xhj.storage.controller;
+
+import java.util.Arrays;
+import java.util.Map;
+
+import com.lyx.common.base.result.R;
+import com.lyx.common.mp.utils.PageUtils;
+import com.xhj.storage.entity.req.StorageReq;
+import com.xhj.storage.entity.vo.StorageVo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import com.xhj.storage.entity.Storage;
+import com.xhj.storage.service.StorageService;
+
+
+
+/**
+ * 
+ *
+ * @author xhj
+ * @email 2642728859@qq.com
+ * @date 2023-09-10 17:08:18
+ */
+@RestController
+@RequestMapping("/storage")
+public class StorageController {
+    @Autowired
+    private StorageService StorageService;
+
+    /**
+     * 分页查询所有库存
+     */
+    @RequestMapping("/list")
+        public R list(StorageReq req){
+        PageUtils<StorageVo> pageUtils = StorageService.queryPage(req);
+
+        return R.ok( pageUtils);
+    }
+
+
+    /**
+     * 查询库存
+     */
+    @GetMapping("/{id}")
+    public R info(@PathVariable("id") Long id){
+		Storage storage = StorageService.getById(id);
+
+        return R.ok(storage);
+    }
+
+    /**
+     * 保存库存
+     */
+    @RequestMapping("/save")
+    public R save(@RequestBody Storage demoStorage){
+		StorageService.save(demoStorage);
+
+        return R.ok();
+    }
+
+    /**
+     * 修改库存
+     */
+    @RequestMapping("/update")
+    public R update(@RequestBody Storage demoStorage){
+		StorageService.updateById(demoStorage);
+
+        return R.ok();
+    }
+
+    /**
+     * 删除库存
+     */
+    @RequestMapping("/delete")
+    public R delete(@RequestBody Long[] ids){
+		StorageService.removeByIds(Arrays.asList(ids));
+
+        return R.ok();
+    }
+
+}
