@@ -1,5 +1,6 @@
 package com.lyx.goods.service;
 
+import com.lyx.common.base.entity.dto.GoodsDTO;
 import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.goods.entity.Goods;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -33,6 +34,12 @@ public interface GoodsService extends IService<Goods> {
        * 查询商品详情
        */
     GoodsVO getGoodsVOById(Long id);
+
+
+    /**
+     * 查询商品详情
+     */
+    GoodsDTO getGoodsDTOById(Long id);
 
      /**
        * 更新商品详情

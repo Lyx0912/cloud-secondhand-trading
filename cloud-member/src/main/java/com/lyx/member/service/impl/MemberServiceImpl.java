@@ -11,6 +11,8 @@ import com.lyx.member.config.MemberMapStruct;
 import com.lyx.member.entity.Member;
 import com.lyx.member.entity.MemberAddr;
 import com.lyx.member.entity.req.MemberListPageReq;
+import com.lyx.member.entity.req.MemberLoginReq;
+import com.lyx.member.entity.vo.MemberLoginVo;
 import com.lyx.member.entity.vo.MemberVO;
 import com.lyx.member.mapper.MemberMapper;
 import com.lyx.member.service.MemberAddrService;
@@ -83,5 +85,21 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         wrapper.eq(MemberAddr::getMemberId,id).eq(MemberAddr::getIsDefault,1);
         vo.setMemberAddr(memberAddrService.getOne(wrapper));
         return vo;
+    }
+
+    /**
+     * 会员登录
+     * @param req
+     * @return
+     */
+    @Override
+    public MemberLoginVo login(MemberLoginReq req) {
+        MemberLoginVo memberLoginVo = new MemberLoginVo();
+        Member member = new Member();
+        member.setUsername(req.getUsername());
+        memberLoginVo.setMember(member);
+        memberLoginVo.setId(1);
+        memberLoginVo.setToken("sdfsdrfgdfgfdghf.sdfsdfsdf.sffgfghfg");
+        return memberLoginVo;
     }
 }

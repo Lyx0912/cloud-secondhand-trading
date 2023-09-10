@@ -1,8 +1,12 @@
 package com.xhj.order.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xhj.order.entity.OrderAddr;
+import com.xhj.order.entity.req.OrderAddrListPageReq;
+import com.xhj.order.entity.vo.OrderAddrVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,5 +18,11 @@ import java.util.Map;
  */
 public interface OrderAddrService extends IService<OrderAddr> {
 
+    /**
+     * 地址分页
+     * @param req
+     * @return
+     */
+    Page<OrderAddr> getOrderList(OrderAddrListPageReq req);
 }
 

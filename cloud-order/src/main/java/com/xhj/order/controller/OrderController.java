@@ -4,6 +4,8 @@ import com.lyx.common.base.result.R;
 import com.lyx.common.mp.utils.PageUtils;
 import com.xhj.order.entity.Order;
 import com.xhj.order.entity.req.OrderListPageReq;
+import com.xhj.order.entity.req.OrderReq;
+import com.xhj.order.entity.vo.OrderVo;
 import com.xhj.order.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -44,12 +46,20 @@ public class OrderController {
     }
 
     /**
+     * 订单准备
+     */
+    @PostMapping("/addOrder")
+    public R addOrder(@RequestBody OrderReq req){
+        OrderVo orderVo = orderService.getOrder(req);
+        return R.ok(orderVo);
+    }
+
+    /**
      * 保存
      */
     @RequestMapping("/save")
     public R save(@RequestBody Order order){
         orderService.save(order);
-
         return R.ok();
     }
 

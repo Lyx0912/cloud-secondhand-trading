@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lyx.common.base.entity.dto.GoodsDTO;
 import com.lyx.common.base.entity.dto.GoodsEsDTO;
 import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.goods.entity.Goods;
@@ -66,13 +67,22 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         wrapper
                 .like(StringUtils.isNotEmpty(req.getSeller()), "g.seller", req.getSeller())
                 .like(StringUtils.isNotEmpty(req.getName()), "g.name", req.getName())
-                .eq("g.deleted", 0)
+                .eq(req.getCategory_id()!=null?req.getCategory_id()!=0:false,
+                        "cid", req.getCategory_id())
+//                .eq("g.deleted", 0)
                 .eq(req.getIsOnSell() != null, "g.isOnSell", req.getIsOnSell());
+        List<Goods> goods = this.baseMapper.selectList(wrapper);
+
         Page<GoodsVO> goodsVOPage = baseMapper.listPage(page, wrapper);
         // 过滤还未通过审核的商品
-        List<GoodsVO> goodsVOS = goodsVOPage.getRecords().stream()
-                .filter(goodsVO -> {
-                    return auditService.getAuditById(goodsVO.getId())!=null;
+        List<GoodsVO> goodsVOS = goods.stream()
+                .map(goods1 -> {
+                    GoodsVO goodsVO = new GoodsVO();
+                    BeanUtils.copyProperties(goods1,goodsVO);
+                    return goodsVO;
+                })
+                .filter(good -> {
+                    return auditService.getAuditById(good.getId())!=null;
                 }).collect(Collectors.toList());
         page.setRecords(goodsVOS);
         PageUtils<GoodsVO> pageUtils = PageUtils.build(page);
@@ -138,7 +148,19 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         // 设置商品详情
         GoodsDetails goodsDetails = detailsService.lambdaQuery().eq(GoodsDetails::getGoodsId, id).one();
         goodsVO.setDetails(goodsDetails);
+        // 远程调用查询库存
+
         return goodsVO;
+    }
+
+    @Override
+    public GoodsDTO getGoodsDTOById(Long id) {
+        GoodsVO goodsVO = getGoodsVOById(id);
+        log.info("goodsVO{}",goodsVO);
+        GoodsDTO goodsDTO = new GoodsDTO();
+        BeanUtils.copyProperties(goodsVO,goodsDTO);
+        log.info("goodsDTO{}",goodsDTO);
+        return goodsDTO;
     }
 
     /**

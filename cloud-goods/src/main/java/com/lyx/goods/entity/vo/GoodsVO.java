@@ -97,4 +97,9 @@ public class GoodsVO {
        * 商品所属分类路径
        */
     private Long[] categoryPath;
+
+    /**
+     * 商品库存
+     */
+    private Long total;
 }

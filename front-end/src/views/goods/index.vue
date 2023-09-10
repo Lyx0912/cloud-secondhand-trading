@@ -60,7 +60,7 @@
           <el-image :src="scope.row.defaultImg" style="width:64px;height:64px;" :preview-src-list="[scope.row.defaultImg]" />
         </template>
       </el-table-column>
-      <el-table-column label="描述" align="center" prop="description" />
+<!--      <el-table-column label="描述" align="center" prop="description" />-->
       <el-table-column label="价格" align="center" prop="price" width="100" :show-overflow-tooltip="true" />
       <el-table-column label="上架状态" align="center" width="100">
         <template v-slot="scope">

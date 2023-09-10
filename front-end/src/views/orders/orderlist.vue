@@ -25,11 +25,11 @@
               @keyup.enter.native="handleQuery"
             />
           </el-form-item>
-          <el-form-item label="上架状态">
-            <el-select v-model="queryParams.state" placeholder="请选择上架状态">
-              <el-option label="已通过" :value="1" />
-              <el-option label="待审核" :value="0" />
-              <el-option label="未通过" :value="2" />
+          <el-form-item label="订单状态">
+            <el-select v-model="queryParams.state" placeholder="请选择订单状态">
+              <el-option label="已发货" :value="1" />
+              <el-option label="待发货" :value="0" />
+              <el-option label="以完成" :value="2" />
             </el-select>
           </el-form-item>
           <el-form-item>
@@ -45,33 +45,23 @@
         width="55"
       />
       <el-table-column align="center" label="商品名称" prop="name" width="150 " :show-overflow-tooltip="true" />
-      <el-table-column label="分类" align="center" prop="categoryName" width="130" :show-overflow-tooltip="true" />
+      <el-table-column label="分类" align="center" prop="categoryName" width="100" :show-overflow-tooltip="true" />
       <el-table-column align="center" label="卖家" prop="seller" width="100" :show-overflow-tooltip="true" />
-      <el-table-column label="图片" align="center" width="150">
-        <template v-slot="scope">
-          <el-image :src="scope.row.defaultImg" style="width:64px;height:64px;" :preview-src-list="[scope.row.defaultImg]" />
-        </template>
-      </el-table-column>
-      <el-table-column label="描述" align="center" prop="description" />
+      <el-table-column align="center" label="买家" prop="seller" width="100" :show-overflow-tooltip="true" />
+      <el-table-column label="订单号" width="150" align="center" prop="description" />
       <el-table-column label="价格" align="center" prop="price" width="100" :show-overflow-tooltip="true" />
-      <el-table-column label="审核状态" align="center" width="100">
+      <el-table-column label="订单状态" align="center" width="100">
         <template  v-slot="scope">
-          <el-tag type="success" effect="dark" v-if="scope.row.state==1">已通过</el-tag>
-          <el-tag type="warning" effect="dark" v-if="scope.row.state==0">待审核</el-tag>
+          <el-tag type="success" effect="dark" v-if="scope.row.state==1">已发货</el-tag>
+          <el-tag type="warning" effect="dark" v-if="scope.row.state==0">待发货</el-tag>
           <el-tooltip class="item" effect="dark" :content="scope.row.mark" placement="top">
-            <el-tag type="danger" effect="dark" v-if="scope.row.state==2">未通过</el-tag>
+            <el-tag type="danger" effect="dark" v-if="scope.row.state==2">已完成</el-tag>
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column label="提交时间" align="center" prop="createTime" width="164" :show-overflow-tooltip="true" />
-      <el-table-column align="center" prop="created_at" label="操作">
-        <template v-slot="scope">
-          <el-button type="primary" icon="el-icon-edit" size="mini" v-if="scope.row.state==0"
-                     @click="handleEdit(scope.row.id)">审核</el-button>
-          <el-button type="danger" icon="el-icon-delete" size="mini" v-if="scope.row.state!=0"
-                     @click="handleDelete(scope.row)">删除</el-button>
-        </template>
-      </el-table-column>
+      <el-table-column label="付款时间" align="center" prop="createTime" width="164" :show-overflow-tooltip="true" />
+      <el-table-column label="发货时间" align="center" prop="createTime" width="164" :show-overflow-tooltip="true" />
+      <el-table-column label="成交时间" align="center" prop="createTime" width="164" :show-overflow-tooltip="true" />
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize" @pagination="getList" />
   </div>

@@ -2,6 +2,7 @@ package com.lyx.goods.controller;
 
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.lyx.common.base.entity.dto.GoodsDTO;
 import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.common.base.result.R;
 import com.lyx.common.web.utils.ResponseUtils;
@@ -64,6 +65,15 @@ public class GoodsController {
     public R info(@PathVariable Long id){
         GoodsVO byId = goodsService.getGoodsVOById(id);
         return R.ok(byId);
+    }
+
+    /**
+     * 查询订单商品详情
+     */
+    @GetMapping("/orderGoods/{id}")
+    public GoodsDTO orderInfo(@PathVariable Long id){
+        GoodsDTO byId = goodsService.getGoodsDTOById(id);
+        return byId;
     }
 
      /**

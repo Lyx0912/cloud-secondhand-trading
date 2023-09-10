@@ -5,8 +5,10 @@ import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.common.base.result.R;
 import com.lyx.common.web.utils.ResponseUtils;
 import com.lyx.member.entity.Member;
+import com.lyx.member.entity.req.MemberLoginReq;
 import com.lyx.member.entity.req.MemberListPageReq;
 import com.lyx.member.entity.req.SaveMemberReq;
+import com.lyx.member.entity.vo.MemberLoginVo;
 import com.lyx.member.entity.vo.MemberVO;
 import com.lyx.member.service.MemberService;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -40,7 +42,16 @@ public class MemberController {
     @Resource
     private MemberService memberService;
 
-     /**
+    /**
+     * 会员登录
+     */
+    @PostMapping("/login")
+    public R login(@RequestBody MemberLoginReq req){
+        MemberLoginVo memberLoginVo = memberService.login(req);
+        return R.ok(memberLoginVo);
+    }
+
+    /**
        * 分页查询会员列表
        */
     @GetMapping("/list")

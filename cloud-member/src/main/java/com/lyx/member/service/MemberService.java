@@ -4,6 +4,8 @@ import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.member.entity.Member;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lyx.member.entity.req.MemberListPageReq;
+import com.lyx.member.entity.req.MemberLoginReq;
+import com.lyx.member.entity.vo.MemberLoginVo;
 import com.lyx.member.entity.vo.MemberVO;
 
 /**
@@ -25,4 +27,11 @@ public interface MemberService extends IService<Member> {
        * 会员详情
        */
     MemberVO getMemberVO(Long id);
+
+    /**
+     * 会员登录
+     * @param req
+     * @return
+     */
+    MemberLoginVo login(MemberLoginReq req);
 }

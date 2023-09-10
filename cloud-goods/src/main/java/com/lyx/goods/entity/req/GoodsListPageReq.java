@@ -17,5 +17,7 @@ public class GoodsListPageReq extends PageReq {
     private Integer isOnSell;
     // 卖家
     private String seller;
+    // 分类id
+    private Long category_id;
 
 }
