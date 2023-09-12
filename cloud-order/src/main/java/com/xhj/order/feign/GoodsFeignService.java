@@ -20,4 +20,10 @@ public interface GoodsFeignService {
     @GetMapping("/goods/orderGoods/{id}")
     GoodsDTO orderInfo(@PathVariable Long id);
 
+    /**
+     * 查询商品详情
+     */
+    @GetMapping("/goods/infoFeign/{id}")
+    R orderFeignInfo(@PathVariable Long id);
+
 }

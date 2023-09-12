@@ -17,5 +17,12 @@ import java.util.Map;
 public interface StorageService extends IService<Storage> {
 
     PageUtils queryPage(StorageReq req);
+
+    /**
+     * 查询剩余库存
+     * @param id
+     * @return
+     */
+    Integer getByIdResidue(Long id);
 }
 

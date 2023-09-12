@@ -1,6 +1,7 @@
 package com.lyx.goods.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -12,6 +13,8 @@ import com.lyx.goods.service.BannerService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -38,5 +41,18 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, Banner> impleme
                 .eq(req.getIsActivite() != null, Banner::getIsActive, req.getIsActivite());
         this.baseMapper.selectPage(page, wrapper);
         return PageUtils.build(page);
+    }
+
+    /**
+     * 查询前十个轮播图
+     * @return
+     */
+    @Override
+    public List<Banner> bannerList() {
+        Page<Banner> page = new Page<>(1,10);
+        QueryWrapper<Banner> wrapper = new QueryWrapper<>();
+        wrapper.eq("is_active", 1);
+        Page<Banner> bannerPage = this.baseMapper.selectPage(page, wrapper);
+        return bannerPage.getRecords();
     }
 }

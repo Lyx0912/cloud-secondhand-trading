@@ -47,6 +47,14 @@ public class BannerController {
         PageUtils<Banner> pageUtils = bannerService.listPage(req);
         return R.ok(pageUtils);
     }
+     /**
+       * 查询前十个轮播图
+       */
+    @GetMapping("/bannerList")
+    public R bannerList() {
+        List<Banner> banners = bannerService.bannerList();
+        return R.ok(banners);
+    }
 
      /**
        * 获取轮播图详情

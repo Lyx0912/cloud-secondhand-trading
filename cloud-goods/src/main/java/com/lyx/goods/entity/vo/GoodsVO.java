@@ -101,5 +101,5 @@ public class GoodsVO {
     /**
      * 商品库存
      */
-    private Long total;
+    private Integer total;
 }

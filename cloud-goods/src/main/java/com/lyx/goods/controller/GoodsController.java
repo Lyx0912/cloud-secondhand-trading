@@ -9,6 +9,7 @@ import com.lyx.common.web.utils.ResponseUtils;
 import com.lyx.goods.entity.Goods;
 import com.lyx.goods.entity.req.GoodsListPageReq;
 import com.lyx.goods.entity.req.GoodsSaveReq;
+import com.lyx.goods.entity.req.GoodsSaveTestReq;
 import com.lyx.goods.entity.vo.GoodsVO;
 import com.lyx.goods.service.GoodsService;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,14 @@ public class GoodsController {
         PageUtils<GoodsVO> res = goodsService.listPage(req);
         return R.ok(res);
     }
+     /**
+       * 分页查询已上传商品列表
+       */
+    @PostMapping("/releaseGoodslist")
+    public R releaseGoodslist(GoodsListPageReq req){
+        PageUtils<GoodsVO> res = goodsService.releaseGoodslistPage(req);
+        return R.ok(res);
+    }
 
      /**
        * 删除商品
@@ -64,6 +73,15 @@ public class GoodsController {
     @GetMapping("/{id}")
     public R info(@PathVariable Long id){
         GoodsVO byId = goodsService.getGoodsVOById(id);
+        return R.ok(byId);
+    }
+
+     /**
+       * 查询商品详情
+       */
+    @GetMapping("/infoFeign/{id}")
+    public R infoFeign(@PathVariable Long id){
+        GoodsVO byId = goodsService.getGoodsVOFeignById(id);
         return R.ok(byId);
     }
 
@@ -93,6 +111,15 @@ public class GoodsController {
     @PutMapping()
     public R update(@Validated @RequestBody GoodsSaveReq req) {
         goodsService.updateGoodsInfo(req);
+        return R.ok();
+    }
+
+    /**
+     * 发布商品信息
+     */
+    @PutMapping("/save")
+    public R save(@Validated @RequestBody GoodsSaveTestReq req) {
+        goodsService.saveGoodsInfo(req);
         return R.ok();
     }
 

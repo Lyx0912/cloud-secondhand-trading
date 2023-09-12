@@ -42,11 +42,19 @@ public class StorageController {
     /**
      * 查询库存
      */
-    @GetMapping("/{id}")
+    @GetMapping("/info/{id}")
     public R info(@PathVariable("id") Long id){
 		Storage storage = StorageService.getById(id);
-
         return R.ok(storage);
+    }
+
+    /**
+     * 查询剩余库存
+     */
+    @GetMapping("/residue/{id}")
+    public Integer residue(@PathVariable("id") Long id){
+        Integer residue = StorageService.getByIdResidue(id);
+        return residue;
     }
 
     /**

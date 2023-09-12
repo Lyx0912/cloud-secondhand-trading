@@ -8,14 +8,18 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lyx.common.base.entity.dto.GoodsDTO;
 import com.lyx.common.base.entity.dto.GoodsEsDTO;
+import com.lyx.common.base.result.R;
 import com.lyx.common.mp.utils.PageUtils;
+import com.lyx.goods.entity.Audit;
 import com.lyx.goods.entity.Goods;
 import com.lyx.goods.entity.GoodsDetails;
 import com.lyx.goods.entity.GoodsImages;
 import com.lyx.goods.entity.req.GoodsListPageReq;
 import com.lyx.goods.entity.req.GoodsSaveReq;
+import com.lyx.goods.entity.req.GoodsSaveTestReq;
 import com.lyx.goods.entity.vo.GoodsVO;
 import com.lyx.goods.feign.SearchElasticFeignService;
+import com.lyx.goods.feign.StorageFeignService;
 import com.lyx.goods.mapper.GoodsMapper;
 import com.lyx.goods.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +57,8 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     private AuditService auditService;
     @Autowired
     private SearchElasticFeignService searchElasticFeignService;
+    @Autowired
+    private StorageFeignService storageFeignService;
 
     /**
      * 分页查询商品
@@ -149,7 +155,33 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         GoodsDetails goodsDetails = detailsService.lambdaQuery().eq(GoodsDetails::getGoodsId, id).one();
         goodsVO.setDetails(goodsDetails);
         // 远程调用查询库存
+        Integer residue = storageFeignService.residue(id);
+        if (residue!=null){
+            goodsVO.setTotal(residue);
+            log.info("residue{}",residue);
+        }else {
+            goodsVO.setTotal(0);
+        }
+        return goodsVO;
+    }
 
+    /**
+     * 查询商品详情
+     *
+     * @param id
+     */
+    @Override
+    public GoodsVO getGoodsVOFeignById(Long id) {
+        // 查询VO
+        GoodsVO goodsVO = baseMapper.getGoodsVOById(id);
+        // 递归查找父分类
+        goodsVO.setCategoryPath(categoryService.findParentCategory(goodsVO.getCid()));
+        // 设置商品图片
+        List<GoodsImages> images = imagesService.lambdaQuery().eq(GoodsImages::getGoodsId, id).orderByAsc(GoodsImages::getCreateTime).select().list();
+        goodsVO.setImages(images);
+        // 设置商品详情
+        GoodsDetails goodsDetails = detailsService.lambdaQuery().eq(GoodsDetails::getGoodsId, id).one();
+        goodsVO.setDetails(goodsDetails);
         return goodsVO;
     }
 
@@ -159,6 +191,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         log.info("goodsVO{}",goodsVO);
         GoodsDTO goodsDTO = new GoodsDTO();
         BeanUtils.copyProperties(goodsVO,goodsDTO);
+        goodsDTO.setCategoryName(categoryService.getById(goodsVO.getCid()).getName());
         log.info("goodsDTO{}",goodsDTO);
         return goodsDTO;
     }
@@ -199,5 +232,57 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
             goodsEsDTOS.add(goodsEsDTO);
             searchElasticFeignService.goodsStatusUp(goodsEsDTOS);
         }
+    }
+
+    /**
+     * 发布商品
+     * @param req
+     */
+    @Transactional
+    @Override
+    public void saveGoodsInfo(GoodsSaveTestReq req) {
+        Goods goods = new Goods();
+        BeanUtils.copyProperties(req,goods);
+        goods.setViewCount(0);
+        goods.setCreateTime(LocalDateTime.now());
+        goods.setUpdateTime(LocalDateTime.now());
+        goods.setDeleted(0);
+        goods.setCid(req.getCategoryPath()[req.getCategoryPath().length-1]);
+        goods.setIsOnSell(0);
+        this.save(goods);
+        // 加入商品的审核状态
+        Audit audit = new Audit();
+        audit.setDeleted(0);
+        audit.setGoodsId(goods.getId());
+        audit.setState(0L);
+        auditService.save(audit);
+        // 上传图片集
+        List<GoodsImages> collect = req.getImages().stream().map(images -> {
+            GoodsImages goodsImage = new GoodsImages();
+            goodsImage.setGoodsId(goods.getId());
+            goodsImage.setCreateTime(LocalDateTime.now());
+            goodsImage.setUpdateTime(LocalDateTime.now());
+            goodsImage.setUrl(images.getUrl());
+            return goodsImage;
+        }).collect(Collectors.toList());
+        imagesService.saveBatch(collect);
+        // 上传商品详情
+        if (req.getDetails()!=null){
+            detailsService.save(req.getDetails());
+        }
+    }
+
+    /**
+     * 查询已上传的商品
+     * @param req
+     * @return
+     */
+    @Override
+    public PageUtils<GoodsVO> releaseGoodslistPage(GoodsListPageReq req) {
+        Page<Goods> goodsPage = new Page<>(req.getPageNo(),req.getPageSize());
+        LambdaQueryWrapper<Goods> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(req.getSeller_id()!=null,Goods::getSellerId,req.getSeller_id());
+        this.baseMapper.selectPage(goodsPage, wrapper);
+        return PageUtils.build(goodsPage);
     }
 }

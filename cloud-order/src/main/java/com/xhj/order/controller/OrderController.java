@@ -5,6 +5,7 @@ import com.lyx.common.mp.utils.PageUtils;
 import com.xhj.order.entity.Order;
 import com.xhj.order.entity.req.OrderListPageReq;
 import com.xhj.order.entity.req.OrderReq;
+import com.xhj.order.entity.vo.OrderListVo;
 import com.xhj.order.entity.vo.OrderVo;
 import com.xhj.order.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +30,9 @@ public class OrderController {
      */
     @RequestMapping("/list")
     public R list(OrderListPageReq req){
-        PageUtils<Order> pageUtils = orderService.getOrderPageList(req);
+        PageUtils<OrderListVo> pageUtils = orderService.getOrderPageList(req);
         System.out.println(req);
-        return R.ok();
+        return R.ok(pageUtils.getList());
     }
 
 

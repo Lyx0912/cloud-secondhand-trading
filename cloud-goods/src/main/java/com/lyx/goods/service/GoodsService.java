@@ -6,6 +6,7 @@ import com.lyx.goods.entity.Goods;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lyx.goods.entity.req.GoodsListPageReq;
 import com.lyx.goods.entity.req.GoodsSaveReq;
+import com.lyx.goods.entity.req.GoodsSaveTestReq;
 import com.lyx.goods.entity.vo.GoodsVO;
 
 import java.util.List;
@@ -34,6 +35,10 @@ public interface GoodsService extends IService<Goods> {
        * 查询商品详情
        */
     GoodsVO getGoodsVOById(Long id);
+     /**
+       * 远程查询商品详情
+       */
+    GoodsVO getGoodsVOFeignById(Long id);
 
 
     /**
@@ -45,4 +50,17 @@ public interface GoodsService extends IService<Goods> {
        * 更新商品详情
        */
     void updateGoodsInfo(GoodsSaveReq req);
+
+    /**
+     * 发布商品
+     * @param req
+     */
+    void saveGoodsInfo(GoodsSaveTestReq req);
+
+    /**
+     * 查询已上传商品
+     * @param req
+     * @return
+     */
+    PageUtils<GoodsVO> releaseGoodslistPage(GoodsListPageReq req);
 }

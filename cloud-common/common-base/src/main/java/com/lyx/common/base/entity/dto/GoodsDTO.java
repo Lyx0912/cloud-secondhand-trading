@@ -27,6 +27,11 @@ public class GoodsDTO {
     private String name;
 
     /**
+     * 分类名称
+     */
+    private String categoryName;
+
+    /**
      * 卖家
      */
     private String seller;

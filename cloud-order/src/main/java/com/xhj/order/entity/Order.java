@@ -30,7 +30,7 @@ public class Order implements Serializable {
     /**
      * 物品编号
      */
-    private String goodsId;
+    private Long goodsId;
     /**
      * 订单号
      */
