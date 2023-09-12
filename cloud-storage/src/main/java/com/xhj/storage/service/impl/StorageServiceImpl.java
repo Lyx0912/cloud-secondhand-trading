@@ -44,4 +44,20 @@ public class StorageServiceImpl extends ServiceImpl<StorageDao, Storage> impleme
         return 0;
     }
 
+    /**
+     * 查询总库存
+     * @param id
+     * @return
+     */
+    @Override
+    public Integer getByIdResidueGoodsId(Long id) {
+        QueryWrapper<Storage> wrapper = new QueryWrapper<>();
+        wrapper.eq("product_id",id);
+        Storage storage = this.getOne(wrapper);
+        if (storage!=null){
+            return storage.getTotal();
+        }
+        return 0;
+    }
+
 }

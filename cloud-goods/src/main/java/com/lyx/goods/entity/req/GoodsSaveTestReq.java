@@ -76,4 +76,9 @@ public class GoodsSaveTestReq {
      * 分类路径
      */
     private Long[] categoryPath;
+
+    /**
+     * 数量
+     */
+    private Integer total;
 }

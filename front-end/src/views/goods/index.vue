@@ -368,6 +368,7 @@ export default {
     handleEdit(id) {
       info(id).then(res => {
         this.goodsForm = res.data
+        console.log(this.goodsForm)
       })
       this.goodsFormShow = true
     },

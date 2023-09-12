@@ -10,6 +10,7 @@ import com.lyx.goods.entity.Goods;
 import com.lyx.goods.entity.req.GoodsListPageReq;
 import com.lyx.goods.entity.req.GoodsSaveReq;
 import com.lyx.goods.entity.req.GoodsSaveTestReq;
+import com.lyx.goods.entity.vo.GoodsReleaseVo;
 import com.lyx.goods.entity.vo.GoodsVO;
 import com.lyx.goods.service.GoodsService;
 import lombok.extern.slf4j.Slf4j;
@@ -52,8 +53,8 @@ public class GoodsController {
        * 分页查询已上传商品列表
        */
     @PostMapping("/releaseGoodslist")
-    public R releaseGoodslist(GoodsListPageReq req){
-        PageUtils<GoodsVO> res = goodsService.releaseGoodslistPage(req);
+    public R releaseGoodslist(@RequestBody GoodsListPageReq req){
+        PageUtils<GoodsReleaseVo> res = goodsService.releaseGoodslistPage(req);
         return R.ok(res);
     }
 

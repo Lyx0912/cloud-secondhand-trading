@@ -58,6 +58,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper,Order> implements 
             GoodsDTO goodsDTO = goodsFeignService.orderInfo(order.getGoodsId());
             if (goodsDTO!=null){
                 orderListVo.setSeller(goodsDTO.getSeller());
+                orderListVo.setState(order.getState());
+                orderListVo.setDefaultImg(goodsDTO.getDefaultImg());
                 orderListVo.setCategoryName(goodsDTO.getCategoryName());
                 orderListVo.setGoodsName(goodsDTO.getName());
             }

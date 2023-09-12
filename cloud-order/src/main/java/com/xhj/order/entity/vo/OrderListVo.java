@@ -42,7 +42,7 @@ public class OrderListVo {
     /**
      * 订单状态
      */
-    private String state;
+    private Integer state;
     /**
      * 付款时间
      */
@@ -61,4 +61,8 @@ public class OrderListVo {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private LocalDateTime finallyTime;
+    /**
+     * 图片
+     */
+    private String defaultImg;
 }

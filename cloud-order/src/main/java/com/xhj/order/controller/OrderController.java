@@ -28,8 +28,17 @@ public class OrderController {
     /**
      * 列表
      */
-    @RequestMapping("/list")
+    @GetMapping("/list")
     public R list(OrderListPageReq req){
+        PageUtils<OrderListVo> pageUtils = orderService.getOrderPageList(req);
+        System.out.println(req);
+        return R.ok(pageUtils.getList());
+    }
+    /**
+     * 列表
+     */
+    @PostMapping("/list")
+    public R qlist(@RequestBody OrderListPageReq req){
         PageUtils<OrderListVo> pageUtils = orderService.getOrderPageList(req);
         System.out.println(req);
         return R.ok(pageUtils.getList());

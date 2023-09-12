@@ -8,15 +8,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lyx.common.base.entity.dto.GoodsDTO;
 import com.lyx.common.base.entity.dto.GoodsEsDTO;
+import com.lyx.common.base.entity.dto.StorageDTO;
 import com.lyx.common.base.result.R;
 import com.lyx.common.mp.utils.PageUtils;
-import com.lyx.goods.entity.Audit;
-import com.lyx.goods.entity.Goods;
-import com.lyx.goods.entity.GoodsDetails;
-import com.lyx.goods.entity.GoodsImages;
+import com.lyx.goods.entity.*;
 import com.lyx.goods.entity.req.GoodsListPageReq;
 import com.lyx.goods.entity.req.GoodsSaveReq;
 import com.lyx.goods.entity.req.GoodsSaveTestReq;
+import com.lyx.goods.entity.vo.GoodsReleaseVo;
 import com.lyx.goods.entity.vo.GoodsVO;
 import com.lyx.goods.feign.SearchElasticFeignService;
 import com.lyx.goods.feign.StorageFeignService;
@@ -71,12 +70,12 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         // 构建查询条件
         QueryWrapper<Goods> wrapper = Wrappers.query();
         wrapper
-                .like(StringUtils.isNotEmpty(req.getSeller()), "g.seller", req.getSeller())
-                .like(StringUtils.isNotEmpty(req.getName()), "g.name", req.getName())
+                .like(StringUtils.isNotEmpty(req.getSeller()), "seller", req.getSeller())
+                .like(StringUtils.isNotEmpty(req.getName()), "name", req.getName())
                 .eq(req.getCategory_id()!=null?req.getCategory_id()!=0:false,
                         "cid", req.getCategory_id())
 //                .eq("g.deleted", 0)
-                .eq(req.getIsOnSell() != null, "g.isOnSell", req.getIsOnSell());
+                .eq(req.getIsOnSell() != null, "is_on_sell", req.getIsOnSell());
         List<Goods> goods = this.baseMapper.selectList(wrapper);
 
         Page<GoodsVO> goodsVOPage = baseMapper.listPage(page, wrapper);
@@ -267,9 +266,14 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         }).collect(Collectors.toList());
         imagesService.saveBatch(collect);
         // 上传商品详情
-        if (req.getDetails()!=null){
-            detailsService.save(req.getDetails());
-        }
+//        if (req.getDetails()!=null){
+//            detailsService.save(req.getDetails());
+//        }
+        // 上传库存
+        StorageDTO storageDTO = new StorageDTO();
+        storageDTO.setTotal(req.getTotal());
+        storageDTO.setProductId(goods.getId());
+        storageFeignService.save(storageDTO);
     }
 
     /**
@@ -278,11 +282,30 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
      * @return
      */
     @Override
-    public PageUtils<GoodsVO> releaseGoodslistPage(GoodsListPageReq req) {
-        Page<Goods> goodsPage = new Page<>(req.getPageNo(),req.getPageSize());
+    public PageUtils<GoodsReleaseVo> releaseGoodslistPage(GoodsListPageReq req) {
+        Page<GoodsReleaseVo> page = new Page<>(req.getPageNo(),req.getPageSize());
         LambdaQueryWrapper<Goods> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(req.getSeller_id()!=null,Goods::getSellerId,req.getSeller_id());
-        this.baseMapper.selectPage(goodsPage, wrapper);
-        return PageUtils.build(goodsPage);
+        List<Goods> goods = this.list(wrapper);
+        List<GoodsReleaseVo> collect = goods.stream().map(good -> {
+            GoodsReleaseVo goodsReleaseVo = new GoodsReleaseVo();
+            LambdaQueryWrapper<Audit> auditWrapper = Wrappers.lambdaQuery();
+            auditWrapper.eq(req.getSeller_id() != null, Audit::getGoodsId, good.getId());
+            Audit audit = auditService.getOne(auditWrapper);
+            BeanUtils.copyProperties(good, goodsReleaseVo);
+            goodsReleaseVo.setAudit(audit);
+            // 查询库存
+            Integer residue = storageFeignService.residueGoodsId(good.getId());
+            goodsReleaseVo.setTotal(residue);
+            // 查询分类名称 和 三级分类
+            Category category = categoryService.getById(good.getCid());
+            goodsReleaseVo.setCategoryName(category.getName());
+            return goodsReleaseVo;
+        }).collect(Collectors.toList());
+        page.setRecords(collect);
+        PageUtils<GoodsReleaseVo> pageUtils = PageUtils.build(page);
+        return pageUtils;
     }
+
+
 }

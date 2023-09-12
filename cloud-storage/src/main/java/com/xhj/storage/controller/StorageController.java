@@ -3,10 +3,12 @@ package com.xhj.storage.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.lyx.common.base.entity.dto.StorageDTO;
 import com.lyx.common.base.result.R;
 import com.lyx.common.mp.utils.PageUtils;
 import com.xhj.storage.entity.req.StorageReq;
 import com.xhj.storage.entity.vo.StorageVo;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,11 +60,22 @@ public class StorageController {
     }
 
     /**
+     * 查询总库存
+     */
+    @GetMapping("/residueGoodsId/{id}")
+    public Integer residueGoodsId(@PathVariable("id") Long id){
+        Integer residue = StorageService.getByIdResidueGoodsId(id);
+        return residue;
+    }
+
+    /**
      * 保存库存
      */
     @RequestMapping("/save")
-    public R save(@RequestBody Storage demoStorage){
-		StorageService.save(demoStorage);
+    public R save(@RequestBody StorageDTO storageDTO){
+        Storage storage = new Storage();
+        BeanUtils.copyProperties(storageDTO,storage);
+		StorageService.save(storage);
 
         return R.ok();
     }

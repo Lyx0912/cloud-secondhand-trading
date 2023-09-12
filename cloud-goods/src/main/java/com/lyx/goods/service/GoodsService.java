@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.lyx.goods.entity.req.GoodsListPageReq;
 import com.lyx.goods.entity.req.GoodsSaveReq;
 import com.lyx.goods.entity.req.GoodsSaveTestReq;
+import com.lyx.goods.entity.vo.GoodsReleaseVo;
 import com.lyx.goods.entity.vo.GoodsVO;
 
 import java.util.List;
@@ -62,5 +63,5 @@ public interface GoodsService extends IService<Goods> {
      * @param req
      * @return
      */
-    PageUtils<GoodsVO> releaseGoodslistPage(GoodsListPageReq req);
+    PageUtils<GoodsReleaseVo> releaseGoodslistPage(GoodsListPageReq req);
 }
