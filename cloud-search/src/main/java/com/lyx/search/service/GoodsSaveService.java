@@ -1,5 +1,6 @@
 package com.lyx.search.service;
 
+import com.lyx.common.base.entity.dto.GoodsDTO;
 import com.lyx.common.base.entity.dto.GoodsEsDTO;
 
 import java.io.IOException;
@@ -15,4 +16,6 @@ public interface GoodsSaveService {
     void goodsStatusUp(List<GoodsEsDTO> goodsEsDTOS);
 
     void goodsDelete(List<Long> ids);
+
+    List<GoodsDTO>  goodsEsList();
 }

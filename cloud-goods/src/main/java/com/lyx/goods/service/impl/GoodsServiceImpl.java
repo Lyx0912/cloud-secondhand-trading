@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.swing.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -307,5 +308,27 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         return pageUtils;
     }
 
+    /**
+     * 用户分页查询商品列表
+     */
+    @Override
+    public PageUtils<GoodsVO> listEsPage(GoodsListPageReq req) {
+        Page<GoodsVO> page = new Page<>(req.getPageNo(),req.getPageSize());
+        // 远程调用es查询商品
+        List<GoodsDTO> goodsDTOS = searchElasticFeignService.goodsEsList();
+        List<GoodsVO> collect = goodsDTOS.stream().map(goodsDTO -> {
+            GoodsVO goodsVO = new GoodsVO();
+            BeanUtils.copyProperties(goodsDTO, goodsVO);
+            return goodsVO;
+        }).filter(item-> {
+            if (req.getCategory_id()!=0){
+                return item.getCid()==req.getCategory_id();
+            }
+            return true;
+        }).collect(Collectors.toList());
+        page.setRecords(collect);
+        PageUtils pageUtils = PageUtils.build(page);
+        return pageUtils;
+    }
 
 }

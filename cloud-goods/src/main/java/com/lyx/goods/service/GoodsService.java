@@ -64,4 +64,9 @@ public interface GoodsService extends IService<Goods> {
      * @return
      */
     PageUtils<GoodsReleaseVo> releaseGoodslistPage(GoodsListPageReq req);
+    /**
+     * 用户分页查询商品列表
+     */
+    PageUtils<GoodsVO> listEsPage(GoodsListPageReq req);
+
 }

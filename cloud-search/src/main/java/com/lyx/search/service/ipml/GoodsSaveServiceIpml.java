@@ -2,10 +2,13 @@ package com.lyx.search.service.ipml;
 
 import com.alibaba.fastjson.JSON;
 
+import com.lyx.common.base.entity.dto.GoodsDTO;
 import com.lyx.common.base.entity.dto.GoodsEsDTO;
 import com.lyx.common.base.exception.BizException;
 import com.lyx.common.base.result.ResultCode;
+import com.lyx.search.Repository.EsGoodsRepository;
 import com.lyx.search.config.EsConfig;
+import com.lyx.search.entity.GoodsEs;
 import com.lyx.search.service.GoodsSaveService;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -14,10 +17,13 @@ import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +39,23 @@ public class GoodsSaveServiceIpml implements GoodsSaveService {
 
     @Autowired
     private RestHighLevelClient highLevelClient;
+    @Autowired
+    private EsGoodsRepository esGoodsRepository;
+
+    /**
+     * 商品查询
+     */
+    @Override
+    public List<GoodsDTO>  goodsEsList(){
+        Iterable<GoodsEs> goodsEs = esGoodsRepository.findAll();
+        List<GoodsDTO> goodsEsList = new ArrayList<>();
+        goodsEs.forEach(goods->{
+            GoodsDTO goodsDTO = new GoodsDTO();
+            BeanUtils.copyProperties(goods,goodsDTO);
+            goodsEsList.add(goodsDTO);
+        });
+        return goodsEsList;
+    }
 
     /**
      * 商品上架

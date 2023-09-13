@@ -50,6 +50,14 @@ public class GoodsController {
         return R.ok(res);
     }
      /**
+       * 用户分页查询商品列表
+       */
+    @GetMapping("/es/list")
+    public R eslist(GoodsListPageReq req){
+        PageUtils<GoodsVO> res = goodsService.listEsPage(req);
+        return R.ok(res);
+    }
+     /**
        * 分页查询已上传商品列表
        */
     @PostMapping("/releaseGoodslist")

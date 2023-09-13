@@ -1,5 +1,6 @@
 package com.lyx.goods.feign;
 
+import com.lyx.common.base.entity.dto.GoodsDTO;
 import com.lyx.common.base.entity.dto.GoodsEsDTO;
 import com.lyx.common.base.result.R;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -23,4 +24,7 @@ public interface SearchElasticFeignService {
 
     @GetMapping("/search/{ids}")
     public R goodsDelete(@PathVariable List<Long> ids);
+
+    @GetMapping("/search/es/goods")
+    List<GoodsDTO>  goodsEsList();
 }

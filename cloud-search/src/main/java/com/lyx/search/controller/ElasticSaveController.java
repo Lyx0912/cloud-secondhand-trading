@@ -1,5 +1,6 @@
 package com.lyx.search.controller;
 
+import com.lyx.common.base.entity.dto.GoodsDTO;
 import com.lyx.common.base.entity.dto.GoodsEsDTO;
 import com.lyx.common.base.result.R;
 import com.lyx.search.service.GoodsSaveService;
@@ -22,6 +23,15 @@ public class ElasticSaveController {
 
     @Autowired
     private GoodsSaveService goodsSaveService;
+
+    /**
+     * 商品查询
+     */
+    @GetMapping("/es/goods")
+    public List<GoodsDTO>  goodsEsList(){
+        List<GoodsDTO>  goodsDTOs = goodsSaveService.goodsEsList();
+        return goodsDTOs;
+    }
 
     @PostMapping("/goods")
     public R goodsStatusUp(@RequestBody List<GoodsEsDTO> goodsEsDTOS){
