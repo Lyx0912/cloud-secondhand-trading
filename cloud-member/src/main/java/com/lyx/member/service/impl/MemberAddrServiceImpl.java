@@ -18,6 +18,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * <p>
  * 用户地址 服务实现类
@@ -40,7 +43,7 @@ public class MemberAddrServiceImpl extends ServiceImpl<MemberAddrMapper, MemberA
     @Override
     public PageUtils<MemberAddrVO> pageMemberAddr(MemberAddrPageReq req) {
         // 构建分页对象 设置分页参数
-        Page<MemberAddr> page = new Page<>(req.getPageNo(),req.getPageSize());
+        Page<MemberAddr> page = new Page<>(req.getPageNo()==0?1:req.getPageNo(),req.getPageSize()==0?5:req.getPageSize());
         // 构建查询条件
         LambdaQueryWrapper<MemberAddr> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(req.getMemberId()!=null,MemberAddr::getMemberId,req.getMemberId())
@@ -55,7 +58,14 @@ public class MemberAddrServiceImpl extends ServiceImpl<MemberAddrMapper, MemberA
         });
 
         // 转换vo
-        pageUtils.setList(memberMapStruct.memberAddrToMemberAddrVO(page.getRecords()));
+        List<MemberAddrVO> memberAddrVOS = memberMapStruct.memberAddrToMemberAddrVO(page.getRecords());
+        if (req.getPageNo()==0){
+            memberAddrVOS = memberAddrVOS.stream().filter(item -> item.getIsDefault() == 1).collect(Collectors.toList());
+        }
+        if (req.getPageSize()==0){
+            memberAddrVOS = memberAddrVOS.stream().filter(item -> item.getIsDefault() == 0).collect(Collectors.toList());
+        }
+        pageUtils.setList(memberAddrVOS);
         pageUtils.setPageNo(page.getCurrent());
         pageUtils.setTotal(page.getTotal());
 
