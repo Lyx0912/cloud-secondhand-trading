@@ -16,6 +16,10 @@ import java.time.LocalDateTime;
 @Data
 public class OrderListVo {
     /**
+     * 商品id
+     */
+    private Long id;
+    /**
      * 商品名称
      */
     private String goodsName;
@@ -43,6 +47,12 @@ public class OrderListVo {
      * 订单状态
      */
     private Integer state;
+    /**
+     * 购买时间
+     */
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+    private LocalDateTime createTime;
     /**
      * 付款时间
      */

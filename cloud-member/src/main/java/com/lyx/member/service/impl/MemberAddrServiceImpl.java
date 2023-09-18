@@ -86,5 +86,18 @@ public class MemberAddrServiceImpl extends ServiceImpl<MemberAddrMapper, MemberA
         save(memberAddr);
     }
 
+    /**
+     * 根据id查询收货地址
+     * @param id
+     * @return
+     */
+    @Override
+    public MemberAddrVO getMemberAddr(Long id) {
+        MemberAddr memberAddr = this.getById(id);
+        MemberAddrVO memberAddrVO = new MemberAddrVO();
+        BeanUtils.copyProperties(memberAddr,memberAddrVO);
+        return memberAddrVO;
+    }
+
 
 }

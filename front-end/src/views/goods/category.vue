@@ -7,7 +7,7 @@
         <el-button icon="el-icon-delete" size="mini" type="danger" @click="handleBatchDelete()">批量删除</el-button>
       </el-col>
     </el-row>
-    <el-input placeholder="输入关键字进行过滤" v-model="filterText" style="margin: 15px 0px"></el-input>
+    <el-input placeholder="输入关键字进行过滤" v-model="filterText" style="margin: 15px 0px;"></el-input>
     <el-tree
       :data="categoryList"
       :props="defaultProps"

@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -33,6 +34,7 @@ import javax.swing.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -59,6 +61,8 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     private SearchElasticFeignService searchElasticFeignService;
     @Autowired
     private StorageFeignService storageFeignService;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     /**
      * 分页查询商品
@@ -119,6 +123,10 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
                         GoodsEsDTO goodsEsDTO = new GoodsEsDTO();
                         BeanUtils.copyProperties(goods1,goodsEsDTO);
                         goodsEsDTOs.add(goodsEsDTO);
+                        // 查询库存
+                        Integer id = storageFeignService.residueGoodsId(goods1.getId());
+                        // 上传库存到redis
+                        redisTemplate.opsForValue().set("goods:"+goods1.getId(),id.toString());
                         return goods1.getId()==goodsId;
                     }
                 }
@@ -146,21 +154,23 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     public GoodsVO getGoodsVOById(Long id) {
         // 查询VO
         GoodsVO goodsVO = baseMapper.getGoodsVOById(id);
-        // 递归查找父分类
-        goodsVO.setCategoryPath(categoryService.findParentCategory(goodsVO.getCid()));
-        // 设置商品图片
-        List<GoodsImages> images = imagesService.lambdaQuery().eq(GoodsImages::getGoodsId, id).orderByAsc(GoodsImages::getCreateTime).select().list();
-        goodsVO.setImages(images);
-        // 设置商品详情
-        GoodsDetails goodsDetails = detailsService.lambdaQuery().eq(GoodsDetails::getGoodsId, id).one();
-        goodsVO.setDetails(goodsDetails);
-        // 远程调用查询库存
-        Integer residue = storageFeignService.residue(id);
-        if (residue!=null){
-            goodsVO.setTotal(residue);
-            log.info("residue{}",residue);
-        }else {
-            goodsVO.setTotal(0);
+        if (goodsVO!=null){
+            // 递归查找父分类
+            goodsVO.setCategoryPath(categoryService.findParentCategory(goodsVO.getCid()));
+            // 设置商品图片
+            List<GoodsImages> images = imagesService.lambdaQuery().eq(GoodsImages::getGoodsId, id).orderByAsc(GoodsImages::getCreateTime).select().list();
+            goodsVO.setImages(images);
+            // 设置商品详情
+            GoodsDetails goodsDetails = detailsService.lambdaQuery().eq(GoodsDetails::getGoodsId, id).one();
+            goodsVO.setDetails(goodsDetails);
+            // 远程调用查询库存
+            Integer residueGoods = storageFeignService.residueGoodsId(id);
+            Integer residue = storageFeignService.residue(id);
+            if (residue!=null){
+                goodsVO.setTotal(residue);
+            }else {
+                goodsVO.setTotal(residueGoods==null?0:residueGoods);
+            }
         }
         return goodsVO;
     }
@@ -224,6 +234,9 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         goods.setCid(req.getCategoryPath()[req.getCategoryPath().length-1]);
         goods.setUpdateTime(LocalDateTime.now());
         updateById(goods);
+        if (req.getTotal()!=null){
+            redisTemplate.opsForValue().set("goods:"+goods.getId(), req.getTotal().toString());
+        }
         // 更新elasticsearch
         if (req.getIsOnSell() == 1){
             ArrayList<GoodsEsDTO> goodsEsDTOS = new ArrayList<>();
@@ -285,9 +298,10 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     @Override
     public PageUtils<GoodsReleaseVo> releaseGoodslistPage(GoodsListPageReq req) {
         Page<GoodsReleaseVo> page = new Page<>(req.getPageNo(),req.getPageSize());
+        Page<Goods> pageGoods = new Page<>(req.getPageNo(),req.getPageSize());
         LambdaQueryWrapper<Goods> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(req.getSeller_id()!=null,Goods::getSellerId,req.getSeller_id());
-        List<Goods> goods = this.list(wrapper);
+        List<Goods> goods = this.page(pageGoods,wrapper).getRecords();
         List<GoodsReleaseVo> collect = goods.stream().map(good -> {
             GoodsReleaseVo goodsReleaseVo = new GoodsReleaseVo();
             LambdaQueryWrapper<Audit> auditWrapper = Wrappers.lambdaQuery();
@@ -305,6 +319,8 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         }).collect(Collectors.toList());
         page.setRecords(collect);
         PageUtils<GoodsReleaseVo> pageUtils = PageUtils.build(page);
+        pageUtils.setTotal(pageGoods.getTotal());
+        pageUtils.setPageSize(pageGoods.getSize());
         return pageUtils;
     }
 
@@ -316,19 +332,34 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         Page<GoodsVO> page = new Page<>(req.getPageNo(),req.getPageSize());
         // 远程调用es查询商品
         List<GoodsDTO> goodsDTOS = searchElasticFeignService.goodsEsList();
-        List<GoodsVO> collect = goodsDTOS.stream().map(goodsDTO -> {
-            GoodsVO goodsVO = new GoodsVO();
-            BeanUtils.copyProperties(goodsDTO, goodsVO);
-            return goodsVO;
-        }).filter(item-> {
-            if (req.getCategory_id()!=0){
-                return item.getCid()==req.getCategory_id();
-            }
-            return true;
-        }).collect(Collectors.toList());
+        List<GoodsVO> collect = null;
+        if (goodsDTOS!=null){
+            collect = goodsDTOS.stream().map(goodsDTO -> {
+                GoodsVO goodsVO = new GoodsVO();
+                BeanUtils.copyProperties(goodsDTO, goodsVO);
+                return goodsVO;
+            }).filter(item-> {
+                if (req.getCategory_id()!=0){
+                    return item.getCid()==req.getCategory_id();
+                }
+                return true;
+            }).collect(Collectors.toList());
+        }
         page.setRecords(collect);
         PageUtils pageUtils = PageUtils.build(page);
         return pageUtils;
+    }
+
+    /**
+     * 删除商品
+     * @param ids
+     */
+    @Transactional
+    @Override
+    public void removeGoodsByIds(List<Long> ids) {
+        this.removeByIds(ids);
+        // 下架es商品
+        searchElasticFeignService.goodsDelete(ids);
     }
 
 }

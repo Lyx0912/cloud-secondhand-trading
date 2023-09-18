@@ -26,6 +26,7 @@
         <module>cloud-message</module>
         <module>cloud-search</module>
         <module>cloud-oss</module>
+        <module>cloud-storage</module>
     </modules>
     <packaging>pom</packaging>
 

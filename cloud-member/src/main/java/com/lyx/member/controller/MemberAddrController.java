@@ -41,6 +41,14 @@ public class MemberAddrController {
         PageUtils<MemberAddrVO> page = memberAddrService.pageMemberAddr(req);
         return R.ok(page);
     }
+     /**
+       * 根据id查询收货地址
+       */
+    @GetMapping("/{id}")
+    public R getById(@PathVariable Long id){
+        MemberAddrVO memberAddr = memberAddrService.getMemberAddr(id);
+        return R.ok(memberAddr);
+    }
 
     /**
      * 添加收货地址

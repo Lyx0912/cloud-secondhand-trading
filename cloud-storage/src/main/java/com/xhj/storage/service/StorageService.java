@@ -31,5 +31,16 @@ public interface StorageService extends IService<Storage> {
      * @return
      */
     Integer getByIdResidueGoodsId(Long id);
+
+    /**
+     * 减剩余库存 加已用库存
+     * @param goodsId
+     */
+    void updateStorage(Long goodsId);
+    /**
+     * 加剩余库存 减已用库存
+     * @param goodsId
+     */
+    void addStorageTotal(Long goodsId);
 }
 

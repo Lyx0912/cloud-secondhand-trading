@@ -72,7 +72,7 @@ public class GoodsController {
     @DeleteMapping("/{ids}")
     public R delete(@PathVariable List<Long> ids){
         // 逻辑删除商品
-        goodsService.removeByIds(ids);
+        goodsService.removeGoodsByIds(ids);
         return R.ok();
     }
 

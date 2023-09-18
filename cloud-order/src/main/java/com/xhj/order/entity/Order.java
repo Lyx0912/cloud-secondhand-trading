@@ -1,6 +1,10 @@
 package com.xhj.order.entity;
 
+import com.alibaba.excel.annotation.ExcelIgnore;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.awt.event.ActionListener;
@@ -14,6 +18,7 @@ import java.time.LocalDateTime;
  * @Description:
  */
 @Data
+@TableName("oms_order")
 public class Order implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -21,7 +26,7 @@ public class Order implements Serializable {
     /**
      * id
      */
-    @TableId
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
     /**
      * 会员编号

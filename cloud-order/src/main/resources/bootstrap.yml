@@ -15,6 +15,24 @@ spring:
         shared-configs[0]:
           data-id: cloud-common.yaml
           refresh: true
+  rabbitmq:
+    host: localhost
+    port: 5672
+    # 开启手动确认
+    listener:
+      simple:
+        acknowledge-mode: manual
+        default-requeue-rejected: false
+      type: simple
+    publisher-returns: true
+    virtual-host: /
 logging:
   level:
     spring.: info
+
+#配置线程池
+xhj:
+  thread:
+    coreSize: 20
+    maxSize: 200
+    keepAliveTime: 10

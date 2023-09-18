@@ -77,5 +77,9 @@ public class GoodsSaveReq {
        */
     private Long[] categoryPath;
 
+    /**
+     * 库存
+     */
+    private Integer total;
 
 }

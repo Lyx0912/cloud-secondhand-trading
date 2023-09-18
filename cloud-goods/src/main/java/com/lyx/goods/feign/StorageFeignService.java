@@ -16,9 +16,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @FeignClient("cloud-storage")
 public interface StorageFeignService {
 
+    /**
+     * 查询剩余库存
+     */
     @GetMapping("/storage/residue/{id}")
     Integer residue(@PathVariable("id") Long id);
 
+    /**
+     * 查询总库存
+     */
     @GetMapping("/storage/residueGoodsId/{id}")
     Integer residueGoodsId(@PathVariable("id") Long id);
 

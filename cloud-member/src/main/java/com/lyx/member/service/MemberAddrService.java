@@ -27,4 +27,10 @@ public interface MemberAddrService extends IService<MemberAddr> {
        */
     void saveMemberAddr(SaveMemberAddrReq req);
 
+    /**
+     * 根据id查询收货地址
+     * @param id
+     * @return
+     */
+    MemberAddrVO getMemberAddr(Long id);
 }

@@ -69,4 +69,9 @@ public interface GoodsService extends IService<Goods> {
      */
     PageUtils<GoodsVO> listEsPage(GoodsListPageReq req);
 
+    /**
+     * 删除商品
+     * @param ids
+     */
+    void removeGoodsByIds(List<Long> ids);
 }

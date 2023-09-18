@@ -86,7 +86,26 @@ public class StorageController {
     @RequestMapping("/update")
     public R update(@RequestBody Storage demoStorage){
 		StorageService.updateById(demoStorage);
+        return R.ok();
+    }
 
+    /**
+     * 减剩余库存 加已用库存
+     * @param goodsId
+     */
+    @RequestMapping("/updateStorage/{id}")
+    public R updateStorage(@PathVariable("id") Long goodsId){
+		StorageService.updateStorage(goodsId);
+        return R.ok();
+    }
+
+    /**
+     * 加剩余库存 减已用库存
+     * @param goodsId
+     */
+    @RequestMapping("/addStorageTotal/{id}")
+    public R addStorageTotal(@PathVariable("id") Long goodsId){
+		StorageService.addStorageTotal(goodsId);
         return R.ok();
     }
 
