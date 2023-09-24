@@ -1,0 +1,84 @@
+/* 全局样式表 */
+
+html,
+body,
+#app {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  /* position: fixed; */
+  /* min-width: 1366px; */
+
+  /* overflow: hidden; */
+}
+ul {
+  list-style: none;
+}
+.el-breadcrumb {
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.el-table {
+  margin-top: 15px;
+}
+
+.el-steps {
+  margin: 20px 0px;
+}
+
+.el-step__title {
+  font-size: 13px;
+}
+
+.ql-editor {
+  min-height: 300px;
+}
+
+.el-input__inner {
+  border-radius: 20px !important;
+}
+.el-input-group__append {
+  border-bottom-right-radius: 20px;
+  border-top-right-radius: 20px;
+}
+.el-input-number__decrease {
+  border-radius: 20px !important;
+  border: 0px !important;
+  background-color: #fff !important;
+}
+.el-input-number__increase{
+  border-radius: 20px !important;
+  border: 0px !important;
+  background-color: #fff !important;
+}
+
+.el-drawer .rtl{
+  overflow: scroll
+}
+
+.el-form-item__label {
+  width: 90px;
+  color: #99a9bf !important;
+}
+.el-breadcrumb{
+  margin: 20px 20px;
+  font-size: 12px;
+}
+.el-card{
+  box-shadow: 0px 1px 1px rgba(0,0,0,0.15) !important;
+}
+
+.el-form-item.is-success .el-input__inner,
+.el-form-item.is-success .el-input__inner:focus,
+.el-form-item.is-success .el-textarea__inner,
+.el-form-item.is-success .el-textarea__inner:focus
+{ border-color:#67C23A }
+
+.el-form-item.is-success .el-input-group__append .el-input__inner,
+.el-form-item.is-success .el-input-group__prepend .el-input__inner
+{ border-color:transparent }
+
+.el-form-item.is-success .el-input__validateIcon
+{ color:#67C23A }
