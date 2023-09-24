@@ -15,5 +15,5 @@ public class OrderReq {
     private Long memberId;
     private Long addrId;
     private BigDecimal price;
-
+    private String memberName;
 }

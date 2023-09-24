@@ -1,10 +1,11 @@
 package com.lyx.goods.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import com.lyx.common.mp.handler.MyMetaObjectHandler;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,8 +31,10 @@ public class GoodsDetails implements Serializable {
 
     private String content;
 
+//    @TableField(value = "CREATE_AT" ,fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 
+//    @TableField(value = "CREATE_AT",fill = FieldFill.UPDATE)
     private LocalDateTime updatedAt;
 
 

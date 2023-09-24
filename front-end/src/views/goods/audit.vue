@@ -358,7 +358,7 @@ export default {
       this.queryParams = {
         pageNo: 1,
         pageSize: 10
-      },
+      }
       this.handleQuery()
     },
     handlePass() {

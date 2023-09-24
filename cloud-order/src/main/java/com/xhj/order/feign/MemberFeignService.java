@@ -15,4 +15,10 @@ public interface MemberFeignService {
 
     @GetMapping("/memberAddr/{id}")
     R getById(@PathVariable Long id);
+
+    /**
+     * 查询用户发布商品数量
+     */
+    @GetMapping("/member/count/{memberId}")
+    R count(@PathVariable Long memberId);
 }

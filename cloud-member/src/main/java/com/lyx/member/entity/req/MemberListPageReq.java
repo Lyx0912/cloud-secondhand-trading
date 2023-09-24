@@ -14,5 +14,6 @@ public class MemberListPageReq extends PageReq {
     private String nickname;
     private String mobile;
     private String email;
+    private Long memberId;
 
 }

@@ -1,18 +1,24 @@
 package com.lyx.member.controller;
 
 
+import com.lyx.common.base.result.IResultCode;
+import com.lyx.common.base.result.ResultCode;
 import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.common.base.result.R;
 import com.lyx.common.web.utils.ResponseUtils;
 import com.lyx.member.entity.Member;
 import com.lyx.member.entity.req.MemberLoginReq;
 import com.lyx.member.entity.req.MemberListPageReq;
+import com.lyx.member.entity.req.MemberPassReq;
 import com.lyx.member.entity.req.SaveMemberReq;
+import com.lyx.member.entity.vo.AreaVo;
 import com.lyx.member.entity.vo.MemberLoginVo;
 import com.lyx.member.entity.vo.MemberVO;
+import com.lyx.member.service.AreaService;
 import com.lyx.member.service.MemberService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import utils.ExcelUtils;
@@ -43,12 +49,41 @@ public class MemberController {
     private MemberService memberService;
 
     /**
+     * 查询用户是否存在
+     * @param name
+     * @return
+     */
+    @PostMapping("/getName/{name}")
+    public R getName(@PathVariable("name")String name){
+        String memberName = memberService.getName(name);
+        if (memberName==null){
+            return R.failed(ResultCode.USER_NOT_EXIST);
+        }
+        return R.ok();
+    }
+
+    /**
      * 会员登录
      */
     @PostMapping("/login")
     public R login(@RequestBody MemberLoginReq req){
         MemberLoginVo memberLoginVo = memberService.login(req);
+        if (memberLoginVo==null){
+            return R.failed(ResultCode.USERNAME_OR_PASSWORD_ERROR);
+        }
         return R.ok(memberLoginVo);
+    }
+    /**
+     * 会员修改
+     */
+    @PostMapping("/updata")
+    public R update(@RequestBody MemberListPageReq req){
+        try{
+            memberService.updateMember(req);
+        }catch (Exception e){
+            return R.failed(ResultCode.USERNAME_OR_PASSWORD_ERROR);
+        }
+        return R.ok();
     }
 
     /**
@@ -67,6 +102,37 @@ public class MemberController {
     public R getById(@NotNull(message = "id can not be null!") @PathVariable Long id){
         MemberVO vo = memberService.getMemberVO(id);
         return R.ok(vo);
+    }
+     /**
+       * 获取会员详情
+       */
+    @GetMapping("/memberId/{id}")
+    public R getMemberById(@NotNull(message = "id can not be null!") @PathVariable Long id){
+        MemberVO vo = memberService.getMemberById(id);
+        return R.ok(vo);
+    }
+
+     /**
+       * 密码对比
+       */
+    @PostMapping("/getPassword")
+    public R getPassword( @RequestBody MemberPassReq req){
+        try{
+            memberService.getPassword(req);
+        }catch (Exception e){
+            return R.failed(ResultCode.USERNAME_OR_PASSWORD_ERROR);
+        }
+
+        return R.ok();
+    }
+
+    /**
+     * 查询用户发布商品数量
+     */
+    @GetMapping("/count/{memberId}")
+    public R count(@PathVariable Long memberId){
+        Integer count = memberService.countMemberId(memberId);
+        return R.ok(count);
     }
 
      /**
@@ -132,4 +198,3 @@ public class MemberController {
     }
 
 }
-

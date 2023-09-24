@@ -21,6 +21,11 @@ public interface StorageFeignService {
      */
     @GetMapping("/storage/residue/{id}")
     Integer residue(@PathVariable("id") Long id);
+    /**
+     * 删除库存
+     */
+    @RequestMapping("/storage/delete")
+    R delete(@RequestBody Long[] ids);
 
     /**
      * 查询总库存

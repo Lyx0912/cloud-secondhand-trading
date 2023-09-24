@@ -3,6 +3,8 @@ package com.lyx.goods.controller;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lyx.common.base.entity.dto.GoodsDTO;
+import com.lyx.common.base.entity.dto.OrderGoodsDTO;
+import com.lyx.common.base.entity.dto.OrderGoodsPageReqDTO;
 import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.common.base.result.R;
 import com.lyx.common.web.utils.ResponseUtils;
@@ -23,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.sql.Wrapper;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -50,12 +53,29 @@ public class GoodsController {
         return R.ok(res);
     }
      /**
+       * 查询用户发布商品数量
+       */
+    @GetMapping("/count/{memberId}")
+    public R count(@PathVariable Long memberId){
+        Integer count = goodsService.memberIdCount(memberId);
+        return R.ok(count);
+    }
+     /**
        * 用户分页查询商品列表
        */
-    @GetMapping("/es/list")
-    public R eslist(GoodsListPageReq req){
+    @PostMapping("/es/list")
+    public R eslist(@RequestBody GoodsListPageReq req){
         PageUtils<GoodsVO> res = goodsService.listEsPage(req);
         return R.ok(res);
+    }
+
+     /**
+       * 用户查询商品列表
+       */
+    @PostMapping("/goodsList")
+    public List<GoodsDTO> goodsList(@RequestBody OrderGoodsPageReqDTO reqDTO){
+        List<GoodsDTO> goodsList = goodsService.goodsList(reqDTO);
+        return goodsList;
     }
      /**
        * 分页查询已上传商品列表
@@ -73,6 +93,24 @@ public class GoodsController {
     public R delete(@PathVariable List<Long> ids){
         // 逻辑删除商品
         goodsService.removeGoodsByIds(ids);
+        return R.ok();
+    }
+
+    /**
+     * 重新发布
+     */
+    @PutMapping("/update")
+    public R update(@Validated @RequestBody GoodsSaveTestReq req){
+        goodsService.updateRes(req);
+        return R.ok();
+    }
+
+    /**
+     * 重新发布
+     */
+    @PutMapping("/memberUpdate")
+    public R memberUpdate( @RequestBody GoodsSaveTestReq req){
+        goodsService.updateRes(req);
         return R.ok();
     }
 
@@ -95,6 +133,14 @@ public class GoodsController {
     }
 
     /**
+     * 查询商品详情
+     */
+    @GetMapping("/orderGoodsInfo/{id}")
+    public OrderGoodsDTO orderGoodsInfo(@PathVariable Long id){
+        OrderGoodsDTO goodsInfo = goodsService.getorderGoodsInfo(id);
+        return goodsInfo;
+    }
+    /**
      * 查询订单商品详情
      */
     @GetMapping("/orderGoods/{id}")
@@ -110,6 +156,19 @@ public class GoodsController {
     public R changeIsOnSell(@RequestBody List<Long> goodsIds ,@PathVariable("isOnSell")Integer isOnSell){
         goodsService.changeIsOnSell(goodsIds,isOnSell);
         log.info("goodsId{}",goodsIds);
+        log.info("isOnSell{}",isOnSell);
+        return R.ok();
+    }
+
+     /**
+       * 切换商品上架状态
+       */
+    @PatchMapping("/{isOnSell}/{goodsId}")
+    public R updateState(@PathVariable("isOnSell")Integer isOnSell,@PathVariable("goodsId")Long goodsId){
+        ArrayList<Long> list = new ArrayList<>();
+        list.add(goodsId);
+        goodsService.changeIsOnSell(list,isOnSell);
+        log.info("goodsId{}",goodsId);
         log.info("isOnSell{}",isOnSell);
         return R.ok();
     }
@@ -138,6 +197,14 @@ public class GoodsController {
         ExcelUtils.export(ResponseUtils.excelResponse(response).getOutputStream(),Goods.class,goodvos,"商品列表");
     }
 
+    /**
+     * 查询商品所有消息
+     */
+    @GetMapping("/getGoods")
+    public R getGoods( GoodsSaveTestReq req) {
+        goodsService.getGoods(req);
+        return R.ok();
+    }
 
 }
 

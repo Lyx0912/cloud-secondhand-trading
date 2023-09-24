@@ -24,7 +24,7 @@ public class OrderAddr implements Serializable {
 	 * ID
 	 */
 	@TableId
-	private Long id;
+	private String id;
 	/**
 	 * 创建时间
 	 */

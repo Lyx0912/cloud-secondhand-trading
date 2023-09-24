@@ -1,5 +1,6 @@
 package com.xhj.order.service.impl;
 
+import com.alibaba.cloud.commons.lang.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -10,19 +11,16 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.lyx.common.base.entity.dto.GoodsDTO;
-import com.lyx.common.base.entity.dto.GoodsEsDTO;
-import com.lyx.common.base.entity.dto.MemberAddrDTO;
+import com.lyx.common.base.entity.dto.*;
 import com.lyx.common.base.result.R;
 import com.lyx.common.mp.utils.PageUtils;
 import com.xhj.order.entity.Order;
 import com.xhj.order.entity.OrderAddr;
+import com.xhj.order.entity.req.OrderAddrMemberReq;
 import com.xhj.order.entity.req.OrderListPageReq;
 import com.xhj.order.entity.req.OrderPaymentReq;
 import com.xhj.order.entity.req.OrderReq;
-import com.xhj.order.entity.vo.OrderAddrVo;
-import com.xhj.order.entity.vo.OrderListVo;
-import com.xhj.order.entity.vo.OrderVo;
+import com.xhj.order.entity.vo.*;
 import com.xhj.order.feign.GoodsFeignService;
 import com.xhj.order.feign.MemberFeignService;
 import com.xhj.order.feign.StorageFeignService;
@@ -30,12 +28,12 @@ import com.xhj.order.mapper.OrderMapper;
 import com.xhj.order.service.OrderAddrService;
 import com.xhj.order.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RSemaphore;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +44,11 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -81,19 +83,122 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper,Order> implements 
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    @Autowired
+    private ThreadPoolExecutor executor;
+
+    @Override
+    public PageUtils<OrderListVo> getAdminOrderPageList(OrderListPageReq req) {
+        Page<OrderListVo> page = new Page<>(req.getPageNo(), req.getPageSize());
+        Page<Order> orderPage = new Page<>(req.getPageNo(), req.getPageSize());
+        // 查询商品信息
+        OrderGoodsPageReqDTO reqDTO = new OrderGoodsPageReqDTO();
+        reqDTO.setName(req.getName());
+        reqDTO.setSeller(req.getSeller());
+        reqDTO.setPageSize(req.getPageSize());
+        reqDTO.setPageNo(req.getPageNo());
+        List<GoodsDTO> goodsDTOs = goodsFeignService.goodsPageList(reqDTO);
+        // 查询的是商品名称和卖家
+        AtomicInteger i = new AtomicInteger();
+        AtomicInteger a = new AtomicInteger();
+        AtomicInteger b = new AtomicInteger();
+        if (req.getName()!=null||req.getSeller()!=null){
+            List<OrderListVo> orderListVoList = new ArrayList<>();
+            // 查询条件
+            LambdaQueryWrapper<Order> wrapper = Wrappers.lambdaQuery();
+            wrapper.eq(req.getUid()!=null,Order::getMemberId,req.getUid())
+                    .eq(req.getState()!=null,Order::getState,req.getState())
+                    .like(req.getBuyer()!=null,Order::getMemberUsername,req.getBuyer());
+            List<Order> orderss = this.list(wrapper);
+            // 遍历查到的商品信息
+            for (GoodsDTO goodsDTO : goodsDTOs) {
+                // 过滤掉不符合条件的订单
+                for (Order order : orderss) {
+                    if (order.getGoodsId()==goodsDTO.getId()){
+                        i.getAndAdd(1);
+                        OrderListVo orderListVo = new OrderListVo();
+                        BeanUtils.copyProperties(order, orderListVo);
+                        orderListVo.setBuyer(order.getMemberUsername());
+                        orderListVo.setId(order.getId());
+                        orderListVo.setSeller(goodsDTO.getSeller());
+                        orderListVo.setState(order.getState());
+                        orderListVo.setDefaultImg(goodsDTO.getDefaultImg());
+                        orderListVo.setCategoryName(goodsDTO.getCategoryName());
+                        orderListVo.setGoodsName(goodsDTO.getName());
+                        if (req.getPageNo()==1&&i.get()<=req.getPageSize()){
+                            orderListVoList.add(orderListVo);
+                            a.getAndAdd(1);
+                        }
+                        if (req.getPageNo()!=1&&i.get()>req.getPageSize()*(req.getPageNo()-1)){
+                            orderListVoList.add(orderListVo);
+                            b.getAndAdd(1);
+                        }
+                    }
+                }
+            }
+
+            page.setRecords(orderListVoList);
+            PageUtils build = PageUtils.build(page);
+            build.setPageSize(Long.parseLong(orderListVoList.size()+""));
+            build.setTotal(Long.parseLong(i.get()+""));
+            return build;
+        }else{
+            // 查询条件
+            LambdaQueryWrapper<Order> wrapper = Wrappers.lambdaQuery();
+            wrapper.eq(req.getUid()!=null,Order::getMemberId,req.getUid())
+                    .eq(req.getState()!=null,Order::getState,req.getState())
+                    .like(req.getBuyer()!=null,Order::getMemberUsername,req.getBuyer());
+            List<Order> orders = this.page(orderPage,wrapper).getRecords();
+            List<OrderListVo> orderListVos = orders.stream().map(order -> {
+                OrderListVo orderListVo = new OrderListVo();
+                BeanUtils.copyProperties(order, orderListVo);
+                orderListVo.setBuyer(order.getMemberUsername());
+                // 远程调用查询卖家 goods_id
+                GoodsDTO goodsDTO = new GoodsDTO();
+                if (order.getGoodsId()!=null){
+                    goodsDTOs.forEach(goodsDTO1 -> {
+                        if (goodsDTO1.getId()==order.getGoodsId()){
+                            BeanUtils.copyProperties(goodsDTO1,goodsDTO);
+                            return;
+                        }
+                    });
+                }
+                if (goodsDTO!=null){
+                    orderListVo.setId(order.getId());
+                    orderListVo.setSeller(goodsDTO.getSeller());
+                    orderListVo.setState(order.getState());
+                    orderListVo.setDefaultImg(goodsDTO.getDefaultImg());
+                    orderListVo.setCategoryName(goodsDTO.getCategoryName());
+                    orderListVo.setGoodsName(goodsDTO.getName());
+                }
+                return orderListVo;
+            }).collect(Collectors.toList());
+            page.setRecords(orderListVos);
+            PageUtils build = PageUtils.build(page);
+            build.setPageSize(orderPage.getSize());
+            build.setTotal(i.get()>0?i.get():orderPage.getTotal());
+            return build;
+        }
+
+    }
+
     @Override
     public PageUtils<OrderListVo> getOrderPageList(OrderListPageReq req) {
         Page<OrderListVo> page = new Page<>(req.getPageNo(), req.getPageSize());
         Page<Order> orderPage = new Page<>(req.getPageNo(), req.getPageSize());
-        // TODO 完善查询条件
-        List<Order> orders = this.page(orderPage).getRecords();
+        // 查询条件
+        LambdaQueryWrapper<Order> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(req.getUid()!=null,Order::getMemberId,req.getUid());
+        List<Order> orders = this.page(orderPage,wrapper).getRecords();
 //        List<Order> orders = this.baseMapper.getOrderList();
         List<OrderListVo> orderListVos = orders.stream().map(order -> {
             OrderListVo orderListVo = new OrderListVo();
             BeanUtils.copyProperties(order, orderListVo);
             orderListVo.setBuyer(order.getMemberUsername());
             // 远程调用查询卖家 goods_id
-            GoodsDTO goodsDTO = goodsFeignService.orderInfo(order.getGoodsId());
+            GoodsDTO goodsDTO = null;
+            if (order.getGoodsId()!=null){
+                goodsDTO = goodsFeignService.orderInfo(order.getGoodsId());
+            }
             if (goodsDTO!=null){
                 orderListVo.setId(order.getGoodsId());
                 orderListVo.setSeller(goodsDTO.getSeller());
@@ -129,30 +234,34 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper,Order> implements 
                 OrderAddrVo orderAddrVo = new OrderAddrVo();
                 if (byId.getData()!=null){
                     String s = JSONObject.toJSONString(byId.getData());
-                    MemberAddrDTO memberAddrDTO = JSON.parseObject(s, MemberAddrDTO.class);
+                    OrderAddrMemberReq orderAddrMemberReq = JSON.parseObject(s, OrderAddrMemberReq.class);
 
                     // 保存收货地址
                     OrderAddr orderAddr = new OrderAddr();
-                    BeanUtils.copyProperties(memberAddrDTO,orderAddr);
+                    BeanUtils.copyProperties(orderAddrMemberReq,orderAddr);
                     orderAddr.setCreateTime(LocalDateTime.now());
+                    orderAddr.setArea(orderAddrMemberReq.getAddrsPath()[orderAddrMemberReq.getAddrsPath().length-1]);
+                    orderAddr.setProvince(orderAddrMemberReq.getAddrsPath()[0]);
+                    orderAddr.setCity(orderAddrMemberReq.getAddrsPath()[1]);
                     orderAddrService.save(orderAddr);
 
                     // 生成订单
                     Order order = new Order();
                     order.setOrderSn(id+"");
+                    order.setMemberUsername(req.getMemberName());
                     order.setGoodsId(req.getGoodsId());
                     order.setMemberId(req.getMemberId());
                     order.setOrderAddrId(orderAddr.getId());
                     order.setPayAmount(req.getPrice());
                     order.setTotalAmount(req.getPrice());
-                    order.setCreateTime(LocalDateTime.now());
+//                    order.setCreateTime(LocalDateTime.now());
                     order.setDeleteStatus(0);
                     order.setState(0);
                     order.setSourceType(0);
                     order.setConfirmStatus(0);
                     order.setIsPayed(0);
                     this.baseMapper.insert(order);
-                    orderAddrVo.setMemberAddrDTO(memberAddrDTO);
+                    orderAddrVo.setMemberAddrDTO(null);
 
                     // 把商品id和地址id保存到redis
                     // 保存订单号到redis 30分钟
@@ -214,6 +323,26 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper,Order> implements 
             }
         }
     }
+
+    @Override
+    public OrderReleaseAddrsCountVo getCount(Long memberId) {
+        OrderReleaseAddrsCountVo countVo = new OrderReleaseAddrsCountVo();
+        // 查询用户订单数量
+        LambdaQueryWrapper<Order> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(StringUtils.isNotEmpty(memberId.toString()),Order::getMemberId,memberId);
+        int orderCount = count(wrapper);
+        // 查询用户地址数量
+        R count1 = memberFeignService.count(memberId);
+        int orderAddrCount = Integer.parseInt(count1.getData().toString());
+        // 查询用户发布商品数量 远程调用
+        R count = goodsFeignService.count(memberId);
+        int goodsCount = Integer.parseInt(count.getData().toString());
+        countVo.setOrderCount(orderCount);
+        countVo.setAddrsCount(orderAddrCount);
+        countVo.setReleaseCount(goodsCount);
+        return countVo;
+    }
+
     /**
      * 取消订单
      */
@@ -226,7 +355,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper,Order> implements 
         Order order = this.getOne(queryWrapper);
         if (order!=null){
             // 如果是待付款状态则取消
-            if (order.getState()==0&&order.getState()==1){
+            if (order.getState()==0||order.getState()==1){
                 deleteOrder(order,req);
             }
         }
@@ -275,5 +404,34 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper,Order> implements 
             return "0";
         }
         return "1";
+    }
+
+    /**
+     * 查询订单详情
+     */
+    @Override
+    public OrderInfoVo getInfo(Long orderId) throws ExecutionException, InterruptedException {
+        OrderInfoVo orderInfoVo = new OrderInfoVo();
+        CompletableFuture<Order> supplyAsync = CompletableFuture.supplyAsync(() -> {
+            // 查询订单信息
+            Order order = getById(orderId);
+            orderInfoVo.setOrder(order);
+            return order;
+        },executor);
+        CompletableFuture<Void> thenAcceptAsync = supplyAsync.thenAcceptAsync(order -> {
+            // 查询商品信息
+            OrderGoodsDTO goodsEsDTO = goodsFeignService.orderGoodsInfo(order.getGoodsId());
+            orderInfoVo.setOrderGoodsDTO(goodsEsDTO);
+        }, executor);
+        CompletableFuture<Void> thenAcceptAsync1 = supplyAsync.thenAcceptAsync(order -> {
+            // 查询订单地址
+            LambdaQueryWrapper<OrderAddr> wrapper = Wrappers.lambdaQuery();
+            wrapper.eq(OrderAddr::getId, order.getOrderAddrId());
+            OrderAddr orderAddr = orderAddrService.getOne(wrapper);
+            orderInfoVo.setOrderAddr(orderAddr);
+        }, executor);
+        //等到所有任务都完成
+        CompletableFuture.allOf(supplyAsync,thenAcceptAsync,thenAcceptAsync1).get();
+        return orderInfoVo;
     }
 }

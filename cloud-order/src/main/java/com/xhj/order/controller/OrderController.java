@@ -6,15 +6,15 @@ import com.xhj.order.entity.Order;
 import com.xhj.order.entity.req.OrderListPageReq;
 import com.xhj.order.entity.req.OrderPaymentReq;
 import com.xhj.order.entity.req.OrderReq;
-import com.xhj.order.entity.vo.OrderAddrVo;
-import com.xhj.order.entity.vo.OrderListVo;
-import com.xhj.order.entity.vo.OrderVo;
+import com.xhj.order.entity.vo.*;
 import com.xhj.order.service.OrderService;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @Author: xhj
@@ -32,16 +32,39 @@ public class OrderController {
      */
     @GetMapping("/list")
     public R list(OrderListPageReq req){
-        PageUtils<OrderListVo> pageUtils = orderService.getOrderPageList(req);
+        PageUtils<OrderListVo> pageUtils = orderService.getAdminOrderPageList(req);
         System.out.println(req);
-        return R.ok(pageUtils.getList());
+        return R.ok(pageUtils);
+    }
+
+    /**
+     * 查询订单详情
+     */
+    @SneakyThrows
+    @GetMapping("/info/{orderId}")
+    public R getinfo(@PathVariable("orderId") Long orderId) {
+        OrderInfoVo orderInfoVo = null;
+        try {
+            orderInfoVo = orderService.getInfo(orderId);
+        } catch (Exception e) {
+            return R.failed();
+        }
+        return R.ok(orderInfoVo);
+    }
+    /**
+     * 查询订单、地址、发布数量
+     */
+    @GetMapping("/count/{memberId}")
+    public R count(@PathVariable Long memberId){
+        OrderReleaseAddrsCountVo countVo = orderService.getCount(memberId);
+        return R.ok(countVo);
     }
     /**
      * 列表
      */
     @PostMapping("/list")
     public R qlist(@RequestBody OrderListPageReq req){
-        PageUtils<OrderListVo> pageUtils = orderService.getOrderPageList(req);
+        PageUtils<OrderListVo> pageUtils = orderService.getAdminOrderPageList(req);
         return R.ok(pageUtils);
     }
 

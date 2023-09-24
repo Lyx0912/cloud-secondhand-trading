@@ -2,6 +2,7 @@ package com.lyx.search.service;
 
 import com.lyx.common.base.entity.dto.GoodsDTO;
 import com.lyx.common.base.entity.dto.GoodsEsDTO;
+import com.lyx.search.entity.req.EsGoodsReq;
 
 import java.io.IOException;
 import java.util.List;
@@ -17,5 +18,5 @@ public interface GoodsSaveService {
 
     void goodsDelete(List<Long> ids);
 
-    List<GoodsDTO>  goodsEsList();
+    List<GoodsDTO>  goodsEsList(EsGoodsReq req) throws IOException;
 }

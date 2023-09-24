@@ -4,10 +4,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xhj.order.entity.OrderAddr;
 import com.xhj.order.entity.req.OrderAddrListPageReq;
+import com.xhj.order.entity.req.OrderAddrReq;
+import com.xhj.order.entity.req.OrderReq;
 import com.xhj.order.entity.vo.OrderAddrVo;
+import com.xhj.order.entity.vo.OrderInfoVo;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * 用户订单配送地址
@@ -24,5 +28,13 @@ public interface OrderAddrService extends IService<OrderAddr> {
      * @return
      */
     Page<OrderAddr> getOrderList(OrderAddrListPageReq req);
+    /**
+     * 修改
+     */
+    void updateAddr(OrderAddrReq req);
+    /**
+     * 查询商品所有消息
+     */
+    OrderInfoVo getGoods(OrderReq req);
 }
 

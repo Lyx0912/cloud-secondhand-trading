@@ -6,7 +6,9 @@ import com.lyx.common.base.result.R;
 import com.lyx.common.web.utils.ResponseUtils;
 import com.lyx.member.entity.MemberAddr;
 import com.lyx.member.entity.req.MemberAddrPageReq;
+import com.lyx.member.entity.req.MemberAddrReq;
 import com.lyx.member.entity.req.SaveMemberAddrReq;
+import com.lyx.member.entity.vo.MemberAddrOneVo;
 import com.lyx.member.entity.vo.MemberAddrVO;
 import com.lyx.member.service.MemberAddrService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +48,8 @@ public class MemberAddrController {
        */
     @GetMapping("/{id}")
     public R getById(@PathVariable Long id){
-        MemberAddrVO memberAddr = memberAddrService.getMemberAddr(id);
-        return R.ok(memberAddr);
+        MemberAddrOneVo memberAddrVO = memberAddrService.getMemberAddr(id);
+        return R.ok(memberAddrVO);
     }
 
     /**
@@ -57,6 +59,24 @@ public class MemberAddrController {
     public R save(@Validated @RequestBody SaveMemberAddrReq req){
         memberAddrService.saveMemberAddr(req);
         return R.ok();
+    }
+
+    /**
+     * 用户添加收货地址
+     */
+    @PostMapping("/savememberAddr")
+    public R saveMemberAddrs(@Validated @RequestBody MemberAddrReq req){
+        memberAddrService.saveMemberAddrs(req);
+        return R.ok();
+    }
+
+    /**
+     * 用户修改收货地址
+     */
+    @PostMapping("/updateMemberAddr")
+    public R updateMemberAddr(@Validated @RequestBody MemberAddrReq req){
+        MemberAddr memberAddr = memberAddrService.updateMemberAddr(req);
+        return R.ok(memberAddr);
     }
 
     /**

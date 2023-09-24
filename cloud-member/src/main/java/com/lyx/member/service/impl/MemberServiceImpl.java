@@ -2,6 +2,7 @@ package com.lyx.member.service.impl;
 
 import com.alibaba.cloud.commons.lang.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lyx.common.mp.utils.PageUtils;
@@ -12,6 +13,7 @@ import com.lyx.member.entity.Member;
 import com.lyx.member.entity.MemberAddr;
 import com.lyx.member.entity.req.MemberListPageReq;
 import com.lyx.member.entity.req.MemberLoginReq;
+import com.lyx.member.entity.req.MemberPassReq;
 import com.lyx.member.entity.vo.MemberLoginVo;
 import com.lyx.member.entity.vo.MemberVO;
 import com.lyx.member.mapper.MemberMapper;
@@ -21,7 +23,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lyx.member.utils.MobileEncrypt;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import static org.bouncycastle.asn1.x500.style.RFC4519Style.member;
 
 /**
  * <p>
@@ -79,7 +84,10 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             throw new BizException(ResultCode.USER_NOT_EXIST);
         }
         BeanUtils.copyProperties(byId,vo);
-        vo.setMobile(MobileEncrypt.encrypt(vo.getMobile()));
+        // 手机号码加密
+        if(vo.getMobile()!=null){
+            vo.setMobile(MobileEncrypt.encrypt(vo.getMobile()));
+        }
         // 设置默认收获地址
         LambdaQueryWrapper<MemberAddr> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(MemberAddr::getMemberId,id).eq(MemberAddr::getIsDefault,1);
@@ -94,12 +102,141 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
      */
     @Override
     public MemberLoginVo login(MemberLoginReq req) {
+        LambdaQueryWrapper<Member> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(StringUtils.isNotEmpty(req.getUsername()),Member::getUsername,req.getUsername());
+        Member one = getOne(wrapper);
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        boolean matches = passwordEncoder.matches(req.getPassword(),one.getPassword());
         MemberLoginVo memberLoginVo = new MemberLoginVo();
+        if (matches){
+            Member member = new Member();
+            member.setUsername(one.getUsername());
+            member.setNickname(one.getNickname());
+            member.setId(one.getId());
+            memberLoginVo.setMember(member);
+            memberLoginVo.setId(one.getId().intValue());
+            memberLoginVo.setToken("sdfsdrfgdfgfdghf.sdfsdfsdf.sffgfghfg");
+            return memberLoginVo;
+        }
+        return null;
+    }
+
+    /**
+     * 查询用户是否存在
+     * @param name
+     * @return
+     */
+    @Override
+    public String getName(String name) {
+        LambdaQueryWrapper<Member> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(Member::getUsername,name);
+        Member member = this.getOne(wrapper);
+        if (member!=null){
+            return member.getUsername();
+        }
+        return null;
+    }
+
+    /**
+     * 密码对比
+     * @param req
+     * @return
+     */
+    @Override
+    public void getPassword(MemberPassReq req) throws Exception {
+        LambdaQueryWrapper<Member> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(StringUtils.isNotEmpty(req.getUid()+""),Member::getId,req.getUid());
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        Member one = getOne(wrapper);
+        boolean matches = passwordEncoder.matches(req.getPassword(), one.getPassword());
+        if (!matches){
+            throw new Exception();
+        }
+    }
+
+    /**
+     * 修改密码
+     * @param req
+     */
+    @Override
+    public void updatePassword(MemberPassReq req) throws Exception {
+            Member member = getById(req.getUid());
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            if (member!=null&&req.getPassword()!=null){
+                LambdaUpdateWrapper<Member> updateWrapper = Wrappers.lambdaUpdate();
+                updateWrapper.eq(Member::getId,req.getUid())
+                                .set(Member::getPassword,passwordEncoder.encode(req.getPassword()));
+                update(updateWrapper);
+            }else{
+                throw new Exception();
+            }
+
+    }
+
+    /**
+     * 用户名是否存在
+     * @param req
+     * @throws Exception
+     */
+    @Override
+    public void getUserByUserName(MemberPassReq req) throws Exception {
+        LambdaQueryWrapper<Member> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(Member::getUsername,req.getName());
+        int count = count(wrapper);
+        if (count>0){
+            throw new Exception();
+        }
+    }
+
+    /**
+     * 用户注册
+     * @param req
+     */
+    @Override
+    public void register(MemberPassReq req) throws Exception {
+        if (req.getName()==null||req.getPassword()==null){
+            throw new Exception();
+        }
         Member member = new Member();
-        member.setUsername(req.getUsername());
-        memberLoginVo.setMember(member);
-        memberLoginVo.setId(1);
-        memberLoginVo.setToken("sdfsdrfgdfgfdghf.sdfsdfsdf.sffgfghfg");
-        return memberLoginVo;
+        member.setUsername(req.getName());
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encode = passwordEncoder.encode(req.getPassword());
+        member.setPassword(encode);
+        save(member);
+    }
+
+    /**
+     * 会员修改
+     * @param req
+     */
+    @Override
+    public void updateMember(MemberListPageReq req) {
+        LambdaUpdateWrapper<Member> wrapper = Wrappers.lambdaUpdate();
+        wrapper.eq(req.getMemberId()!=null,Member::getId,req.getMemberId())
+                .set(req.getNickname()!=null,Member::getNickname,req.getNickname())
+                .set(req.getMobile()!=null,Member::getMobile,req.getMobile())
+                .set(req.getEmail()!=null,Member::getEmail,req.getEmail());
+        update(wrapper);
+    }
+
+    /**
+     * 获取用户信息
+     * @param id
+     * @return
+     */
+    @Override
+    public MemberVO getMemberById(Long id) {
+        Member member = getById(id);
+        MemberVO memberVO = new MemberVO();
+        BeanUtils.copyProperties(member,memberVO);
+        return memberVO;
+    }
+
+    @Override
+    public Integer countMemberId(Long memberId) {
+        LambdaQueryWrapper<Member> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(Member::getId,memberId);
+        int count = count(wrapper);
+        return count;
     }
 }

@@ -6,9 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.lyx.common.base.entity.dto.GoodsDTO;
-import com.lyx.common.base.entity.dto.GoodsEsDTO;
-import com.lyx.common.base.entity.dto.StorageDTO;
+import com.lyx.common.base.entity.dto.*;
 import com.lyx.common.base.result.R;
 import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.goods.entity.*;
@@ -227,7 +225,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
 
 
         // 更新商品详情
-        detailsService.updateById(req.getDetails());
+//        detailsService.updateById(req.getDetails());
         // 更新商品信息
         Goods goods = new Goods();
         BeanUtils.copyProperties(req,goods);
@@ -269,6 +267,13 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         audit.setGoodsId(goods.getId());
         audit.setState(0L);
         auditService.save(audit);
+        //
+        GoodsDetails details = new GoodsDetails();
+        details.setContent(("<h1>你好</h1>"));
+        details.setGoodsId(goods.getId());
+        details.setCreatedAt(LocalDateTime.now());
+        details.setUpdatedAt(LocalDateTime.now());
+        detailsService.save(details);
         // 上传图片集
         List<GoodsImages> collect = req.getImages().stream().map(images -> {
             GoodsImages goodsImage = new GoodsImages();
@@ -299,6 +304,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     public PageUtils<GoodsReleaseVo> releaseGoodslistPage(GoodsListPageReq req) {
         Page<GoodsReleaseVo> page = new Page<>(req.getPageNo(),req.getPageSize());
         Page<Goods> pageGoods = new Page<>(req.getPageNo(),req.getPageSize());
+        // 构建查询商品的条件
         LambdaQueryWrapper<Goods> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(req.getSeller_id()!=null,Goods::getSellerId,req.getSeller_id());
         List<Goods> goods = this.page(pageGoods,wrapper).getRecords();
@@ -331,7 +337,10 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     public PageUtils<GoodsVO> listEsPage(GoodsListPageReq req) {
         Page<GoodsVO> page = new Page<>(req.getPageNo(),req.getPageSize());
         // 远程调用es查询商品
-        List<GoodsDTO> goodsDTOS = searchElasticFeignService.goodsEsList();
+        EsGoodsDTO esGoodsDTO = new EsGoodsDTO();
+        esGoodsDTO.setCid(req.getCategory_id());
+        esGoodsDTO.setName(req.getName());
+        List<GoodsDTO> goodsDTOS = searchElasticFeignService.goodsEsList(esGoodsDTO);
         List<GoodsVO> collect = null;
         if (goodsDTOS!=null){
             collect = goodsDTOS.stream().map(goodsDTO -> {
@@ -339,8 +348,10 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
                 BeanUtils.copyProperties(goodsDTO, goodsVO);
                 return goodsVO;
             }).filter(item-> {
-                if (req.getCategory_id()!=0){
-                    return item.getCid()==req.getCategory_id();
+                if (req.getCategory_id()!=null){
+                    if (req.getCategory_id()!=0){
+                        return item.getCid()==req.getCategory_id();
+                    }
                 }
                 return true;
             }).collect(Collectors.toList());
@@ -362,4 +373,83 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         searchElasticFeignService.goodsDelete(ids);
     }
 
+    /**
+     * 查询用户发布了多少条商品
+     * @param memberId
+     * @return
+     */
+    @Override
+    public Integer memberIdCount(Long memberId) {
+        // 查询用户发布了多少条商品
+        LambdaQueryWrapper<Goods> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(StringUtils.isNotEmpty(memberId.toString()),Goods::getSellerId,memberId);
+        int count = count(wrapper);
+        /*// 查询用户发布的商品
+        List<Goods> goodsList = list(wrapper);
+        // 过滤掉未通过的商品
+        List<Goods> goodsList1 = goodsList.stream().filter(goods -> {
+            LambdaQueryWrapper<Audit> queryWrapper = Wrappers.lambdaQuery();
+            queryWrapper.eq(Audit::getGoodsId, goods.getId());
+            Audit audit = auditService.getOne(queryWrapper);
+            if (audit.getState() == 1) {
+                return true;
+            }
+            return false;
+        }).collect(Collectors.toList());*/
+        return count;
+    }
+
+    /**
+     * 用户查询商品列表
+     */
+    @Override
+    public List<GoodsDTO> goodsList(OrderGoodsPageReqDTO reqDTO) {
+        LambdaQueryWrapper<Goods> wrapper = Wrappers.lambdaQuery();
+        wrapper.like(reqDTO.getName()!=null,Goods::getName,reqDTO.getName())
+                .like(reqDTO.getSeller()!=null,Goods::getSeller,reqDTO.getSeller());
+        List<Goods> list = list(wrapper);
+        List<GoodsDTO> goodsDTOS = list.stream().map(goods -> {
+            GoodsDTO goodsDTO = new GoodsDTO();
+            BeanUtils.copyProperties(goods, goodsDTO);
+            goodsDTO.setCategoryName(categoryService.getById(goods.getCid()).getName());
+            return goodsDTO;
+        }).collect(Collectors.toList());
+        return goodsDTOS;
+    }
+
+    /**
+     * 查询商品详情
+     */
+    @Override
+    public OrderGoodsDTO getorderGoodsInfo(Long id) {
+        Goods goods = getById(id);
+        OrderGoodsDTO orderGoodsDTO = new OrderGoodsDTO();
+        BeanUtils.copyProperties(goods,orderGoodsDTO);
+        return orderGoodsDTO;
+    }
+
+    /**
+     * 重新发布
+     * @param req
+     */
+    @Override
+    public void updateRes(GoodsSaveTestReq req) {
+        Goods goods = new Goods();
+        BeanUtils.copyProperties(req,goods);
+        goods.setUpdateTime(LocalDateTime.now());
+        this.baseMapper.updateById(goods);
+        // 修改审核状态
+        LambdaUpdateWrapper<Audit> wrapper = Wrappers.lambdaUpdate();
+        wrapper.eq(Audit::getGoodsId,req.getId())
+                        .set(Audit::getState,0);
+        auditService.update(wrapper);
+    }
+
+    /**
+     * 查询商品所有消息
+     */
+    @Override
+    public void getGoods(GoodsSaveTestReq req) {
+
+    }
 }

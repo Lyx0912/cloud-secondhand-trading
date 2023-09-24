@@ -4,7 +4,9 @@ import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.member.entity.MemberAddr;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lyx.member.entity.req.MemberAddrPageReq;
+import com.lyx.member.entity.req.MemberAddrReq;
 import com.lyx.member.entity.req.SaveMemberAddrReq;
+import com.lyx.member.entity.vo.MemberAddrOneVo;
 import com.lyx.member.entity.vo.MemberAddrVO;
 
 /**
@@ -32,5 +34,17 @@ public interface MemberAddrService extends IService<MemberAddr> {
      * @param id
      * @return
      */
-    MemberAddrVO getMemberAddr(Long id);
+    MemberAddrOneVo getMemberAddr(Long id);
+
+    /**
+     * 用户添加收货地址
+     * @param req
+     */
+    void saveMemberAddrs(MemberAddrReq req);
+
+    /**
+     * 修改地址
+     * @param req
+     */
+    MemberAddr updateMemberAddr(MemberAddrReq req);
 }

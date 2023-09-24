@@ -1,10 +1,7 @@
 package com.xhj.order.entity;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.awt.event.ActionListener;
@@ -43,6 +40,7 @@ public class Order implements Serializable {
     /**
      * 订单创建时间
      */
+    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
     /**
      * 用户名
@@ -119,5 +117,5 @@ public class Order implements Serializable {
     /**
      * 用户订单地址id
      */
-    private Long orderAddrId;
+    private String orderAddrId;
 }

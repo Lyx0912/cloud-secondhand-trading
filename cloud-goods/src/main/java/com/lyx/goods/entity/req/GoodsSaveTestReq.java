@@ -20,6 +20,10 @@ import java.util.List;
 public class GoodsSaveTestReq {
 
     /**
+     * 商品id
+     */
+    private Long id;
+    /**
      * 物品名称
      */
     @NotBlank(message = "名称不能为空")
@@ -35,6 +39,7 @@ public class GoodsSaveTestReq {
      * 卖家
      */
     @ExcelIgnore
+//    @NotBlank(message = "sellerId不能为空")
     private Integer sellerId;
 
 
@@ -59,26 +64,30 @@ public class GoodsSaveTestReq {
     /**
      * 商品详情
      */
+    @NotNull (message = "商品详情不能为空")
     private GoodsDetails details;
 
     /**
      * 商品图片
      */
-    @NotNull(message = "请先上传图片集")
+    @NotNull(message = "请先上传图片")
     private List<GoodsImagesVo> images;
 
     /**
      * 展示图片
      */
+    @NotNull(message = "请先上传图片集")
     private String defaultImg;
 
     /**
      * 分类路径
      */
+    @NotNull(message = "分类不能为空")
     private Long[] categoryPath;
 
     /**
      * 数量
      */
+    @NotNull(message = "数量不能为空")
     private Integer total;
 }

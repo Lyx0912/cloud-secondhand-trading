@@ -5,11 +5,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lyx.common.base.result.R;
 import com.lyx.common.mp.utils.PageUtils;
 import com.lyx.member.config.MemberMapStruct;
 import com.lyx.member.entity.MemberAddr;
 import com.lyx.member.entity.req.MemberAddrPageReq;
+import com.lyx.member.entity.req.MemberAddrReq;
 import com.lyx.member.entity.req.SaveMemberAddrReq;
+import com.lyx.member.entity.vo.MemberAddrOneVo;
 import com.lyx.member.entity.vo.MemberAddrVO;
 import com.lyx.member.mapper.MemberAddrMapper;
 import com.lyx.member.service.MemberAddrService;
@@ -87,15 +90,76 @@ public class MemberAddrServiceImpl extends ServiceImpl<MemberAddrMapper, MemberA
     }
 
     /**
+     * 用户添加收货地址
+     *
+     * @param req
+     */
+    @Override
+    public void saveMemberAddrs(MemberAddrReq req) {
+        LambdaQueryWrapper<MemberAddr> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(MemberAddr::getMemberId,req.getMemberId())
+                .eq(MemberAddr::getIsDefault,1);
+        List<MemberAddr> addrs = list(wrapper);
+        MemberAddr memberAddr = new MemberAddr();
+        // 拷贝属性
+        BeanUtils.copyProperties(req,memberAddr);
+        memberAddr.setProvince(req.getAddrsPath()[0]);
+        memberAddr.setCity(req.getAddrsPath()[1]);
+        memberAddr.setArea(req.getAddrsPath()[2]);
+        if (addrs==null||addrs.size()==0){
+            memberAddr.setIsDefault(1);
+        }
+        if (addrs!=null){
+            addrs.stream().forEach(addr -> {
+                addr.setIsDefault(0);
+                updateById(addr);
+            });
+        }
+        save(memberAddr);
+    }
+
+    /**
+     * 修改地址
+     * @param req
+     */
+    @Override
+    public MemberAddr updateMemberAddr(MemberAddrReq req) {
+        LambdaQueryWrapper<MemberAddr> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(MemberAddr::getMemberId,req.getMemberId())
+                .eq(MemberAddr::getIsDefault,1);
+        List<MemberAddr> addrs = list(wrapper);
+        MemberAddr memberAddr = new MemberAddr();
+        BeanUtils.copyProperties(req,memberAddr);
+        if (req.getAddrsPath()!=null){
+            memberAddr.setProvince(req.getAddrsPath()[0]);
+            memberAddr.setCity(req.getAddrsPath()[1]);
+            memberAddr.setArea(req.getAddrsPath()[2]);
+        }
+        memberAddr.setIsDefault(req.getIsDefault());
+        if (req.getIsDefault()!=null){
+            if (req.getIsDefault()==1){
+                addrs.stream().forEach(addr -> {
+                    addr.setIsDefault(0);
+                    updateById(addr);
+                });
+            }
+        }
+        updateById(memberAddr);
+        return memberAddr;
+    }
+
+    /**
      * 根据id查询收货地址
      * @param id
      * @return
      */
     @Override
-    public MemberAddrVO getMemberAddr(Long id) {
+    public MemberAddrOneVo getMemberAddr(Long id) {
         MemberAddr memberAddr = this.getById(id);
-        MemberAddrVO memberAddrVO = new MemberAddrVO();
+        MemberAddrOneVo memberAddrVO = new MemberAddrOneVo();
         BeanUtils.copyProperties(memberAddr,memberAddrVO);
+        String[] addr = {memberAddr.getProvince(),memberAddr.getCity(),memberAddr.getArea()};
+        memberAddrVO.setAddrsPath(addr);
         return memberAddrVO;
     }
 

@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import converter.StatusConverter;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Transient;
 
 /**
  * <p>

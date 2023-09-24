@@ -1,5 +1,6 @@
 package com.lyx.goods.feign;
 
+import com.lyx.common.base.entity.dto.EsGoodsDTO;
 import com.lyx.common.base.entity.dto.GoodsDTO;
 import com.lyx.common.base.entity.dto.GoodsEsDTO;
 import com.lyx.common.base.result.R;
@@ -20,11 +21,11 @@ import java.util.List;
 public interface SearchElasticFeignService {
 
     @PostMapping("/search/goods")
-    public R goodsStatusUp(@RequestBody List<GoodsEsDTO> goodsEsDTOS);
+    R goodsStatusUp(@RequestBody List<GoodsEsDTO> goodsEsDTOS);
 
     @GetMapping("/search/{ids}")
-    public R goodsDelete(@PathVariable List<Long> ids);
+    R goodsDelete(@PathVariable List<Long> ids);
 
-    @GetMapping("/search/es/goods")
-    List<GoodsDTO>  goodsEsList();
+    @PostMapping("/search/es/goods")
+    List<GoodsDTO>  goodsEsList(@RequestBody EsGoodsDTO esGoodsDTO);
 }

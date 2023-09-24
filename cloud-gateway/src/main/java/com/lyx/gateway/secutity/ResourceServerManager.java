@@ -62,6 +62,8 @@ public class ResourceServerManager implements ReactiveAuthorizationManager<Autho
         String token = request.getHeaders().getFirst(SecurityConstants.AUTHORIZATION_KEY);
         if (StrUtil.isBlank(token) || !StrUtil.startWithIgnoreCase(token, SecurityConstants.JWT_PREFIX)) {
             return Mono.just(new AuthorizationDecision(false));
+        }else{
+
         }
         // 从redis中获取资源权限
         Map<String, Object> urlPermRolesRules = redisTemplate.opsForHash().entries(GlobalConstants.URL_PERM_ROLES_KEY);

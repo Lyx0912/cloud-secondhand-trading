@@ -31,14 +31,14 @@ public class GoodsEs {
     private String name;
 
     /**
-     * 分类名称
-     */
-    private String categoryName;
-
-    /**
      * 卖家
      */
     private String seller;
+
+    /**
+     * 描述
+     */
+    private String description;
 
     /**
      * 价格
@@ -56,4 +56,9 @@ public class GoodsEs {
      * 默认的图片地址
      */
     private String defaultImg;
+
+    /**
+     * 所属分类
+     */
+    private Long cid;
 }

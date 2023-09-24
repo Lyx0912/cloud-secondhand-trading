@@ -3,6 +3,7 @@ package com.lyx.search.controller;
 import com.lyx.common.base.entity.dto.GoodsDTO;
 import com.lyx.common.base.entity.dto.GoodsEsDTO;
 import com.lyx.common.base.result.R;
+import com.lyx.search.entity.req.EsGoodsReq;
 import com.lyx.search.service.GoodsSaveService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +28,9 @@ public class ElasticSaveController {
     /**
      * 商品查询
      */
-    @GetMapping("/es/goods")
-    public List<GoodsDTO>  goodsEsList(){
-        List<GoodsDTO>  goodsDTOs = goodsSaveService.goodsEsList();
+    @PostMapping("/es/goods")
+    public List<GoodsDTO>  goodsEsList(@RequestBody EsGoodsReq req) throws IOException {
+        List<GoodsDTO>  goodsDTOs = goodsSaveService.goodsEsList(req);
         return goodsDTOs;
     }
 

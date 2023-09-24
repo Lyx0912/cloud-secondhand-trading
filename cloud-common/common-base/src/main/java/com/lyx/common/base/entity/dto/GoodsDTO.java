@@ -52,5 +52,8 @@ public class GoodsDTO {
      * 默认的图片地址
      */
     private String defaultImg;
-
+    /**
+     * 所属分类
+     */
+    private Long cid;
 }

@@ -9,19 +9,29 @@ import com.lyx.common.base.result.ResultCode;
 import com.lyx.search.Repository.EsGoodsRepository;
 import com.lyx.search.config.EsConfig;
 import com.lyx.search.entity.GoodsEs;
+import com.lyx.search.entity.req.EsGoodsReq;
 import com.lyx.search.service.GoodsSaveService;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.*;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import javax.naming.directory.SearchResult;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,15 +51,39 @@ public class GoodsSaveServiceIpml implements GoodsSaveService {
     private RestHighLevelClient highLevelClient;
     @Autowired
     private EsGoodsRepository esGoodsRepository;
+//    ElasticsearchTemplate elasticsearchTemplate;
 
     /**
      * 商品查询
      */
     @Override
-    public List<GoodsDTO>  goodsEsList(){
+    public List<GoodsDTO>  goodsEsList(EsGoodsReq req) throws IOException {
+
+//        WildcardQueryBuilder wildcardQuery = QueryBuilders.wildcardQuery("name", "华为");
+//        QueryStringQueryBuilder field = QueryBuilders.queryStringQuery("华为").field("name");
+//        Iterable<GoodsEs> search = esGoodsRepository.search(field);
+//        QueryBuilder builder = QueryBuilders.fuzzyQuery("nanme","华为");
+
+
+//        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+//        FuzzyQueryBuilder queryBuilder = QueryBuilders.fuzzyQuery("name", "华为");
+//        sourceBuilder.query(queryBuilder);
+//        SearchRequest searchRequest = new SearchRequest("goods");
+//        searchRequest.source(sourceBuilder);
+//        SearchResponse search = highLevelClient.search(searchRequest, EsConfig.COMMON_OPTIONS);
+//        log.info("search{}",search.getHits().getHits());
+        QueryBuilder queryBuilder = null;
+        if (req.getName()!=null&&req.getName()!=""){
+            queryBuilder = QueryBuilders.matchQuery("name", req.getName());
+        }
+        if (req.getCid()!=null&&req.getCid()!=0){
+            queryBuilder = QueryBuilders.matchQuery("cid", req.getCid());
+        }
+        Iterable<GoodsEs> search = esGoodsRepository.search(queryBuilder);
+
         Iterable<GoodsEs> goodsEs = esGoodsRepository.findAll();
         List<GoodsDTO> goodsEsList = new ArrayList<>();
-        goodsEs.forEach(goods->{
+        search.forEach(goods->{
             GoodsDTO goodsDTO = new GoodsDTO();
             BeanUtils.copyProperties(goods,goodsDTO);
             goodsEsList.add(goodsDTO);
@@ -65,6 +99,8 @@ public class GoodsSaveServiceIpml implements GoodsSaveService {
     public void goodsStatusUp(List<GoodsEsDTO> goodsEsDTOS) {
         BulkRequest bulkRequest = new BulkRequest();
         for (GoodsEsDTO goodsEsDTO : goodsEsDTOS) {
+            goodsEsDTO.setDescription("");
+            goodsEsDTO.setSeller("");
             IndexRequest indexRequest = new IndexRequest("goods");
             indexRequest.id(goodsEsDTO.getId().toString());
             String s = JSON.toJSONString(goodsEsDTO);

@@ -11,4 +11,18 @@ import lombok.Data;
 @Data
 public class OrderListPageReq extends PageReq {
     private Long uid;
+    private Long state;
+    /**
+     * 卖家
+     */
+    private String seller;
+    /**
+     * 买家
+     */
+    private String buyer;
+    /**
+     * 商品名称
+     */
+    private String name;
+
 }

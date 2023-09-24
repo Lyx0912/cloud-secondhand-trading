@@ -6,9 +6,11 @@ import com.lyx.common.mp.utils.PageUtils;
 import com.xhj.order.entity.Order;
 import com.xhj.order.entity.OrderAddr;
 import com.xhj.order.entity.req.OrderAddrListPageReq;
+import com.xhj.order.entity.req.OrderAddrReq;
 import com.xhj.order.entity.req.OrderListPageReq;
 import com.xhj.order.entity.req.OrderReq;
 import com.xhj.order.entity.vo.OrderAddrVo;
+import com.xhj.order.entity.vo.OrderInfoVo;
 import com.xhj.order.entity.vo.OrderVo;
 import com.xhj.order.service.OrderAddrService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +67,15 @@ public class OrderAddrController {
     @RequestMapping("/update")
     public R update(@RequestBody OrderAddr orderAddr){
         orderAddrService.updateById(orderAddr);
+        return R.ok();
+    }
 
+    /**
+     * 修改
+     */
+    @PostMapping("/updates")
+    public R updateAddr(@RequestBody OrderAddrReq req){
+        orderAddrService.updateAddr(req);
         return R.ok();
     }
 
@@ -77,6 +87,16 @@ public class OrderAddrController {
         orderAddrService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
+    }
+
+
+    /**
+     * 查询商品所有消息
+     */
+    @GetMapping("/getGoods")
+    public R getGoods(OrderReq req) {
+        OrderInfoVo orderInfoVo = orderAddrService.getGoods(req);
+        return R.ok(orderInfoVo);
     }
 
 }

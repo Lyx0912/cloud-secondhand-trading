@@ -6,10 +6,10 @@ import com.xhj.order.entity.Order;
 import com.xhj.order.entity.req.OrderListPageReq;
 import com.xhj.order.entity.req.OrderPaymentReq;
 import com.xhj.order.entity.req.OrderReq;
-import com.xhj.order.entity.vo.OrderAddrVo;
-import com.xhj.order.entity.vo.OrderListVo;
-import com.xhj.order.entity.vo.OrderVo;
+import com.xhj.order.entity.vo.*;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.ExecutionException;
 
 /**
  * @Author: xhj
@@ -48,4 +48,17 @@ public interface OrderService extends IService<Order> {
      * rabbitmq取消订单
      */
     void rabbitMqDeleteOrderByOrderId(OrderPaymentReq req);
+
+    /**
+     * 查询订单、地址、发布数量
+     * @return
+     */
+    OrderReleaseAddrsCountVo getCount(Long memberId);
+
+    PageUtils<OrderListVo> getAdminOrderPageList(OrderListPageReq req);
+
+    /**
+     * 查询订单详情
+     */
+    OrderInfoVo getInfo(Long orderId) throws ExecutionException, InterruptedException;
 }

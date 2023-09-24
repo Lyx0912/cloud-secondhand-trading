@@ -16,6 +16,7 @@ import com.lyx.goods.entity.req.AuditListPageReq;
 import com.lyx.goods.entity.req.AuditSaveReq;
 import com.lyx.goods.entity.vo.AuditVo;
 import com.lyx.goods.feign.SearchElasticFeignService;
+import com.lyx.goods.feign.StorageFeignService;
 import com.lyx.goods.mapper.AuditMapper;
 import com.lyx.goods.service.AuditService;
 import com.lyx.goods.service.CategoryService;
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +53,12 @@ public class AuditServiceImpl extends ServiceImpl<AuditMapper, Audit> implements
 
     @Autowired
     private SearchElasticFeignService feignService;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    @Autowired
+    private StorageFeignService storageFeignService;
 
     /**
      *  分页查询商品审核列表
