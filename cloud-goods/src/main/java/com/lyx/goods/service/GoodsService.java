@@ -13,6 +13,7 @@ import com.lyx.goods.entity.vo.GoodsReleaseVo;
 import com.lyx.goods.entity.vo.GoodsVO;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * <p>
@@ -37,7 +38,7 @@ public interface GoodsService extends IService<Goods> {
      /**
        * 查询商品详情
        */
-    GoodsVO getGoodsVOById(Long id);
+    GoodsVO getGoodsVOById(Long id) throws ExecutionException, InterruptedException;
      /**
        * 远程查询商品详情
        */
@@ -47,7 +48,7 @@ public interface GoodsService extends IService<Goods> {
     /**
      * 查询商品详情
      */
-    GoodsDTO getGoodsDTOById(Long id);
+    GoodsDTO getGoodsDTOById(Long id) throws ExecutionException, InterruptedException;
 
      /**
        * 更新商品详情
@@ -100,5 +101,9 @@ public interface GoodsService extends IService<Goods> {
     /**
      * 查询商品所有消息
      */
-    void getGoods(GoodsSaveTestReq req);
+//    void getGoods(GoodsSaveTestReq req);
+    /**
+     * 查询用户发布商品id
+     */
+    List<Long> getGoodsById(Long memberId);
 }

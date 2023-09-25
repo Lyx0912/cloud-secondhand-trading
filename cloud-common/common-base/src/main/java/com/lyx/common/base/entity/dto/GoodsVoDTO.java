@@ -1,13 +1,7 @@
-package com.lyx.goods.entity.vo;
+package com.lyx.common.base.entity.dto;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.lyx.goods.entity.Category;
-import com.lyx.goods.entity.GoodsDetails;
-import com.lyx.goods.entity.GoodsImages;
+import com.lyx.common.base.entity.GoodsImages;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -15,16 +9,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * @author 黎勇炫
- * @date 2023年04月05日 14:37
+ * @Author: xhj
+ * @Date: 2023/09/25/14:44
+ * @Description:
  */
 @Data
-public class GoodsVO {
-
-
-     /**
-       * 编号
-       */
+public class GoodsVoDTO {
+    /**
+     * 编号
+     */
     private Long id;
 
     /**
@@ -32,9 +25,9 @@ public class GoodsVO {
      */
     private String name;
 
-     /**
-       * 卖家
-       */
+    /**
+     * 卖家
+     */
     private String seller;
 
     /**
@@ -69,9 +62,9 @@ public class GoodsVO {
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private LocalDateTime updateTime;
 
-     /**
-       * 默认的图片地址
-       */
+    /**
+     * 默认的图片地址
+     */
     private String defaultImg;
 
     /**
@@ -79,39 +72,24 @@ public class GoodsVO {
      */
     private List<GoodsImages> images;
 
-     /**
-       * 商品详情
-       */
-    private GoodsDetails details;
 
     /**
      * 所属分类
      */
     private Long cid;
-    /**
-     * 卖家id
-     */
-    @TableField(value = "seller_id")
-    private Long sellerId;
 
-     /**
-       * 分类名称
-       */
+    /**
+     * 分类名称
+     */
     private String categoryName;
 
-     /**
-       * 商品所属分类路径
-       */
+    /**
+     * 商品所属分类路径
+     */
     private Long[] categoryPath;
 
     /**
      * 商品库存
      */
     private Integer total;
-    /**
-     * 手机号码
-     */
-    private String mobile;
-
-
 }

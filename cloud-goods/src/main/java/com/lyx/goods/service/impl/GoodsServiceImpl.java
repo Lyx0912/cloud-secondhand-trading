@@ -15,6 +15,7 @@ import com.lyx.goods.entity.req.GoodsSaveReq;
 import com.lyx.goods.entity.req.GoodsSaveTestReq;
 import com.lyx.goods.entity.vo.GoodsReleaseVo;
 import com.lyx.goods.entity.vo.GoodsVO;
+import com.lyx.goods.feign.MemberFeignService;
 import com.lyx.goods.feign.SearchElasticFeignService;
 import com.lyx.goods.feign.StorageFeignService;
 import com.lyx.goods.mapper.GoodsMapper;
@@ -33,6 +34,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 /**
@@ -60,7 +64,12 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     @Autowired
     private StorageFeignService storageFeignService;
     @Autowired
+    private MemberFeignService memberFeignService;
+    @Autowired
     private StringRedisTemplate redisTemplate;
+    @Autowired
+    private ThreadPoolExecutor executor;
+
 
     /**
      * 分页查询商品
@@ -149,28 +158,64 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
      * @param id
      */
     @Override
-    public GoodsVO getGoodsVOById(Long id) {
+    public GoodsVO getGoodsVOById(Long id) throws ExecutionException, InterruptedException {
         // 查询VO
-        GoodsVO goodsVO = baseMapper.getGoodsVOById(id);
-        if (goodsVO!=null){
-            // 递归查找父分类
-            goodsVO.setCategoryPath(categoryService.findParentCategory(goodsVO.getCid()));
-            // 设置商品图片
-            List<GoodsImages> images = imagesService.lambdaQuery().eq(GoodsImages::getGoodsId, id).orderByAsc(GoodsImages::getCreateTime).select().list();
-            goodsVO.setImages(images);
-            // 设置商品详情
-            GoodsDetails goodsDetails = detailsService.lambdaQuery().eq(GoodsDetails::getGoodsId, id).one();
-            goodsVO.setDetails(goodsDetails);
-            // 远程调用查询库存
-            Integer residueGoods = storageFeignService.residueGoodsId(id);
-            Integer residue = storageFeignService.residue(id);
-            if (residue!=null){
-                goodsVO.setTotal(residue);
-            }else {
-                goodsVO.setTotal(residueGoods==null?0:residueGoods);
+        GoodsVO vo = new GoodsVO();
+        CompletableFuture<GoodsVO> supplyAsync = CompletableFuture.supplyAsync(() -> {
+            GoodsVO goodsVO = baseMapper.getGoodsVOById(id);
+            return goodsVO;
+        }, executor);
+        CompletableFuture<Void> runAsync5 = supplyAsync.thenRunAsync(() -> {
+            try {
+                if (supplyAsync.get() != null) {
+
+                    // 递归查找父分类
+                    CompletableFuture<Void> runAsync = supplyAsync.thenAcceptAsync((goodsVO) -> {
+                        try {
+                            BeanUtils.copyProperties(supplyAsync.get(), vo);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        }
+                        vo.setCategoryPath(categoryService.findParentCategory(goodsVO.getCid()));
+                    }, executor);
+                    // 设置商品图片
+                    CompletableFuture<Void> runAsync1 = CompletableFuture.runAsync(() -> {
+                        List<GoodsImages> images = imagesService.lambdaQuery().eq(GoodsImages::getGoodsId, id).orderByAsc(GoodsImages::getCreateTime).select().list();
+                        vo.setImages(images);
+                    }, executor);
+                    // 设置商品详情
+                    CompletableFuture<Void> runAsync2 = CompletableFuture.runAsync(() -> {
+                        GoodsDetails goodsDetails = detailsService.lambdaQuery().eq(GoodsDetails::getGoodsId, id).one();
+                        vo.setDetails(goodsDetails);
+                    }, executor);
+                    // 远程调用查询库存
+                    CompletableFuture<Void> runAsync3 = CompletableFuture.runAsync(() -> {
+                        Integer residueGoods = storageFeignService.residueGoodsId(id);
+                        Integer residue = storageFeignService.residue(id);
+                        if (residue != null) {
+                            vo.setTotal(residue);
+                        } else {
+                            vo.setTotal(residueGoods == null ? 0 : residueGoods);
+                        }
+                    }, executor);
+                    // 设置手机号码
+                    CompletableFuture<Void> runAsync4 = CompletableFuture.runAsync(() -> {
+                        Goods goods = getById(id);
+                        String mobile = memberFeignService.getMemberMobile(Long.parseLong(goods.getSellerId() + ""));
+                        vo.setMobile(mobile);
+                    }, executor);
+                    CompletableFuture.allOf(runAsync, runAsync1, runAsync2, runAsync3, runAsync4).get();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
             }
-        }
-        return goodsVO;
+        }, executor);
+        CompletableFuture.allOf(runAsync5,supplyAsync).get();
+        return vo;
     }
 
     /**
@@ -182,11 +227,11 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     public GoodsVO getGoodsVOFeignById(Long id) {
         // 查询VO
         GoodsVO goodsVO = baseMapper.getGoodsVOById(id);
-        // 递归查找父分类
-        goodsVO.setCategoryPath(categoryService.findParentCategory(goodsVO.getCid()));
         // 设置商品图片
         List<GoodsImages> images = imagesService.lambdaQuery().eq(GoodsImages::getGoodsId, id).orderByAsc(GoodsImages::getCreateTime).select().list();
         goodsVO.setImages(images);
+        // 递归查找父分类
+        goodsVO.setCategoryPath(categoryService.findParentCategory(goodsVO.getCid()));
         // 设置商品详情
         GoodsDetails goodsDetails = detailsService.lambdaQuery().eq(GoodsDetails::getGoodsId, id).one();
         goodsVO.setDetails(goodsDetails);
@@ -194,7 +239,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     }
 
     @Override
-    public GoodsDTO getGoodsDTOById(Long id) {
+    public GoodsDTO getGoodsDTOById(Long id) throws ExecutionException, InterruptedException {
         GoodsVO goodsVO = getGoodsVOById(id);
         log.info("goodsVO{}",goodsVO);
         GoodsDTO goodsDTO = new GoodsDTO();
@@ -446,10 +491,11 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     }
 
     /**
-     * 查询商品所有消息
+     * 查询用户发布商品id
      */
     @Override
-    public void getGoods(GoodsSaveTestReq req) {
-
+    public List<Long> getGoodsById(Long memberId) {
+        List<Long> ids = baseMapper.getGoodsId(memberId);
+        return ids;
     }
 }

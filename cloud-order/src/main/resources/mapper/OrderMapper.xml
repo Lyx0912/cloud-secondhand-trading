@@ -37,4 +37,35 @@
                pay_time, delivery_time, finally_time, settled_time, is_payed, close_type, version, order_addr_id
         from oms_order
     </select>
+    <select id="getSalesTotal" resultType="java.math.BigDecimal">
+        select sum(pay_amount) from oms_order where goods_id in
+        <foreach collection="goodsById" item="id" index="index"
+                 open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+    <select id="getPurchases" resultType="java.lang.Integer">
+        select count(*) from oms_order where goods_id in
+        <foreach collection="goodsById" item="id" index="index"
+                 open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+    <select id="getRecordedTotal" resultType="java.math.BigDecimal">
+        select sum(pay_amount) from oms_order where goods_id in
+        <foreach collection="goodsById" item="id" index="index"
+                 open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        and confirm_status = 1
+    </select>
+    <select id="getOrderRecorded" resultType="com.xhj.order.entity.vo.OrderRecordedVo">
+        select order_sn,goods_id,member_username,finally_time,pay_amount from oms_order
+        where goods_id in
+        <foreach collection="goodsById" item="id" index="index"
+                 open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+          and state = 3
+    </select>
 </mapper>

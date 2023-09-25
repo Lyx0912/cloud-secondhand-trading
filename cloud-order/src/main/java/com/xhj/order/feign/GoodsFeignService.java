@@ -51,4 +51,10 @@ public interface GoodsFeignService {
     @GetMapping("/goods/count/{memberId}")
     R count(@PathVariable Long memberId);
 
+    /**
+     * 查询用户发布商品id
+     */
+    @GetMapping("/goods/getGoods/{memberId}")
+    List<Long> getGoodsById(@PathVariable Long memberId);
+
 }

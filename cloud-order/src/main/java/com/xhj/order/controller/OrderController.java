@@ -143,4 +143,31 @@ public class OrderController {
         String status = orderService.payment(req);
         return R.ok(status);
     }
+    /**
+     * 安全信息获取
+     */
+    @GetMapping("/secure/{memberId}")
+    public R secure(@PathVariable Long memberId){
+        OrderSecureVo orderSecureVo = null;
+        try {
+            orderSecureVo = orderService.secure(memberId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return R.failed();
+        }
+        return R.ok(orderSecureVo);
+    }
+    /**
+     * 确认收货
+     */
+    @GetMapping("/confirm/{orderSn}")
+    public R confirm(@PathVariable String orderSn){
+        try {
+            orderService.confirm(orderSn);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return R.failed();
+        }
+        return R.ok();
+    }
 }

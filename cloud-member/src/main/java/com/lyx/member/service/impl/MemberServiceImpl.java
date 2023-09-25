@@ -26,6 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static org.bouncycastle.asn1.x500.style.RFC4519Style.member;
 
 /**
@@ -238,5 +240,24 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         wrapper.eq(Member::getId,memberId);
         int count = count(wrapper);
         return count;
+    }
+    /**
+     * 批量查询
+     */
+    @Override
+    public List<Member> getList(List<Long> ids) {
+        List<Member> members = baseMapper.selectBatchIds(ids);
+        return members;
+    }
+
+    /**
+     * 获取手机号
+     * @param id
+     * @return
+     */
+    @Override
+    public String getMemberMobile(Long id) {
+        Member member = getById(id);
+        return member.getMobile();
     }
 }

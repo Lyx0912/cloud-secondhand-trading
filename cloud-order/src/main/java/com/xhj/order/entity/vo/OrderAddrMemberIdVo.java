@@ -1,5 +1,6 @@
 package com.xhj.order.entity.vo;
 
+import com.lyx.common.base.entity.dto.GoodsVoDTO;
 import com.lyx.common.base.entity.dto.OrderGoodsDTO;
 import lombok.Data;
 
@@ -12,6 +13,6 @@ import java.util.List;
  */
 @Data
 public class OrderAddrMemberIdVo {
-    private OrderGoodsDTO goodsDTO;
+    private GoodsVoDTO goodsDTO;
     private List<OrderInfoVo> orderInfoVos;
 }

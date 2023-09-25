@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -433,5 +434,68 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper,Order> implements 
         //等到所有任务都完成
         CompletableFuture.allOf(supplyAsync,thenAcceptAsync,thenAcceptAsync1).get();
         return orderInfoVo;
+    }
+
+    /**
+     * 安全信息获取
+     */
+    @Override
+    public OrderSecureVo secure(Long memberId) throws ExecutionException, InterruptedException {
+        OrderSecureVo orderSecureVo = new OrderSecureVo();
+        // 查询上传商品信息
+        CompletableFuture<List<Long>> supplyAsync = CompletableFuture.supplyAsync(() -> {
+            List<Long> goodsById = goodsFeignService.getGoodsById(memberId);
+            return goodsById;
+        }, executor);
+        CompletableFuture<Void> thenAcceptAsync = supplyAsync.thenAcceptAsync(goodsById -> {
+            if (goodsById.size()>0){
+
+                // 总销售额
+                CompletableFuture<Void> runAsync = CompletableFuture.runAsync(() -> {
+                    BigDecimal salesTotal = baseMapper.getSalesTotal(goodsById);
+                    orderSecureVo.setSalesTotal(salesTotal);
+                }, executor);
+                // 总购买量
+                CompletableFuture<Void> runAsync1 = CompletableFuture.runAsync(() -> {
+                    int purchasesTotal = baseMapper.getPurchases(goodsById);
+                    orderSecureVo.setPurchasesTotal(new BigDecimal(purchasesTotal));
+                }, executor);
+
+                // 入账总金额
+                CompletableFuture<Void> runAsync2 = CompletableFuture.runAsync(() -> {
+                    BigDecimal recordedTotal = baseMapper.getRecordedTotal(goodsById);
+                    orderSecureVo.setRecordedTotal(recordedTotal);
+                    // 钱包
+                    orderSecureVo.setPurse(recordedTotal);
+                }, executor);
+                // 入账记录
+                CompletableFuture<Void> runAsync3 = CompletableFuture.runAsync(() -> {
+                    List<OrderRecordedVo> orderRecordedVos = baseMapper.getOrderRecorded(goodsById);
+                    orderSecureVo.setRecordedVos(orderRecordedVos);
+                }, executor);
+                try {
+                    CompletableFuture.allOf(runAsync, runAsync1, runAsync2, runAsync3).get();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        CompletableFuture.allOf(supplyAsync,thenAcceptAsync).get();
+        return orderSecureVo;
+    }
+
+    /**
+     * 确认收货
+     * @param orderSn
+     */
+    @Override
+    public void confirm(String orderSn) {
+        LambdaUpdateWrapper<Order> wrapper = Wrappers.lambdaUpdate();
+        wrapper.eq(Order::getOrderSn,orderSn)
+                        .set(Order::getFinallyTime,LocalDateTime.now())
+                                .set(Order::getState,3)
+                                        .set(Order::getConfirmStatus,1)
+                                                .set(Order::getSettledTime,LocalDateTime.now());
+        update(wrapper);
     }
 }

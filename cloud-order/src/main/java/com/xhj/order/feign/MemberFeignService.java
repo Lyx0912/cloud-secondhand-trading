@@ -4,6 +4,10 @@ import com.lyx.common.base.result.R;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 /**
  * @Author: xhj
@@ -21,4 +25,14 @@ public interface MemberFeignService {
      */
     @GetMapping("/member/count/{memberId}")
     R count(@PathVariable Long memberId);
+
+    /**
+     * 批量查询
+     * @param ids
+     * @return
+     */
+    @PostMapping("/getList")
+    R getList(@RequestBody List<Long> ids);
+
+
 }

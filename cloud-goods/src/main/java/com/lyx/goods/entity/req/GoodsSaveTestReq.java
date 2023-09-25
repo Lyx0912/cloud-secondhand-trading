@@ -64,7 +64,7 @@ public class GoodsSaveTestReq {
     /**
      * 商品详情
      */
-    @NotNull (message = "商品详情不能为空")
+//    @NotNull (message = "商品详情不能为空")
     private GoodsDetails details;
 
     /**

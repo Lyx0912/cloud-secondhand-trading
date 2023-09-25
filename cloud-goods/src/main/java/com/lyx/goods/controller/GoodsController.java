@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.sql.Wrapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * <p>
@@ -106,7 +108,7 @@ public class GoodsController {
     }
 
     /**
-     * 重新发布
+     * 用户新发布
      */
     @PutMapping("/memberUpdate")
     public R memberUpdate( @RequestBody GoodsSaveTestReq req){
@@ -118,7 +120,7 @@ public class GoodsController {
        * 查询商品详情
        */
     @GetMapping("/{id}")
-    public R info(@PathVariable Long id){
+    public R info(@PathVariable Long id) throws ExecutionException, InterruptedException {
         GoodsVO byId = goodsService.getGoodsVOById(id);
         return R.ok(byId);
     }
@@ -144,7 +146,7 @@ public class GoodsController {
      * 查询订单商品详情
      */
     @GetMapping("/orderGoods/{id}")
-    public GoodsDTO orderInfo(@PathVariable Long id){
+    public GoodsDTO orderInfo(@PathVariable Long id) throws ExecutionException, InterruptedException {
         GoodsDTO byId = goodsService.getGoodsDTOById(id);
         return byId;
     }
@@ -200,10 +202,19 @@ public class GoodsController {
     /**
      * 查询商品所有消息
      */
-    @GetMapping("/getGoods")
-    public R getGoods( GoodsSaveTestReq req) {
-        goodsService.getGoods(req);
-        return R.ok();
+//    @GetMapping("/getGoods")
+//    public R getGoods( GoodsSaveTestReq req) {
+//        goodsService.getGoods(req);
+//        return R.ok();
+//    }
+
+    /**
+     * 查询用户发布商品id
+     */
+    @GetMapping("/getGoods/{memberId}")
+    public List<Long> getGoodsById(@PathVariable Long memberId) {
+        List<Long> ids = goodsService.getGoodsById(memberId);
+        return ids;
     }
 
 }

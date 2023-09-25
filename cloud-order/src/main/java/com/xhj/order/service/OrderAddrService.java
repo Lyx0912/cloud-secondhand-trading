@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.xhj.order.entity.OrderAddr;
 import com.xhj.order.entity.req.OrderAddrListPageReq;
 import com.xhj.order.entity.req.OrderAddrReq;
+import com.xhj.order.entity.req.OrderDeliveryCompanyReq;
 import com.xhj.order.entity.req.OrderReq;
+import com.xhj.order.entity.vo.OrderAddrMemberIdVo;
 import com.xhj.order.entity.vo.OrderAddrVo;
 import com.xhj.order.entity.vo.OrderInfoVo;
 
@@ -35,6 +37,10 @@ public interface OrderAddrService extends IService<OrderAddr> {
     /**
      * 查询商品所有消息
      */
-    OrderInfoVo getGoods(OrderReq req);
+    OrderAddrMemberIdVo getGoods(OrderReq req) throws ExecutionException, InterruptedException;
+    /**
+     * 填写快递单号
+     */
+    void updateOrder(OrderDeliveryCompanyReq req);
 }
 

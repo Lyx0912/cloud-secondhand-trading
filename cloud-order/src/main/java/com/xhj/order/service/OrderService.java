@@ -61,4 +61,15 @@ public interface OrderService extends IService<Order> {
      * 查询订单详情
      */
     OrderInfoVo getInfo(Long orderId) throws ExecutionException, InterruptedException;
+
+    /**
+     * 安全信息获取
+     */
+    OrderSecureVo secure(Long memberId) throws ExecutionException, InterruptedException;
+
+    /**
+     * 确认收货
+     * @param orderSn
+     */
+    void confirm(String orderSn);
 }

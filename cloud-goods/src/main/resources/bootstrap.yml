@@ -20,3 +20,13 @@ logging:
   level:
     spring.: info
 
+#配置线程池
+xhj:
+  thread:
+    coreSize: 20
+    maxSize: 200
+    keepAliveTime: 10
+
+#mybatis-plus:
+#  configuration:
+#    map-underscore-to-camel-case: true

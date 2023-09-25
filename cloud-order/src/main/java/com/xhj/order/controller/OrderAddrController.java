@@ -5,10 +5,8 @@ import com.lyx.common.base.result.R;
 import com.lyx.common.mp.utils.PageUtils;
 import com.xhj.order.entity.Order;
 import com.xhj.order.entity.OrderAddr;
-import com.xhj.order.entity.req.OrderAddrListPageReq;
-import com.xhj.order.entity.req.OrderAddrReq;
-import com.xhj.order.entity.req.OrderListPageReq;
-import com.xhj.order.entity.req.OrderReq;
+import com.xhj.order.entity.req.*;
+import com.xhj.order.entity.vo.OrderAddrMemberIdVo;
 import com.xhj.order.entity.vo.OrderAddrVo;
 import com.xhj.order.entity.vo.OrderInfoVo;
 import com.xhj.order.entity.vo.OrderVo;
@@ -18,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @Author: xhj
@@ -89,14 +88,33 @@ public class OrderAddrController {
         return R.ok();
     }
 
+    /**
+     * 填写快递单号
+     */
+    @PostMapping("/updateOrder")
+    public R updateOrder(@RequestBody OrderDeliveryCompanyReq req){
+        orderAddrService.updateOrder(req);
+        return R.ok();
+    }
+
 
     /**
      * 查询商品所有消息
      */
     @GetMapping("/getGoods")
-    public R getGoods(OrderReq req) {
-        OrderInfoVo orderInfoVo = orderAddrService.getGoods(req);
-        return R.ok(orderInfoVo);
+    public R getGoods(Long goodsId)  {
+        OrderReq req = new OrderReq();
+        req.setGoodsId(goodsId);
+        OrderAddrMemberIdVo orderAddrMemberIdVo = null;
+        try {
+            orderAddrMemberIdVo = orderAddrService.getGoods(req);
+        } catch (Exception e) {
+            e.printStackTrace();
+            R.failed();
+        }
+        return R.ok(orderAddrMemberIdVo);
     }
+
+
 
 }

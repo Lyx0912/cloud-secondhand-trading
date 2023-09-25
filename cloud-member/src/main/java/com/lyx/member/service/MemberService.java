@@ -9,6 +9,8 @@ import com.lyx.member.entity.req.MemberPassReq;
 import com.lyx.member.entity.vo.MemberLoginVo;
 import com.lyx.member.entity.vo.MemberVO;
 
+import java.util.List;
+
 /**
  * <p>
  *  服务类
@@ -85,4 +87,15 @@ public interface MemberService extends IService<Member> {
      * 查询用户发布商品数量
      */
     Integer countMemberId(Long memberId);
+    /**
+     * 批量查询
+     */
+    List<Member> getList(List<Long> ids);
+
+    /**
+     * 获取手机号
+     * @param id
+     * @return
+     */
+    String getMemberMobile(Long id);
 }

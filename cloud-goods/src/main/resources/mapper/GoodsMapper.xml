@@ -10,7 +10,10 @@
     </select>
 
     <select id="getGoodsVOById" resultType="com.lyx.goods.entity.vo.GoodsVO">
-        SELECT g.id,g.cid,g.name,g.seller,g.description,g.price,g.view_count,g.is_on_sell,g.create_time,g.update_time,g.default_img
+        SELECT g.id,g.cid,g.name,g.seller,g.description,g.price,g.view_count,g.is_on_sell,g.create_time,g.update_time,g.default_img,g.seller_id
         FROM gms_goods g WHERE g.id = #{id}
+    </select>
+    <select id="getGoodsId" resultType="java.lang.Long">
+        select id from gms_goods where seller_id = #{memberId}
     </select>
 </mapper>

@@ -63,6 +63,14 @@ public class MemberController {
     }
 
     /**
+     * 批量查询
+     */
+    @PostMapping("/getList")
+    public R getList(@RequestBody List<Long> ids){
+        List<Member> members = memberService.getList(ids);
+        return R.ok(members);
+    }
+    /**
      * 会员登录
      */
     @PostMapping("/login")
@@ -102,6 +110,14 @@ public class MemberController {
     public R getById(@NotNull(message = "id can not be null!") @PathVariable Long id){
         MemberVO vo = memberService.getMemberVO(id);
         return R.ok(vo);
+    }
+     /**
+       * 获取手机号
+       */
+    @GetMapping("/memberMobile/{id}")
+    public String getMemberMobile(@NotNull(message = "id can not be null!") @PathVariable Long id){
+        String mobile = memberService.getMemberMobile(id);
+        return mobile;
     }
      /**
        * 获取会员详情
