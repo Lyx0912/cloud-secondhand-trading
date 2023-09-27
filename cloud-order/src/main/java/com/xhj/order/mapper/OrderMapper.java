@@ -44,4 +44,11 @@ public interface OrderMapper extends BaseMapper<Order> {
      * @return
      */
     List<OrderRecordedVo> getOrderRecorded(List<Long> goodsById);
+
+    /**
+     * 根据订单号查询
+     * @param orderSn
+     * @return
+     */
+    Order getOneOrder(Long orderSn);
 }

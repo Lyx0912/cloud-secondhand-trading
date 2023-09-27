@@ -37,12 +37,12 @@ public interface OrderService extends IService<Order> {
     /**
      * 取消订单
      */
-    void deleteOrderByOrderId(OrderPaymentReq req);
+    void deleteOrderByOrderId(OrderPaymentReq req) throws ExecutionException, InterruptedException;
 
     /**
      * 付款
      */
-    String payment(OrderPaymentReq req);
+    String payment(OrderPaymentReq req) throws ExecutionException, InterruptedException;
 
     /**
      * rabbitmq取消订单
@@ -72,4 +72,5 @@ public interface OrderService extends IService<Order> {
      * @param orderSn
      */
     void confirm(String orderSn);
+
 }

@@ -48,33 +48,33 @@
 <!--        type="selection"-->
 <!--        width="55"-->
 <!--      />-->
-      <el-table-column align="center" label="商品名称" prop="goodsName" width="150 " :show-overflow-tooltip="true" />
-      <el-table-column label="分类" align="center" prop="categoryName" width="100" :show-overflow-tooltip="true" />
-      <el-table-column align="center" label="卖家" prop="seller" width="100" :show-overflow-tooltip="true" />
-      <el-table-column align="center" label="买家" prop="buyer" width="100" :show-overflow-tooltip="true" />
-      <el-table-column label="订单号" width="150" align="center" prop="orderSn" />
-      <el-table-column label="价格" align="center" prop="payAmount" width="100" :show-overflow-tooltip="true" />
-      <el-table-column label="订单状态" align="center" width="100">
+      <el-table-column align="center" label="商品名称" prop="goodsName" width="160 " :show-overflow-tooltip="true" />
+      <el-table-column align="center" label="卖家" prop="sellerName" width="130" :show-overflow-tooltip="true" />
+      <el-table-column align="center" label="买家" prop="buyerName" width="130" :show-overflow-tooltip="true" />
+      <el-table-column label="订单号" width="190" align="center" prop="orderSn" />
+      <el-table-column label="支付流水号" width="160" align="center" prop="bizPayNo" />
+      <el-table-column label="价格" align="center" prop="payAmount" width="130" :show-overflow-tooltip="true" />
+      <el-table-column label="支付方式" align="center" width="100">
         <template  v-slot="scope">
-          <el-tag type="warning" effect="state" v-if="scope.row.state==1">待发货</el-tag>
-          <el-tag type="primary" effect="state" v-if="scope.row.state==2">已发货</el-tag>
-          <el-tag type="warning" effect="dark" v-if="scope.row.state==0">待付款</el-tag>
-          <el-tag type="danger" effect="dark" v-if="scope.row.state==4">已取消</el-tag>
-          <el-tooltip class="item" effect="dark" :content="scope.row.mark" placement="top">
-            <el-tag type="success" effect="dark" v-if="scope.row.state==3">已完成</el-tag>
-          </el-tooltip>
+          <span type="danger" effect="dark" v-if="scope.row.payId==1">支付宝支付</span>
+          <span type="success" effect="dark" v-if="scope.row.payId==2">微信支付</span>
+          <span type="success" effect="dark" v-if="scope.row.payId==3">花呗支付</span>
         </template>
       </el-table-column>
-      <el-table-column label="付款时间" align="center" prop="payTime" width="164" :show-overflow-tooltip="true" />
-      <el-table-column label="发货时间" align="center" prop="deliveryTime" width="164" :show-overflow-tooltip="true" />
-      <el-table-column label="成交时间" align="center" prop="finallyTime" width="164" :show-overflow-tooltip="true" />
+      <el-table-column label="付款时间" align="center" prop="createTime" width="164" :show-overflow-tooltip="true" />
+      <el-table-column label="支付状态" align="center" width="100">
+        <template  v-slot="scope">
+          <el-tag type="danger" effect="dark" v-if="scope.row.payStatus==0">已取消</el-tag>
+          <el-tag type="success" effect="dark" v-if="scope.row.payStatus==1">已支付</el-tag>
+        </template>
+      </el-table-column>
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize" @pagination="getList" />
 
   </div>
 </template>
 <script>
-import { list } from '@/api/orders/oderlist'
+import { list } from '@/api/orders/pay'
 import pagination from '@/components/Pagination'
 
 export default {
@@ -122,7 +122,7 @@ export default {
         console.log(response.data.total)
         this.listLoading = false
       })
-    },
+    }
     // 删除订单
     // handleDelete(){
     // },

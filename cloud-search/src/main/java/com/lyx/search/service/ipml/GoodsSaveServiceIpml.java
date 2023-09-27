@@ -76,8 +76,9 @@ public class GoodsSaveServiceIpml implements GoodsSaveService {
         if (req.getName()!=null&&req.getName()!=""){
             queryBuilder = QueryBuilders.matchQuery("name", req.getName());
         }
-        if (req.getCid()!=null&&req.getCid()!=0){
-            queryBuilder = QueryBuilders.matchQuery("cid", req.getCid());
+        if (req.getCid()!=null&&req.getCid().size()>0){
+//            queryBuilder = QueryBuilders.matchQuery("cid", req.getCid());
+            queryBuilder = QueryBuilders.termsQuery("cid",req.getCid());
         }
         Iterable<GoodsEs> search = esGoodsRepository.search(queryBuilder);
 
@@ -88,6 +89,7 @@ public class GoodsSaveServiceIpml implements GoodsSaveService {
             BeanUtils.copyProperties(goods,goodsDTO);
             goodsEsList.add(goodsDTO);
         });
+        log.info("goodsEsList{}",goodsEsList);
         return goodsEsList;
     }
 

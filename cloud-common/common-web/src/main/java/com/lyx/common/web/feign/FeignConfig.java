@@ -11,6 +11,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
+import java.util.Optional;
 
 /**
  * @author 黎勇炫
@@ -42,18 +43,21 @@ public class FeignConfig {
         return (template) -> {
             ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder
                     .getRequestAttributes();
-            HttpServletRequest request = attributes.getRequest();
-            //获取请求头
-            Enumeration<String> headerNames = request.getHeaderNames();
-            if (headerNames != null) {
-                while (headerNames.hasMoreElements()) {
-                    String name = headerNames.nextElement();
-                    String values = request.getHeader(name);
-                    //将请求头保存到模板中
-                    template.header(name, values);
-                }
-                template.header("serviceName",applicationName);
-            }
+            Optional.ofNullable(attributes)
+                    .ifPresent(attr -> {
+                        HttpServletRequest req = attr.getRequest();
+                        //获取请求头
+                        Enumeration<String> headerNames = req.getHeaderNames();
+                        if (headerNames != null) {
+                            while (headerNames.hasMoreElements()) {
+                                String name = headerNames.nextElement();
+                                String values = req.getHeader(name);
+                                //将请求头保存到模板中
+                                template.header(name, values);
+                            }
+                            template.header("serviceName",applicationName);
+                        }
+                    });
 
         };
     }

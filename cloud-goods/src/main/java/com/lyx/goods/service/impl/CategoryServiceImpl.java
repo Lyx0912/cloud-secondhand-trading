@@ -1,11 +1,13 @@
 package com.lyx.goods.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lyx.common.base.constant.GlobalConstants;
 import com.lyx.common.base.exception.BizException;
 import com.lyx.common.base.result.ResultCode;
 import com.lyx.goods.entity.Category;
 import com.lyx.goods.entity.req.CategorySaveReq;
+import com.lyx.goods.entity.vo.CategoryVo;
 import com.lyx.goods.mapper.CategoryMapper;
 import com.lyx.goods.service.CategoryService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -142,5 +144,22 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     @CacheEvict(value = "category",allEntries = true)
     public void batchDelete(List<Long> ids) {
         removeByIds(ids);
+    }
+
+    /**
+     * 查询1号分类菜单
+     */
+    @Override
+    public List<CategoryVo> category() {
+        LambdaQueryWrapper<Category> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(Category::getCatLevel,1);
+        List<Category> categories = list(wrapper);
+        List<CategoryVo> categoryVos = categories.stream().map(category -> {
+            CategoryVo categoryVo = new CategoryVo();
+            BeanUtils.copyProperties(category, categoryVo);
+            return categoryVo;
+        }).collect(Collectors.toList());
+
+        return categoryVos;
     }
 }

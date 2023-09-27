@@ -1,5 +1,6 @@
 package com.xhj.order.entity;
 
+import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -28,10 +29,12 @@ public class OrderAddr implements Serializable {
 	/**
 	 * 创建时间
 	 */
+	@DateTimeFormat("yyyy-MM-dd hh:mm:ss")
 	private LocalDateTime createTime;
 	/**
 	 * 更新时间
 	 */
+	@DateTimeFormat("yyyy-MM-dd hh:mm:ss")
 	private LocalDateTime updateTime;
 	/**
 	 * 用户ID

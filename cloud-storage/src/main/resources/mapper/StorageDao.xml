@@ -11,6 +11,9 @@
         <result property="used" column="used"/>
         <result property="residue" column="residue"/>
     </resultMap>
+    <update id="addUpdate">
+        UPDATE demo_storage SET used = used-1,residue = residue+1 WHERE (product_id = #{goodsId})
+    </update>
 
 
 </mapper>

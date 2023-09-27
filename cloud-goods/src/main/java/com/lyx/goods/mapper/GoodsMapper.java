@@ -26,4 +26,17 @@ public interface GoodsMapper extends BaseMapper<Goods> {
     GoodsVO getGoodsVOById(Long id);
 
     List<Long> getGoodsId(Long memberId);
+    /**
+     浏览量加一
+     */
+    void updateViewCount(Long id);
+
+    /**
+     * 查询一级分类下所有三级分类
+     * @param categoryId
+     * @return
+     */
+    List<Long> category(Long categoryId);
+
+    List<GoodsVO> listIds(List<Long> ids);
 }

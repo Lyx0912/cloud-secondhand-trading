@@ -55,6 +55,14 @@ public class GoodsController {
         return R.ok(res);
     }
      /**
+       * 查询商品列表
+       */
+    @GetMapping("/list/{ids}")
+    public List<GoodsVO> listIds(@PathVariable("ids") List<Long> ids){
+        List<GoodsVO> goodsVOs = goodsService.listIds(ids);
+        return goodsVOs;
+    }
+     /**
        * 查询用户发布商品数量
        */
     @GetMapping("/count/{memberId}")

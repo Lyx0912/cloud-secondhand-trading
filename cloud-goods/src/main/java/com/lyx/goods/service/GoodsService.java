@@ -106,4 +106,6 @@ public interface GoodsService extends IService<Goods> {
      * 查询用户发布商品id
      */
     List<Long> getGoodsById(Long memberId);
+
+    List<GoodsVO> listIds(List<Long> ids);
 }

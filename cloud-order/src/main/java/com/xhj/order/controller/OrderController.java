@@ -59,6 +59,7 @@ public class OrderController {
         OrderReleaseAddrsCountVo countVo = orderService.getCount(memberId);
         return R.ok(countVo);
     }
+
     /**
      * 列表
      */
@@ -66,6 +67,15 @@ public class OrderController {
     public R qlist(@RequestBody OrderListPageReq req){
         PageUtils<OrderListVo> pageUtils = orderService.getAdminOrderPageList(req);
         return R.ok(pageUtils);
+    }
+
+    /**
+     * 首页
+     */
+    @PostMapping("/dashboard")
+    public R dashboard(){
+//        PageUtils<OrderListVo> pageUtils = orderService.dashboard();
+        return R.ok();
     }
 
 
@@ -131,7 +141,12 @@ public class OrderController {
      */
     @DeleteMapping("/deleteOrderByOrderId")
     public R deleteOrderByOrderId(OrderPaymentReq req){
-        orderService.deleteOrderByOrderId(req);
+        try {
+            orderService.deleteOrderByOrderId(req);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return R.failed();
+        }
         return R.ok();
     }
 
@@ -140,7 +155,13 @@ public class OrderController {
      */
     @PostMapping("/payment")
     public R payment(@RequestBody OrderPaymentReq req){
-        String status = orderService.payment(req);
+        String status = null;
+        try {
+            status = orderService.payment(req);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return R.ok("0");
+        }
         return R.ok(status);
     }
     /**

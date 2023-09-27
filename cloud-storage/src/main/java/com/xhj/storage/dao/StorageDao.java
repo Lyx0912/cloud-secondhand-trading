@@ -13,5 +13,6 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface StorageDao extends BaseMapper<Storage> {
-	
+
+    void addUpdate(Long goodsId);
 }

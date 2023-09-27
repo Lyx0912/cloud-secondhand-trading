@@ -68,4 +68,10 @@
         </foreach>
           and state = 3
     </select>
+    <select id="getOneOrder" resultType="com.xhj.order.entity.Order">
+        SELECT id,member_id,goods_id,order_sn,create_time,member_username,total_amount,pay_amount,
+               pay_type,source_type,state,delivery_company,delivery_sn,note,confirm_status,delete_status,
+               pay_time,delivery_time,finally_time,settled_time,is_payed,close_type,version,order_addr_id
+        FROM oms_order where order_sn = #{orderSn}
+    </select>
 </mapper>

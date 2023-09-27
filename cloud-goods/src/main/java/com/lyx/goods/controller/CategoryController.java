@@ -7,6 +7,7 @@ import com.lyx.common.base.result.R;
 import com.lyx.common.web.utils.ResponseUtils;
 import com.lyx.goods.entity.Category;
 import com.lyx.goods.entity.req.CategorySaveReq;
+import com.lyx.goods.entity.vo.CategoryVo;
 import com.lyx.goods.service.CategoryService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,14 @@ public class CategoryController {
     @GetMapping("/list")
     public R list(){
         List<Category> res = categoryService.categoryTree();
+        return R.ok(res);
+    }
+     /**
+       * 查询1号分类菜单
+       */
+    @GetMapping()
+    public R category(){
+        List<CategoryVo> res = categoryService.category();
         return R.ok(res);
     }
 

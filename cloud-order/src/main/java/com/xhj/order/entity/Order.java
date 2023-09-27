@@ -1,6 +1,7 @@
 package com.xhj.order.entity;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
+import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
@@ -89,18 +90,22 @@ public class Order implements Serializable {
     /**
      * 付款时间
      */
+    @DateTimeFormat("yyyy-MM-dd hh:mm:ss")
     private LocalDateTime payTime;
     /**
      * 发货时间
      */
+    @DateTimeFormat("yyyy-MM-dd hh:mm:ss")
     private LocalDateTime deliveryTime;
     /**
      * 完成时间
      */
+    @DateTimeFormat("yyyy-MM-dd hh:mm:ss")
     private LocalDateTime finallyTime;
     /**
      * 结算时间
      */
+    @DateTimeFormat("yyyy-MM-dd hh:mm:ss")
     private LocalDateTime settledTime;
     /**
      * 是否已支付，1.已支付0.未支付

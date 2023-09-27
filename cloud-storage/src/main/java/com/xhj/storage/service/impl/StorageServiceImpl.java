@@ -75,7 +75,7 @@ public class StorageServiceImpl extends ServiceImpl<StorageDao, Storage> impleme
         Storage storage = this.getOne(lambdaQuery);
         LambdaUpdateWrapper<Storage> wrapper = Wrappers.lambdaUpdate();
         wrapper.set(true,Storage::getResidue,storage.getResidue()==null?0:storage.getResidue()-1)
-                .set(true,Storage::getUsed,(storage.getUsed()==null?0:storage.getUsed())+1)
+                .set(true,Storage::getUsed,(storage.getUsed()==null?1:storage.getUsed())+1)
                 .eq(true,Storage::getId,goodsId);
         this.update(wrapper);
     }
@@ -89,11 +89,11 @@ public class StorageServiceImpl extends ServiceImpl<StorageDao, Storage> impleme
         LambdaQueryWrapper<Storage> lambdaQuery = Wrappers.lambdaQuery();
         lambdaQuery.eq(true,Storage::getProductId,goodsId);
         Storage storage = this.getOne(lambdaQuery);
-        LambdaUpdateWrapper<Storage> wrapper = Wrappers.lambdaUpdate();
-        wrapper.set(true,Storage::getResidue,storage.getResidue()==null?0:storage.getResidue()+1)
-                .set(true,Storage::getUsed,(storage.getUsed()==null?0:storage.getUsed())-1)
-                .eq(true,Storage::getId,goodsId);
-        this.update(wrapper);
+//        LambdaUpdateWrapper<Storage> wrapper = Wrappers.lambdaUpdate();
+//        wrapper.set(true,Storage::getResidue,storage.getResidue()==null?1:storage.getResidue()+1)
+//                .set(true,Storage::getUsed,(storage.getUsed()==null?0:storage.getUsed())-1)
+//                .eq(true,Storage::getId,goodsId);
+        baseMapper.addUpdate(goodsId);
     }
 
 }

@@ -49,7 +49,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-
+import { list } from '@/api/dashboard/index'
 export default {
   name: 'Dashboard',
   computed: {
@@ -61,7 +61,15 @@ export default {
   mounted() {
     this.drawChar()
   },
+  created() {
+    this.indexList()
+  },
   methods: {
+    indexList(){
+      list().then(res => {
+        console.log(res)
+      })
+    },
     drawChar() {
       var chartLine = this.$echarts.init(document.getElementById('char-line'))
       var charBar = this.$echarts.init(document.getElementById('char-bar'))

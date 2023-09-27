@@ -57,4 +57,10 @@ public interface GoodsFeignService {
     @GetMapping("/goods/getGoods/{memberId}")
     List<Long> getGoodsById(@PathVariable Long memberId);
 
+    /**
+     * 查询商品列表
+     */
+    @GetMapping("/goods/list/{ids}")
+    List<GoodsDTO> listIds(@PathVariable("ids") List<Long> ids);
+
 }

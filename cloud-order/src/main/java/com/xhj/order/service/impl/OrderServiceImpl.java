@@ -4,9 +4,7 @@ import com.alibaba.cloud.commons.lang.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -16,6 +14,7 @@ import com.lyx.common.base.result.R;
 import com.lyx.common.mp.utils.PageUtils;
 import com.xhj.order.entity.Order;
 import com.xhj.order.entity.OrderAddr;
+import com.xhj.order.entity.Pay;
 import com.xhj.order.entity.req.OrderAddrMemberReq;
 import com.xhj.order.entity.req.OrderListPageReq;
 import com.xhj.order.entity.req.OrderPaymentReq;
@@ -27,21 +26,19 @@ import com.xhj.order.feign.StorageFeignService;
 import com.xhj.order.mapper.OrderMapper;
 import com.xhj.order.service.OrderAddrService;
 import com.xhj.order.service.OrderService;
+import com.xhj.order.service.PayService;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RSemaphore;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -69,6 +66,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper,Order> implements 
 
     @Autowired
     private GoodsFeignService goodsFeignService;
+    @Autowired
+    private PayService payService;
 
     @Autowired
     private StringRedisTemplate redisTemplate;
@@ -100,8 +99,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper,Order> implements 
         List<GoodsDTO> goodsDTOs = goodsFeignService.goodsPageList(reqDTO);
         // 查询的是商品名称和卖家
         AtomicInteger i = new AtomicInteger();
-        AtomicInteger a = new AtomicInteger();
-        AtomicInteger b = new AtomicInteger();
         if (req.getName()!=null||req.getSeller()!=null){
             List<OrderListVo> orderListVoList = new ArrayList<>();
             // 查询条件
@@ -127,11 +124,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper,Order> implements 
                         orderListVo.setGoodsName(goodsDTO.getName());
                         if (req.getPageNo()==1&&i.get()<=req.getPageSize()){
                             orderListVoList.add(orderListVo);
-                            a.getAndAdd(1);
                         }
                         if (req.getPageNo()!=1&&i.get()>req.getPageSize()*(req.getPageNo()-1)){
                             orderListVoList.add(orderListVo);
-                            b.getAndAdd(1);
                         }
                     }
                 }
@@ -255,14 +250,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper,Order> implements 
                     order.setOrderAddrId(orderAddr.getId());
                     order.setPayAmount(req.getPrice());
                     order.setTotalAmount(req.getPrice());
-//                    order.setCreateTime(LocalDateTime.now());
                     order.setDeleteStatus(0);
                     order.setState(0);
                     order.setSourceType(0);
                     order.setConfirmStatus(0);
                     order.setIsPayed(0);
                     this.baseMapper.insert(order);
-                    orderAddrVo.setMemberAddrDTO(null);
+                    MemberAddrDTO memberAddrDTO = new MemberAddrDTO();
+                    memberAddrDTO.setMemberId(req.getMemberId());
+                    orderAddrVo.setMemberAddrDTO(memberAddrDTO);
 
                     // 把商品id和地址id保存到redis
                     // 保存订单号到redis 30分钟
@@ -322,7 +318,20 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper,Order> implements 
             if (order.getState()==0||order.getState()==null){
                 deleteOrder(order,req);
             }
+            // 如果已支付则修改支付状态
+            if (order.getState()==1){
+                payService.updateState(order.getOrderSn(),0);
+            }
+            if (order.getState()!=4){
+                storageFeignService.addStorageTotal(order.getGoodsId());
+            }
         }
+        // 删除redis里面的订单信息
+        String name = "order:"+req.getMemberId()+":"+req.getOrderSn();
+        redisTemplate.opsForValue().getOperations().delete(name);
+        // 加库存 获取信号量
+        RSemaphore semaphore = redissonClient.getSemaphore("goods:"+order.getGoodsId());
+        semaphore.release();
     }
 
     @Override
@@ -349,17 +358,35 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper,Order> implements 
      */
     @Transactional
     @Override
-    public void deleteOrderByOrderId(OrderPaymentReq req) {
+    public void deleteOrderByOrderId(OrderPaymentReq req) throws ExecutionException, InterruptedException {
         // 先判断是否已经付款或取消
-        LambdaQueryWrapper<Order> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(Order::getOrderSn,req.getOrderSn());
-        Order order = this.getOne(queryWrapper);
-        if (order!=null){
-            // 如果是待付款状态则取消
-            if (order.getState()==0||order.getState()==1){
-                deleteOrder(order,req);
+        CompletableFuture<Void> runAsync = CompletableFuture.runAsync(() -> {
+            LambdaQueryWrapper<Order> queryWrapper = Wrappers.lambdaQuery();
+            queryWrapper.eq(Order::getOrderSn, req.getOrderSn());
+            Order order = this.getOne(queryWrapper);
+            if (order != null) {
+                // 如果是待付款状态则取消
+                if (order.getState() == 0 || order.getState() == 1) {
+                    deleteOrder(order, req);
+                }
+                // 如果已支付则修改支付状态
+                if (order.getState()==1){
+                    payService.updateState(order.getOrderSn(),0);
+                }
+                if (order.getState()!=4){
+                    storageFeignService.addStorageTotal(order.getGoodsId());
+                }
             }
-        }
+        }, executor);
+
+        // 删除redis里面的订单信息
+        CompletableFuture<Void> runAsync1 = CompletableFuture.runAsync(() -> {
+            String name = "order:" + req.getMemberId() + ":" + req.getOrderSn();
+            redisTemplate.opsForValue().getOperations().delete(name);
+            RSemaphore semaphore = redissonClient.getSemaphore("goods:"+req.getGoodsId());
+            semaphore.release();
+        }, executor);
+        CompletableFuture.allOf(runAsync,runAsync1).get();
     }
     public void deleteOrder(Order order,OrderPaymentReq req){
         RSemaphore semaphore = redissonClient.getSemaphore("goods:"+req.getGoodsId());
@@ -384,28 +411,59 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper,Order> implements 
      * 付款
      * @param req
      */
+    @Transactional
     @Override
-    public String payment(OrderPaymentReq req) {
+    public String payment(OrderPaymentReq req) throws ExecutionException, InterruptedException {
         // 先判断是否存在
-        OrderVo orderSn = getOrderSn(req.getOrderSn(), req.getMemberId());
-        if (orderSn==null){
-            return "0";
-        }
-        LambdaUpdateWrapper<Order> wrapper = Wrappers.lambdaUpdate();
-        wrapper.eq(Order::getOrderSn,req.getOrderSn())
-                .set(Order::getPayType,req.getPayType())
-                .set(Order::getState,1)
-                .set(Order::getPayTime,LocalDateTime.now())
-                .set(Order::getIsPayed,1);
-        this.update(wrapper);
-        // 删除redis里面的订单信息
-        String name = "order:"+req.getMemberId()+":"+req.getOrderSn();
-        Boolean aBoolean = redisTemplate.opsForValue().getOperations().delete(name);
-        if (!aBoolean){
-            return "0";
-        }
-        return "1";
+        CompletableFuture<OrderVo> supplyAsync = CompletableFuture.supplyAsync(() -> {
+            OrderVo orderSn = getOrderSn(req.getOrderSn(), req.getMemberId());
+            return orderSn;
+        }, executor);
+        CompletableFuture<Void> thenAcceptAsync = supplyAsync.thenAcceptAsync((orderSn) -> {
+            if (orderSn != null) {
+                // 修改订单状态
+                CompletableFuture<Void> runAsync = CompletableFuture.runAsync(() -> {
+                    LambdaUpdateWrapper<Order> wrapper = Wrappers.lambdaUpdate();
+                    wrapper.eq(Order::getOrderSn, req.getOrderSn())
+                            .set(Order::getPayType, req.getPayType())
+                            .set(Order::getState, 1)
+                            .set(Order::getPayTime, LocalDateTime.now())
+                            .set(Order::getIsPayed, 1);
+                    this.update(wrapper);
+                }, executor);
+                // 插入支付记录
+                CompletableFuture<Void> runAsync1 = CompletableFuture.runAsync(() -> {
+                    Order order = baseMapper.getOneOrder(req.getOrderSn());
+                    // 查询商品名称 查询卖家名称
+                    GoodsDTO goodsDTO = goodsFeignService.orderInfo(order.getGoodsId());
+                    Pay pay = new Pay();
+                    // 设置买家名称 商品名称 卖家名称
+                    pay.setBuyerName(order.getMemberUsername());
+                    pay.setSellerName(goodsDTO.getSeller());
+                    pay.setGoodsName(goodsDTO.getName());
+                    BeanUtils.copyProperties(order, pay);
+                    pay.setCreateTime(LocalDateTime.now());
+                    pay.setOrderId(order.getId());
+                    pay.setPayAmount(order.getPayAmount().toString());
+                    payService.savePay(pay);
+                }, executor);
+                // 删除redis里面的订单信息
+                CompletableFuture<Void> runAsync2 = CompletableFuture.runAsync(() -> {
+                    String name = "order:" + req.getMemberId() + ":" + req.getOrderSn();
+                    Boolean aBoolean = redisTemplate.opsForValue().getOperations().delete(name);
+                }, executor);
+//                try {
+//                    CompletableFuture.allOf(runAsync, runAsync1, runAsync2).get();
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+            }
+        }, executor);
+        CompletableFuture.allOf(supplyAsync,thenAcceptAsync).get();
+        return supplyAsync.get()!=null?"1":"0";
     }
+
+
 
     /**
      * 查询订单详情
@@ -471,6 +529,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper,Order> implements 
                 // 入账记录
                 CompletableFuture<Void> runAsync3 = CompletableFuture.runAsync(() -> {
                     List<OrderRecordedVo> orderRecordedVos = baseMapper.getOrderRecorded(goodsById);
+                    List<GoodsDTO> goodsDTO = goodsFeignService.listIds(goodsById);
+                    // 查询对应的商品信息
+                    orderRecordedVos.stream().map(orderRecordedVo -> {
+                        for (GoodsDTO dto : goodsDTO) {
+                            if (dto.getId().equals(Long.parseLong(orderRecordedVo.getGoodsId()))){
+                                orderRecordedVo.setGoodsName(dto.getName());
+                            }
+                        }
+                        return orderRecordedVo;
+                    }).collect(Collectors.toList());
                     orderSecureVo.setRecordedVos(orderRecordedVos);
                 }, executor);
                 try {

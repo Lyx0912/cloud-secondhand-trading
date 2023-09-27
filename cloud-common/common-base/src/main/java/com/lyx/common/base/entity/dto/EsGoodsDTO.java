@@ -3,6 +3,7 @@ package com.lyx.common.base.entity.dto;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @Author: xhj
@@ -14,7 +15,7 @@ public class EsGoodsDTO {
     /**
      * 所属分类
      */
-    private Long cid;
+    private List<Long> cid;
 
     /**
      * 价格

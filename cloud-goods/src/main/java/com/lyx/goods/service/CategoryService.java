@@ -3,6 +3,7 @@ package com.lyx.goods.service;
 import com.lyx.goods.entity.Category;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lyx.goods.entity.req.CategorySaveReq;
+import com.lyx.goods.entity.vo.CategoryVo;
 
 import java.util.List;
 
@@ -35,4 +36,9 @@ public interface CategoryService extends IService<Category> {
 
     Long[] findParentCategory(Long cid);
 
+    /**
+     * 查询1号分类菜单
+     * @return
+     */
+    List<CategoryVo> category();
 }

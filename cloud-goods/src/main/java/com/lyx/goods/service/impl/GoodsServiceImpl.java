@@ -178,6 +178,8 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
                         } catch (ExecutionException e) {
                             e.printStackTrace();
                         }
+                        // 浏览量加一
+                        baseMapper.updateViewCount(goodsVO.getId());
                         vo.setCategoryPath(categoryService.findParentCategory(goodsVO.getCid()));
                     }, executor);
                     // 设置商品图片
@@ -381,9 +383,14 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     @Override
     public PageUtils<GoodsVO> listEsPage(GoodsListPageReq req) {
         Page<GoodsVO> page = new Page<>(req.getPageNo(),req.getPageSize());
+        List<Long> categories = null;
+        if (req.getCategory_id()!=0){
+            // 查询一级分类下所有三级分类
+            categories = baseMapper.category(req.getCategory_id());
+        }
         // 远程调用es查询商品
         EsGoodsDTO esGoodsDTO = new EsGoodsDTO();
-        esGoodsDTO.setCid(req.getCategory_id());
+        esGoodsDTO.setCid(categories);
         esGoodsDTO.setName(req.getName());
         List<GoodsDTO> goodsDTOS = searchElasticFeignService.goodsEsList(esGoodsDTO);
         List<GoodsVO> collect = null;
@@ -392,13 +399,6 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
                 GoodsVO goodsVO = new GoodsVO();
                 BeanUtils.copyProperties(goodsDTO, goodsVO);
                 return goodsVO;
-            }).filter(item-> {
-                if (req.getCategory_id()!=null){
-                    if (req.getCategory_id()!=0){
-                        return item.getCid()==req.getCategory_id();
-                    }
-                }
-                return true;
             }).collect(Collectors.toList());
         }
         page.setRecords(collect);
@@ -498,4 +498,12 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
         List<Long> ids = baseMapper.getGoodsId(memberId);
         return ids;
     }
+
+    @Override
+    public List<GoodsVO> listIds(List<Long> ids) {
+        List<GoodsVO> goodsVO = baseMapper.listIds(ids);
+        return goodsVO;
+    }
+
+
 }
